@@ -2,6 +2,14 @@ const express = require("express");
 
 const app = express();
 
+app.use(
+  cors({
+    origin: ["https://vercel.com/praneeths-projects-c8a17623/prod-skillnaav"],
+    methods: ["POST", "GET"],
+    credentials: true,
+  })
+);
+
 require("dotenv").config();
 
 const skillnaavRoute = require("./routes/skillnaavRoute");
@@ -12,7 +20,7 @@ app.use("/api/skillnaav", skillnaavRoute);
 const port = process.env.PORT || 5000;
 const path = require("path");
 
-if (process.env.NODE_ENV ===  "production") {
+if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "client/build")));
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "client/build/index.html"));
