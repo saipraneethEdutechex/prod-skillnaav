@@ -4,7 +4,9 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://vercel.com/praneeths-projects-c8a17623/prod-skillnaav"],
+    origin: [
+      "https://vercel.com/praneeths-projects-c8a17623/prod-skillnaav/H7v7S1jJWDp6pouL6R6aqa1m3quL",
+    ],
     methods: ["POST", "GET"],
     credentials: true,
   })
