@@ -5,7 +5,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://prod-skillnaav-ipac.vercel.app"],
+    origin: ["https://prod-skillnaav-lsej.vercel.app"],
     methods: ["POST", "GET"],
     credentials: true,
   })
