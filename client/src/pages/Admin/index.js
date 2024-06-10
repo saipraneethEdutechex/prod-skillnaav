@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense, useMemo } from "react";
 import { useSelector } from "react-redux";
 import {
   FaHome,
@@ -10,27 +10,31 @@ import {
   FaEnvelope,
 } from "react-icons/fa";
 import SkillnaavLogo from "../../assets/skillnaav_logo-250w.png";
-import AdminDiscover from "./AdminDiscover";
-import AdminVision from "./AdminVision";
-import AdminFeatures from "./AdminFeatures";
-import AdminTeam from "./AdminTeam";
-import AdminPricing from "./AdminPricing";
-import AdminFaqs from "./AdminFaqs";
-import AdminContact from "./AdminContact";
+
+const AdminDiscover = lazy(() => import("./AdminDiscover"));
+const AdminVision = lazy(() => import("./AdminVision"));
+const AdminFeatures = lazy(() => import("./AdminFeatures"));
+const AdminTeam = lazy(() => import("./AdminTeam"));
+const AdminPricing = lazy(() => import("./AdminPricing"));
+const AdminFaqs = lazy(() => import("./AdminFaqs"));
+const AdminContact = lazy(() => import("./AdminContact"));
 
 const Admin = () => {
   const { skillnaavData } = useSelector((state) => state.root);
   const [selectedTab, setSelectedTab] = useState("Discover");
 
-  const navItems = [
-    { label: "Discover", component: <AdminDiscover />, icon: <FaHome /> },
-    { label: "Vision", component: <AdminVision />, icon: <FaEye /> },
-    { label: "Features", component: <AdminFeatures />, icon: <FaCog /> },
-    { label: "Team", component: <AdminTeam />, icon: <FaUsers /> },
-    { label: "Pricing", component: <AdminPricing />, icon: <FaDollarSign /> },
-    { label: "FAQs", component: <AdminFaqs />, icon: <FaQuestionCircle /> },
-    { label: "Contact", component: <AdminContact />, icon: <FaEnvelope /> },
-  ];
+  const navItems = useMemo(
+    () => [
+      { label: "Discover", component: <AdminDiscover />, icon: <FaHome /> },
+      { label: "Vision", component: <AdminVision />, icon: <FaEye /> },
+      { label: "Features", component: <AdminFeatures />, icon: <FaCog /> },
+      { label: "Team", component: <AdminTeam />, icon: <FaUsers /> },
+      { label: "Pricing", component: <AdminPricing />, icon: <FaDollarSign /> },
+      { label: "FAQs", component: <AdminFaqs />, icon: <FaQuestionCircle /> },
+      { label: "Contact", component: <AdminContact />, icon: <FaEnvelope /> },
+    ],
+    []
+  );
 
   const handleTabSelect = (label) => {
     setSelectedTab(label);
@@ -51,9 +55,7 @@ const Admin = () => {
             alt="Skillnaav Logo"
             className="w-32 h-20 mr-auto"
           />
-          <span className="text-white text-2xl font-medium">
-            Admin Panel
-          </span>
+          <span className="text-white text-2xl font-medium">Admin Panel</span>
           <span
             onClick={() => {
               localStorage.removeItem("token");
@@ -85,11 +87,19 @@ const Admin = () => {
         </aside>
 
         <main className="flex-1 p-10 bg-gray-100 shadow-inner">
-          {navItems.map((item) =>
-            item.label === selectedTab ? (
-              <div key={item.label}>{item.component}</div>
-            ) : null
-          )}
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center h-screen">
+                Loading...
+              </div>
+            }
+          >
+            {navItems.map((item) =>
+              item.label === selectedTab ? (
+                <div key={item.label}>{item.component}</div>
+              ) : null
+            )}
+          </Suspense>
         </main>
       </div>
     </div>
