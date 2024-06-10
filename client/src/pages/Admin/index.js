@@ -52,7 +52,7 @@ const Admin = () => {
             className="w-32 h-20 mr-auto"
           />
           <span className="text-white text-2xl font-medium">
-            Admin Dashboard
+            Admin Pnael
           </span>
           <span
             onClick={() => {
