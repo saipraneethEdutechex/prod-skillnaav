@@ -20,27 +20,30 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex flex-wrap items-center justify-between px-5 py-4 lg:container lg:mx-auto lg:px-20">
+    <nav className="relative flex items-center justify-between px-5 py-4 lg:container lg:mx-auto lg:px-20">
       <div className="flex items-center gap-x-5">
-        <a href="/">
-          <div>
-            <img className="w-[150px]" src={SkillNaavLogo} alt="logo" />
-          </div>
+        <a href="/" aria-label="Home">
+          <img className="w-[150px]" src={SkillNaavLogo} alt="SkillNaav Logo" />
         </a>
         <div className="hidden lg:flex gap-x-8 ml-8">
           {navLinks.map((item, index) => (
-            <a key={index} href={item.href}>
-              <div className="text-[#36485C] font-medium">{item.name}</div>
+            <a
+              key={index}
+              href={item.href}
+              className="text-[#36485C] font-medium hover:text-[#451E5D] transition duration-300"
+            >
+              {item.name}
             </a>
           ))}
         </div>
       </div>
 
-      <div className="flex gap-x-5 items-center">
-        <a href="#contacts">
-          <div className="hidden lg:block font-medium text-white bg-[#451E5D] hover:bg-[#2c3b4e] px-4 py-2 rounded-md transition">
-            Request A Call Back
-          </div>
+      <div className="flex items-center gap-x-5">
+        <a
+          href="#contacts"
+          className="hidden lg:block font-medium text-white bg-[#451E5D] hover:bg-[#2c3b4e] px-4 py-2 rounded-md transition duration-300"
+        >
+          Request A Call Back
         </a>
         <div className="lg:hidden" onClick={toggleMenu}>
           <img
@@ -48,36 +51,43 @@ const Navbar = () => {
             alt="Menu Button"
             width={30}
             height={30}
+            className="cursor-pointer transition-transform duration-300 transform hover:scale-110"
           />
         </div>
       </div>
 
       {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="absolute top-0 left-0 w-full h-screen bg-white flex flex-col items-center justify-center gap-5 z-50">
-          <div className="flex justify-end w-full p-4">
-            <img
-              src={Close}
-              alt="Close Menu"
-              onClick={toggleMenu}
-              width={30}
-              height={30}
-            />
-          </div>
-          {navLinks.map((item, index) => (
-            <a key={index} href={item.href} onClick={toggleMenu}>
-              <div className="text-[#36485C] font-medium text-2xl">
-                {item.name}
-              </div>
-            </a>
-          ))}
-          <a href="#contacts" onClick={toggleMenu}>
-            <div className="font-medium text-white bg-[#451E5D] hover:bg-[#2c3b4e] px-6 py-3 rounded-md transition text-2xl">
-              Request A Call Back
-            </div>
-          </a>
+      <div
+        className={`${
+          menuOpen ? "translate-x-0" : "-translate-x-full"
+        } fixed top-0 left-0 w-full h-screen bg-white flex flex-col items-center justify-center gap-5 z-50 transition-transform duration-300 ease-in-out`}
+      >
+        <div className="flex justify-end w-full p-4">
+          <img
+            src={Close}
+            alt="Close Menu"
+            onClick={toggleMenu}
+            width={30}
+            height={30}
+            className="cursor-pointer transition-transform duration-300 transform hover:scale-110"
+          />
         </div>
-      )}
+        {navLinks.map((item, index) => (
+          <a
+            key={index}
+            href={item.href}
+            onClick={toggleMenu}
+            className="text-[#36485C] font-medium text-2xl transition duration-300 transform hover:scale-105"
+          >
+            {item.name}
+          </a>
+        ))}
+        <a href="#contacts" onClick={toggleMenu}>
+          <div className="font-medium text-white bg-[#451E5D] hover:bg-[#2c3b4e] px-6 py-3 rounded-md transition duration-300 text-2xl">
+            Request A Call Back
+          </div>
+        </a>
+      </div>
     </nav>
   );
 };
