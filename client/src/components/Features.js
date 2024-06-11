@@ -13,11 +13,7 @@ const buttonImages = {
 };
 
 // Define placeholder image sources
-const imageSources = [
-  "../assets/Feature3Img.png",
-  "../assets/Feature4Img.png",
- 
-];
+const imageSources = ["../assets/Feature3Img.png", "../assets/Feature4Img.png"];
 
 const Features = () => {
   const { skillnaavData } = useSelector((state) => state.root);
@@ -69,7 +65,7 @@ const Features = () => {
           <div className="relative w-full sm:w-1/2 lg:px-12">
             <img
               src={feature.imgSrc}
-              alt={`Feature ${index + 1} Image`}
+              alt={`Feature ${index + 1}`}
               className="w-full object-cover"
             />
           </div>

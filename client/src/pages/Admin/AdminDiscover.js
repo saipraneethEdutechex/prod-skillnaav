@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Form, Input, Button, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -15,7 +15,7 @@ import { motion } from "framer-motion";
 function importAll(r) {
   let images = {};
   r.keys().map((item) => {
-    images[item.replace("./", "")] = r(item);
+    return (images[item.replace("./", "")] = r(item));
   });
   return images;
 }
@@ -32,18 +32,18 @@ function AdminDiscover() {
     (state) => state.root
   );
 
-  useEffect(() => {
-    getImage();
-  }, []);
-
-  const getImage = async () => {
+  const getImage = useCallback(async () => {
     try {
       const result = await axios.get("/get-image");
       dispatch(SetImages(result.data.data));
     } catch (error) {
       console.error("Error fetching images:", error);
     }
-  };
+  }, [dispatch]);
+
+  useEffect(() => {
+    getImage();
+  }, [getImage]);
 
   const handleDeleteImage = async (imageId) => {
     try {

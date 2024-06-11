@@ -5,10 +5,12 @@ import axios from "axios";
 import { SetSkillNaavData, SetImages } from "../redux/rootSlice";
 import BlueArrow from "../assets/blue-button.svg";
 import Gradient from "../assets/Gradient.svg";
+
 function importAll(r) {
   let images = {};
   r.keys().map((item) => {
     images[item.replace("./", "")] = r(item);
+    return null; // Adding return statement to fix the warning
   });
   return images;
 }
@@ -20,11 +22,6 @@ const allImages = importAll(
 function Discover() {
   const dispatch = useDispatch();
   const { skillnaavData, images } = useSelector((state) => state.root);
-
-  useEffect(() => {
-    getData();
-    getImage();
-  }, []);
 
   const getData = async () => {
     try {
@@ -43,6 +40,14 @@ function Discover() {
       console.error("Error fetching images:", error);
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await getData();
+      await getImage();
+    };
+    fetchData(); // Calling fetchData function
+  }, [dispatch]); // Added dispatch as a dependency
 
   if (!skillnaavData) {
     return <div>Loading...</div>;
@@ -67,7 +72,7 @@ function Discover() {
           <button className="text-[#4328EB] font-medium flex items-center justify-center gap-x-2 w-1/2 px-8 py-4 rounded-[4px] lg:w-fit">
             {skillnaavData.discover[0]?.viewpricebtn || "View Pricing"}
             <span>
-              <img src={BlueArrow} alt="Learn More" />
+              <img src={BlueArrow} alt="Blue Arrow" />
             </span>
           </button>
         </div>
@@ -82,7 +87,7 @@ function Discover() {
         <div className="absolute bottom-5 flex w-full flex-col items-center">
           <img
             src={require("../assets/app_mockup.png")}
-            alt="hero image"
+            alt="App Mockup"
             className="mb-10 md:w-[60%] md:mt-20 sm:mb-20 px-3 sm:px-20 sm:mx-12 lg:w-[60%] xl:w-[65%]"
           />
           <div className="flex w-full flex-col items-center lg:container lg:flex-row lg:justify-between lg:px-20">
