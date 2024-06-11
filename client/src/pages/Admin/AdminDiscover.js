@@ -43,7 +43,7 @@ function AdminDiscover() {
 
   useEffect(() => {
     getImage();
-  }, [getImage]);
+  }, []);
 
   const handleDeleteImage = async (imageId) => {
     try {

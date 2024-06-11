@@ -41,13 +41,13 @@ function Discover() {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await getData();
-      await getImage();
-    };
-    fetchData(); // Calling fetchData function
-  }, [dispatch]); // Added dispatch as a dependency
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     await getData();
+  //     await getImage();
+  //   };
+  //   fetchData(); // Calling fetchData function
+  // }, [dispatch]); // Added dispatch as a dependency
 
   if (!skillnaavData) {
     return <div>Loading...</div>;
