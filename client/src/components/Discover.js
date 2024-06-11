@@ -95,15 +95,16 @@ function Discover() {
               Trusted by these companies
             </p>
             <div className="grid grid-cols-3 items-center justify-center justify-items-center px-[20px] align-middle lg:grid-cols-5">
-              {images.map((image, index) => (
-                <motion.img
-                  key={index}
-                  whileHover={{ scale: 1.1 }}
-                  src={allImages[image.image]}
-                  alt={`Company ${index + 1}`}
-                  className="h-16 w-auto"
-                />
-              ))}
+              {Array.isArray(images) &&
+                images.map((image, index) => (
+                  <motion.img
+                    key={index}
+                    whileHover={{ scale: 1.1 }}
+                    src={allImages[image.image]}
+                    alt={`Company ${index + 1}`}
+                    className="h-16 w-auto"
+                  />
+                ))}
             </div>
           </div>
         </div>
