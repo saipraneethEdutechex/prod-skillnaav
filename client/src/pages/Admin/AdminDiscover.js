@@ -175,19 +175,20 @@ function AdminDiscover() {
           Upload Image
         </Button>
         <div className="grid grid-cols-3 items-center justify-center justify-items-center px-[20px] align-middle lg:grid-cols-5">
-          {Object.values(allImages).map((image, index) => (
-            <div key={index}>
-              <motion.img
-                height={100}
-                width={100}
-                src={images[image.image]}
-                alt={`Company ${index + 1}`}
-              />
-              <button onClick={() => handleDeleteImage(image._id)}>
-                Delete
-              </button>
-            </div>
-          ))}
+          {allImages &&
+            Object.values(allImages).map((image, index) => (
+              <div key={index}>
+                <motion.img
+                  height={100}
+                  width={100}
+                  src={images[image.image]}
+                  alt={`Company ${index + 1}`}
+                />
+                <button onClick={() => handleDeleteImage(image._id)}>
+                  Delete
+                </button>
+              </div>
+            ))}
         </div>
         <div className="flex justify-end">
           <Button
