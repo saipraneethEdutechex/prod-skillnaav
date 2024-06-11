@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Button, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { ShowLoading, HideLoading } from "../../redux/rootSlice";
+import {
+  ShowLoading,
+  HideLoading,
+  AddImage,
+  RemoveImage,
+  SetImages,
+} from "../../redux/rootSlice";
 import axios from "axios";
 import { motion } from "framer-motion";
 
 // Import all images
 function importAll(r) {
   let images = {};
-  r.keys().map((item, index) => {
+  r.keys().map((item) => {
     images[item.replace("./", "")] = r(item);
   });
   return images;
@@ -19,11 +25,12 @@ const images = importAll(
 );
 
 function AdminDiscover() {
-  const [allImages, setAllImages] = useState(null);
   const [file, setFile] = useState();
   const [previewUrl, setPreviewUrl] = useState();
   const dispatch = useDispatch();
-  const { skillnaavData } = useSelector((state) => state.root);
+  const { skillnaavData, images: allImages } = useSelector(
+    (state) => state.root
+  );
 
   useEffect(() => {
     getImage();
@@ -32,17 +39,21 @@ function AdminDiscover() {
   const getImage = async () => {
     try {
       const result = await axios.get("/get-image");
-      setAllImages(result.data.data);
-      console.log("Fetched Images", result.data.data);
+      dispatch(SetImages(result.data.data));
     } catch (error) {
       console.error("Error fetching images:", error);
     }
   };
 
-  const handleDeleteImage = (indexToDelete) => {
-    setAllImages((prevImages) =>
-      prevImages.filter((image, index) => index !== indexToDelete)
-    );
+  const handleDeleteImage = async (imageId) => {
+    try {
+      await axios.delete(`/delete-image/${imageId}`);
+      dispatch(RemoveImage(imageId));
+      message.success("Image deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      message.error("Failed to delete image. Please try again later.");
+    }
   };
 
   const handleUpload = async () => {
@@ -54,10 +65,8 @@ function AdminDiscover() {
       const formData = new FormData();
       formData.append("file", file);
       const response = await axios.post("/upload", formData);
-      console.log(response);
+      dispatch(AddImage(response.data));
       message.success("Image uploaded successfully.");
-
-      // Update previewUrl with the uploaded image
       setPreviewUrl(URL.createObjectURL(file));
     } catch (error) {
       console.error("Error:", error);
@@ -85,10 +94,6 @@ function AdminDiscover() {
     }
   };
 
-  if (!skillnaavData || !skillnaavData.discover || !skillnaavData.discover[0]) {
-    return <div>Loading...</div>;
-  }
-
   const onInputChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
@@ -97,6 +102,10 @@ function AdminDiscover() {
       setPreviewUrl(imageUrl);
     }
   };
+
+  if (!skillnaavData || !skillnaavData.discover || !skillnaavData.discover[0]) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="p-8 bg-white rounded-lg shadow-lg max-w-4xl mx-auto mt-10">
@@ -164,28 +173,21 @@ function AdminDiscover() {
         )}
         <Button type="primary" onClick={handleUpload}>
           Upload Image
-        </Button>{" "}
+        </Button>
         <div className="grid grid-cols-3 items-center justify-center justify-items-center px-[20px] align-middle lg:grid-cols-5">
-          {allImages == null
-            ? ""
-            : allImages.map((source, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.8, delay: index * 0.2 }}
-                >
-                  <img
-                    height={100}
-                    width={100}
-                    src={images[source.image]}
-                    alt={`Company ${index + 1}`}
-                  />
-                  <button onClick={() => handleDeleteImage(index)}>
-                    Delete
-                  </button>
-                </motion.div>
-              ))}
+          {allImages.map((image, index) => (
+            <div key={index}>
+              <motion.img
+                height={100}
+                width={100}
+                src={images[image.image]}
+                alt={`Company ${index + 1}`}
+              />
+              <button onClick={() => handleDeleteImage(image._id)}>
+                Delete
+              </button>
+            </div>
+          ))}
         </div>
         <div className="flex justify-end">
           <Button

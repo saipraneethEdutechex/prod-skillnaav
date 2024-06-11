@@ -72,3 +72,15 @@ app.get("/get-image", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+// Delete Image
+app.delete("/delete-image/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await DiscoverImage.findByIdAndDelete(id);
+    res.json({ status: "ok", message: "Image deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting image:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});

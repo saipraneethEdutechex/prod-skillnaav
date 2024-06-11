@@ -1,151 +1,100 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import Gradient from "../assets/Gradient.svg";
-import HeroImage from "../assets/app_mockup.png";
-import BlueArrow from "../assets/blue-button.svg";
-import { useSelector } from "react-redux";
+import BlueGradient from "../assets/blue-button.svg"; 
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import { SetSkillNaavData, SetImages } from "../redux/rootSlice";
 
-// Import all other images
 function importAll(r) {
   let images = {};
-  r.keys().map((item, index) => {
+  r.keys().map((item) => {
     images[item.replace("./", "")] = r(item);
   });
   return images;
 }
 
-const images = importAll(
+const allImages = importAll(
   require.context("../../src/images", false, /\.(png|jpe?g|svg)$/)
 );
 
-const Discover = () => {
-  const [allImages, setAllImages] = useState(null);
-  const { skillnaavData } = useSelector((state) => state.root);
+function Discover() {
+  const dispatch = useDispatch();
+  const { skillnaavData, images } = useSelector((state) => state.root);
 
   useEffect(() => {
+    getData();
     getImage();
   }, []);
+
+  const getData = async () => {
+    try {
+      const result = await axios.get("/api/skillnaav/get-data");
+      dispatch(SetSkillNaavData(result.data.data));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   const getImage = async () => {
     try {
       const result = await axios.get("/get-image");
-      setAllImages(result.data.data);
-      console.log("Fetched Images", result.data.data);
+      dispatch(SetImages(result.data.data));
     } catch (error) {
       console.error("Error fetching images:", error);
     }
   };
 
-  const handleDeleteImage = (indexToDelete) => {
-    setAllImages((prevImages) =>
-      prevImages.filter((image, index) => index !== indexToDelete)
-    );
-  };
-
-  if (
-    !skillnaavData ||
-    !skillnaavData.discover ||
-    skillnaavData.discover.length === 0
-  ) {
-    return null;
+  if (!skillnaavData) {
+    return <div>Loading...</div>;
   }
 
-  const discover = skillnaavData.discover[0];
-  const { discoverheading, discoversubheading, tryforfreebtn, viewpricebtn } =
-    discover;
-
   return (
-    <motion.div
-      id="discover"
-      className="pt-4 lg:pt-10"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-    >
-      <div className="px-[20px] lg:px-[280px]">
-        <motion.h1
-          className="text-center text-[32px] leading-[40px] font-medium text-[#172026] lg:text-[64px] lg:leading-[72px]"
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-        >
-          {discoverheading || ""}
-        </motion.h1>
-        <motion.p
-          className="text-center pt-6 text-[18px] font-normal text-[#36485C] lg:text-[18px] lg:leading-7"
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          {discoversubheading || ""}
-        </motion.p>
-        <motion.div
-          className="align-center flex w-full py-8 justify-center gap-x-6"
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-        >
-          <button className="bg-[#4328EB] text-[#FFFFFF] w-1/2 px-8 py-4 rounded-[4px] lg:w-fit">
-            {tryforfreebtn || ""}
-          </button>
-          <button className="text-[#4328EB] font-medium flex items-center justify-center gap-x-2 w-1/2 px-8 py-4 rounded-[4px] lg:w-fit">
-            {viewpricebtn || ""}
-            <span>
-              <img src={BlueArrow} alt="Learn More" />
-            </span>
-          </button>
-        </motion.div>
-      </div>
-      <motion.div
-        className="relative flex h-full w-full justify-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 0.6 }}
-      >
-        <img
-          src={Gradient}
-          alt="Gradient"
-          className="min-h-[500px] w-full object-cover lg:h-auto"
-        />
-        <div className="absolute bottom-5 flex w-full flex-col items-center">
-          <img
-            src={HeroImage}
-            alt="hero image"
-            className="mb-10 md:w-[60%] md:mt-20 sm:mb-20 px-3 sm:px-20 sm:mx-12 lg:w-[60%] xl:w-[65%]"
-          />
-          <div className="flex w-full flex-col items-center lg:container lg:flex-row lg:justify-between lg:px-20">
-            <p className="text-[white] text-center text-[16px] lg:text-[18px]">
-              Trusted by these companies
+    <div>
+      {/* Discover Section */}
+      <div className="lg:h-screen bg-no-repeat bg-cover flex justify-center items-center h-auto lg:py-0 py-10">
+        <div className="flex justify-center items-center w-full h-full relative bg-white bg-opacity-70">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-4xl p-6 lg:p-16 lg:px-32 rounded-3xl shadow-lg bg-white bg-opacity-70"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-6 text-center">
+              {skillnaavData.discover[0]?.discoverheading}
+            </h2>
+            <p className="text-lg text-gray-800 mb-8 text-center">
+              {skillnaavData.discover[0]?.discoversubheading}
             </p>
-            <div className="grid grid-cols-3 items-center justify-center justify-items-center px-[20px] align-middle lg:grid-cols-5">
-              {allImages == null
-                ? ""
-                : allImages.map((source, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ duration: 0.8, delay: index * 0.2 }}
-                    >
-                      <img
-                        height={100}
-                        width={100}
-                        src={
-                          source.image === "file_1718098225371.jpg"
-                            ? images[source.image]
-                            : images[source.image]
-                        }
-                        alt={`Company ${index + 1}`}
-                      />
-                    </motion.div>
-                  ))}
+            <div className="flex justify-center space-x-4 mb-8">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                className="bg-blue-500 text-white font-semibold px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {skillnaavData.discover[0]?.tryforfreebtn}
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                className="bg-green-500 text-white font-semibold px-6 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                {skillnaavData.discover[0]?.viewpricebtn}
+              </motion.button>
             </div>
-          </div>
+            <div className="grid grid-cols-3 items-center justify-center justify-items-center px-[20px] align-middle lg:grid-cols-5">
+              {images.map((image, index) => (
+                <motion.img
+                  key={index}
+                  whileHover={{ scale: 1.1 }}
+                  src={allImages[image.image]}
+                  alt={`Company ${index + 1}`}
+                  className="h-16 w-auto"
+                />
+              ))}
+            </div>
+          </motion.div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
-};
+}
 
 export default Discover;
