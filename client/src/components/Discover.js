@@ -5,9 +5,23 @@ import HeroImage from "../assets/app_mockup.png";
 import BlueArrow from "../assets/blue-button.svg";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import univ from "../../src/images/file_1718098225371.jpg"; // Import the default image
+
+// Import all other images
+function importAll(r) {
+  let images = {};
+  r.keys().map((item, index) => {
+    images[item.replace("./", "")] = r(item);
+  });
+  return images;
+}
+
+const images = importAll(
+  require.context("../../src/images", false, /\.(png|jpe?g|svg)$/)
+);
 
 const Discover = () => {
-  const [allImages, setAllImages] = useState([]);
+  const [allImages, setAllImages] = useState(null);
   const { skillnaavData } = useSelector((state) => state.root);
 
   useEffect(() => {
@@ -18,6 +32,7 @@ const Discover = () => {
     try {
       const result = await axios.get("/get-image");
       setAllImages(result.data.data);
+      console.log("Fetched Images", result.data.data);
     } catch (error) {
       console.error("Error fetching images:", error);
     }
@@ -99,16 +114,24 @@ const Discover = () => {
               Trusted by these companies
             </p>
             <div className="grid grid-cols-3 items-center justify-center justify-items-center px-[20px] align-middle lg:grid-cols-5">
-              {allImages.map((image, index) => (
-                <motion.img
-                  key={index}
-                  src={image.image}
-                  alt={`Company ${index + 1}`}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.8, delay: index * 0.2 }}
-                />
-              ))}
+              {allImages == null
+                ? ""
+                : allImages.map((source, index) => (
+                    <motion.img
+                      key={index}
+                      height={100}
+                      width={100}
+                      src={
+                        source.image === "file_1718098225371.jpg"
+                          ? univ
+                          : images[source.image]
+                      }
+                      alt={`Company ${index + 1}`}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.8, delay: index * 0.2 }}
+                    />
+                  ))}
             </div>
           </div>
         </div>

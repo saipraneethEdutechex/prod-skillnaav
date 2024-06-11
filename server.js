@@ -6,7 +6,6 @@ const path = require("path");
 const mongoose = require("mongoose");
 const { DiscoverImage } = require("./models/skillnaavModel");
 require("dotenv").config();
-
 const port = process.env.PORT || 5000;
 
 // Middleware
@@ -29,7 +28,7 @@ app.use("/api/skillnaav", skillnaavRoute);
 // Multer Storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "ImageFolder/Images");
+    cb(null, "./client/src/images");
   },
   filename: (req, file, cb) => {
     cb(
