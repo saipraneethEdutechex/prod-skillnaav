@@ -18,6 +18,11 @@ const discoverSchema = new mongoose.Schema({
     required: true,
   },
 });
+const DiscoverImgSchema = new mongoose.Schema({
+  image: {
+    type: String,
+  },
+});
 
 const visionheadingSchema = new mongoose.Schema({
   visionheading: {
@@ -261,6 +266,7 @@ const footerSchema = new mongoose.Schema({
 
 module.exports = {
   Discover: mongoose.model("discovers", discoverSchema),
+  DiscoverImage: mongoose.model("discoverimg", DiscoverImgSchema),
   VisionHead: mongoose.model("visionhead", visionheadingSchema),
   VisionPoint: mongoose.model("visionpoint", visionpointsSchema),
   Feature: mongoose.model("features", featureSchema),

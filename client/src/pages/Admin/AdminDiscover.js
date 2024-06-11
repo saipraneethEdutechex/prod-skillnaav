@@ -1,12 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Input, Button, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { ShowLoading, HideLoading } from "../../redux/rootSlice";
 import axios from "axios";
 
 function AdminDiscover() {
+  const [file, setFile] = useState();
   const dispatch = useDispatch();
   const { skillnaavData } = useSelector((state) => state.root);
+
+  const handleUpload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await axios.post("/upload", formData);
+      console.log(response);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const onFinish = async (values) => {
     try {
@@ -31,6 +43,10 @@ function AdminDiscover() {
   if (!skillnaavData || !skillnaavData.discover || !skillnaavData.discover[0]) {
     return <div>Loading...</div>;
   }
+
+  const onInputChange = (e) => {
+    setFile(e.target.files[0]);
+  };
 
   return (
     <div className="p-8 bg-white rounded-lg shadow-lg max-w-4xl mx-auto mt-10">
@@ -84,6 +100,8 @@ function AdminDiscover() {
             className="rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
           />
         </Form.Item>
+        <input type="file" onChange={onInputChange} />
+        <button onClick={handleUpload}>Upload</button>
         <div className="flex justify-end">
           <button
             htmlType="submit"
