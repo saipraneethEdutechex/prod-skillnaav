@@ -175,7 +175,7 @@ function AdminDiscover() {
           Upload Image
         </Button>
         <div className="grid grid-cols-3 items-center justify-center justify-items-center px-[20px] align-middle lg:grid-cols-5">
-          {allImages.map((image, index) => (
+          {Object.values(allImages).map((image, index) => (
             <div key={index}>
               <motion.img
                 height={100}
