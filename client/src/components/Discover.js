@@ -5,7 +5,6 @@ import HeroImage from "../assets/app_mockup.png";
 import BlueArrow from "../assets/blue-button.svg";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import univ from "../../src/images/file_1718098225371.jpg"; // Import the default image
 
 // Import all other images
 function importAll(r) {
@@ -36,6 +35,12 @@ const Discover = () => {
     } catch (error) {
       console.error("Error fetching images:", error);
     }
+  };
+
+  const handleDeleteImage = (indexToDelete) => {
+    setAllImages((prevImages) =>
+      prevImages.filter((image, index) => index !== indexToDelete)
+    );
   };
 
   if (
@@ -117,20 +122,23 @@ const Discover = () => {
               {allImages == null
                 ? ""
                 : allImages.map((source, index) => (
-                    <motion.img
+                    <motion.div
                       key={index}
-                      height={100}
-                      width={100}
-                      src={
-                        source.image === "file_1718098225371.jpg"
-                          ? univ
-                          : images[source.image]
-                      }
-                      alt={`Company ${index + 1}`}
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.8, delay: index * 0.2 }}
-                    />
+                    >
+                      <img
+                        height={100}
+                        width={100}
+                        src={
+                          source.image === "file_1718098225371.jpg"
+                            ? images[source.image]
+                            : images[source.image]
+                        }
+                        alt={`Company ${index + 1}`}
+                      />
+                    </motion.div>
                   ))}
             </div>
           </div>
