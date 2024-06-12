@@ -85,17 +85,17 @@ function AdminDiscover() {
           />
         </Form.Item>
         <div className="flex justify-end">
-          <button
+          <Button
             htmlType="submit"
             type="primary"
             className="bg-blue-600 text-white font-semibold px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Save Changes
-          </button>
+          </Button>
         </div>
       </Form>
     </div>
   );
 }
 
-export default AdminDiscover;
+export default React.memo(AdminDiscover);

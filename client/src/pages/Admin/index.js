@@ -1,5 +1,6 @@
 import React, { useEffect, useState, lazy, Suspense, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { Spin } from "antd";
 import {
   FaHome,
   FaEye,
@@ -90,7 +91,7 @@ const Admin = () => {
           <Suspense
             fallback={
               <div className="flex items-center justify-center h-screen">
-                Loading...
+                <Spin size="large" tip="Loading..." />
               </div>
             }
           >
@@ -106,4 +107,4 @@ const Admin = () => {
   );
 };
 
-export default Admin;
+export default React.memo(Admin);
