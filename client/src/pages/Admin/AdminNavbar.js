@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { LoadingOutlined } from "@ant-design/icons";
-import { Spin } from "antd";
+import { Spin, message } from "antd";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -11,6 +11,7 @@ function AdminNavbar() {
 
   const handleUpload = () => {
     if (!file) {
+      message.error("Please select a file to upload");
       return;
     }
 
@@ -19,14 +20,16 @@ function AdminNavbar() {
     setLoading(true);
 
     axios
-      .post("/upload", formData)
+      .post("/api/upload", formData)
       .then((res) => {
         console.log(res);
+        message.success("File uploaded successfully");
         setLoading(false);
         setFile(null);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
+        message.error("Failed to upload file");
         setLoading(false);
       });
   };

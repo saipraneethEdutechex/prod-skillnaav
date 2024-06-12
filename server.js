@@ -37,15 +37,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.post(
-  "https://mern-skillnaav-12f3c3d9b0f2.herokuapp.com/upload",
-  upload.single("file"),
-  (req, res) => {
-    NavbarLogo.create({ skillnaavlogo: req.file.filename })
-      .then((result) => res.json(result))
-      .catch((err) => console.log(err));
-  }
-);
+app.post("/api/upload", upload.single("file"), (req, res) => {
+  NavbarLogo.create({ skillnaavlogo: req.file.filename })
+    .then((result) => res.json(result))
+    .catch((err) => console.log(err));
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
