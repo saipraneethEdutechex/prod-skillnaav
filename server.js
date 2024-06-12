@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === "production") {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "ImageFolder/Images");
+    cb(null, "./client/src/UploadedImages/Navbar");
   },
   filename: (req, file, cb) => {
     cb(
@@ -41,6 +41,12 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
   NavbarLogo.create({ skillnaavlogo: req.file.filename })
     .then((result) => res.json(result))
     .catch((err) => console.log(err));
+});
+
+app.get("/api/getImage", (req, res) => {
+  NavbarLogo.find()
+    .then((users) => res.json(users))
+    .catch((err) => res.json(err));
 });
 
 app.listen(port, () => {

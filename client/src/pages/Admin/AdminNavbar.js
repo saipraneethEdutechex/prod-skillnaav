@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Spin, message } from "antd";
@@ -9,14 +9,14 @@ function AdminNavbar() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const formData = new FormData();
+  formData.append("file", file);
   const handleUpload = () => {
     if (!file) {
       message.error("Please select a file to upload");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", file);
     setLoading(true);
 
     axios
@@ -33,6 +33,22 @@ function AdminNavbar() {
         setLoading(false);
       });
   };
+
+  useEffect(() => {
+    axios
+      .get("/api/getImage")
+      .then((res) => {
+        console.log(res);
+        message.success("File uploaded successfully");
+        setLoading(false);
+        setFile(null);
+      })
+      .catch((err) => {
+        console.error(err);
+        message.error("Failed to upload file");
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div>
