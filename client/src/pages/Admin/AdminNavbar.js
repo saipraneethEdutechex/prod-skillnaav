@@ -16,7 +16,7 @@ function AdminNavbar() {
       .catch((err) => console.log(err));
   };
   const getImage = async () => {
-    const result = await axios.get("/getImage");
+    const result = await axios.get("/api/getImage");
     console.log(result);
     setAllImages(result.data.data);
   };

@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
+require("dotenv").config();
 
 const { SkillNaavLogo } = require("./models/skillnaavModel");
 
@@ -9,22 +10,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-require("dotenv").config();
-
 const skillnaavRoute = require("./routes/skillnaavRoute");
-
-app.use(express.json());
 app.use("/api/skillnaav", skillnaavRoute);
 
 const port = process.env.PORT || 5000;
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "client/build")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "client/build/index.html"));
-  });
-}
-
+// MongoDB connection
 const dbConfig = require("./config/dbConfig");
 
 const storage = multer.diskStorage({
@@ -49,7 +40,7 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
     .catch((err) => console.log(err));
 });
 
-app.get("/getImage", async (req, res) => {
+app.get("/api/getImage", async (req, res) => {
   try {
     SkillNaavLogo.find({}).then((data) => {
       res.send({ status: "ok", data: data });
@@ -59,6 +50,16 @@ app.get("/getImage", async (req, res) => {
   }
 });
 
+// Serve the static files from the React app
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "client/build")));
+
+  // Catch-all route to serve the React app
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client/build/index.html"));
+  });
+}
+
 app.listen(port, () => {
-  console.log(`Server running in port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
