@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
+
 require("dotenv").config();
 
 const { SkillNaavLogo } = require("./models/skillnaavModel");
@@ -20,7 +21,7 @@ const dbConfig = require("./config/dbConfig");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "ImageFolder/Images");
+    cb(null, "./client/src/Images/Navbar");
   },
   filename: (req, file, cb) => {
     cb(
