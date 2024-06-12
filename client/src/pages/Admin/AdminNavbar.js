@@ -46,7 +46,9 @@ const AdminNavbar = () => {
       .post("/api/upload", formData)
       .then((res) => {
         console.log("Image uploaded successfully:", res);
-        fetchImages();
+        // Add the newly uploaded image to the existing images array
+        setImages((prevImages) => [...prevImages, res.data.data]);
+        fetchImages(); // Fetch images again to ensure the state is up to date
       })
       .catch((err) => {
         console.error("Error uploading image:", err);
@@ -90,18 +92,23 @@ const AdminNavbar = () => {
             key={index}
             className="relative rounded overflow-hidden bg-white shadow-md"
           >
-            <motion.img
-              whileHover={{ scale: 1.1 }}
-              src={allImages[image.image]}
-              alt={`Uploaded ${index + 1}`}
-              className="w-full h-48 object-cover"
-            />
-            <button
-              onClick={() => handleDelete(image._id)}
-              className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-full"
-            >
-              Delete
-            </button>
+            {image &&
+              image.image && ( // Add a check to ensure image and image.image are defined
+                <motion.img
+                  whileHover={{ scale: 1.1 }}
+                  src={allImages[image.image]}
+                  alt={`Uploaded ${index + 1}`}
+                  className="w-full h-48 object-cover"
+                />
+              )}
+            {image && ( // Add a check to ensure image is defined
+              <button
+                onClick={() => handleDelete(image._id)}
+                className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-full"
+              >
+                Delete
+              </button>
+            )}
           </div>
         ))}
       </div>
