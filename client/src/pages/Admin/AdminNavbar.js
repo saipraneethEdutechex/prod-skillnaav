@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 function AdminNavbar() {
   const [file, setFile] = useState();
@@ -10,6 +10,12 @@ function AdminNavbar() {
       .then((res) => console.log(res))
       .catch((err) => console.log(err));
   };
+  useEffect(() => {
+    axios
+      .get("/api/getImage")
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
+  }, []);
 
   return (
     <div>
