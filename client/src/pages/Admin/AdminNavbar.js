@@ -30,6 +30,7 @@ const AdminNavbar = () => {
       setLoading(true);
       const result = await axios.get("/api/getImage");
       setImages(result.data.data);
+      console.log("Images fetched successfully:", result.data.data);
     } catch (error) {
       console.error("Error fetching images:", error);
     } finally {
@@ -44,20 +45,24 @@ const AdminNavbar = () => {
     axios
       .post("/api/upload", formData)
       .then((res) => {
-        console.log(res);
+        console.log("Image uploaded successfully:", res);
         fetchImages();
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.error("Error uploading image:", err);
+      });
   };
 
   const handleDelete = (id) => {
     axios
       .delete(`/api/deleteImage/${id}`)
       .then((res) => {
-        console.log(res);
+        console.log("Image deleted successfully:", res);
         fetchImages();
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.error("Error deleting image:", err);
+      });
   };
 
   return (
