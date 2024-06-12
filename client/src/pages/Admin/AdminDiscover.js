@@ -1,12 +1,15 @@
 import React from "react";
-import { Form, Input, Button, message } from "antd";
+import { Form, Input, Button, message, Skeleton } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { ShowLoading, HideLoading } from "../../redux/rootSlice";
 import axios from "axios";
+import { LoadingOutlined } from "@ant-design/icons";
+
+const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 function AdminDiscover() {
   const dispatch = useDispatch();
-  const { skillnaavData } = useSelector((state) => state.root);
+  const { skillnaavData, loading } = useSelector((state) => state.root);
 
   const onFinish = async (values) => {
     try {
@@ -29,7 +32,7 @@ function AdminDiscover() {
   };
 
   if (!skillnaavData || !skillnaavData.discover || !skillnaavData.discover[0]) {
-    return <div>Loading...</div>;
+    return <Skeleton active avatar />;
   }
 
   return (

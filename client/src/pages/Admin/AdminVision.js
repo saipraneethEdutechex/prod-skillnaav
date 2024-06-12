@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Modal, Form, Input, Button, message, List, Spin } from "antd";
+import { Modal, Form, Input, Button, message, List, Skeleton } from "antd";
 import axios from "axios";
 
 const AdminVision = () => {
@@ -88,7 +88,7 @@ const AdminVision = () => {
   if (!skillnaavData) {
     return (
       <div className="flex justify-center items-center h-full">
-        <Spin size="large" />
+        <Skeleton active avatar />
       </div>
     );
   }
