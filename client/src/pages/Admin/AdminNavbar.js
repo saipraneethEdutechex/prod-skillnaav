@@ -1,13 +1,39 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import { SetImages } from "../../redux/rootSlice";
+
+function importAll(r) {
+  let images = {};
+  r.keys().map((item) => {
+    images[item.replace("./", "")] = r(item);
+    return null;
+  });
+  return images;
+}
+
+const allImages = importAll(
+  require.context("../../Images/Navbar", false, /\.(png|jpe?g|svg)$/)
+);
 
 function AdminNavbar() {
+  const dispatch = useDispatch();
+  const images = useSelector((state) => state.root.images);
   const [file, setFile] = useState(null);
-  const [allImages, setAllImages] = useState([]);
+
+  const fetchImages = async () => {
+    try {
+      const result = await axios.get("/api/getImage");
+      dispatch(SetImages(result.data.data));
+    } catch (error) {
+      console.error("Error fetching images:", error);
+    }
+  };
 
   useEffect(() => {
-    getImage();
-  }, []);
+    fetchImages();
+  }, [dispatch]);
 
   const handleUpload = () => {
     const formData = new FormData();
@@ -17,32 +43,27 @@ function AdminNavbar() {
       .post("/api/upload", formData)
       .then((res) => {
         console.log(res);
-        getImage();
+        fetchImages();
       })
       .catch((err) => console.log(err));
-  };
-
-  const getImage = async () => {
-    try {
-      const result = await axios.get("/api/getImage");
-      console.log(result);
-      setAllImages(result.data.data);
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   return (
     <div>
       <input type="file" onChange={(e) => setFile(e.target.files[0])} />
       <button onClick={handleUpload}>Upload</button>
-      {allImages.map((data, index) => (
-        <img
-          key={index}
-          src={`../../Images/Navbar/${data.image}`}
-          alt="uploaded"
-        />
-      ))}
+      <div className="grid grid-cols-3 gap-4">
+        {images &&
+          images.map((image, index) => (
+            <motion.img
+              key={index}
+              whileHover={{ scale: 1.1 }}
+              src={allImages[image.image]}
+              alt={`Uploaded ${index + 1}`}
+              className="h-16 w-auto"
+            />
+          ))}
+      </div>
     </div>
   );
 }
