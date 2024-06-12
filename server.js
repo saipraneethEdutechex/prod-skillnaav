@@ -61,6 +61,23 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
+// Upload image endpoint
+app.post("/api/upload", upload.single("file"), (req, res) => {
+  const newImage = new SkillNaavLogo({ image: req.file.filename });
+  newImage
+    .save()
+    .then((result) => res.json(result))
+    .catch((err) => console.log(err));
+});
+
+// Delete image endpoint
+app.delete("/api/deleteImage/:id", (req, res) => {
+  const { id } = req.params;
+  SkillNaavLogo.findByIdAndDelete(id)
+    .then((result) => res.json(result))
+    .catch((err) => console.log(err));
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
