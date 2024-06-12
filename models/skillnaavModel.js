@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
 
+const navbarlogoSchema = new mongoose.Schema({
+  skillnaavlogo: {
+    type: String,
+  },
+});
 const discoverSchema = new mongoose.Schema({
   discoverheading: {
     type: String,
@@ -260,6 +265,7 @@ const footerSchema = new mongoose.Schema({
 });
 
 module.exports = {
+  NavbarLogo: mongoose.model("navbarlogo", navbarlogoSchema),
   Discover: mongoose.model("discovers", discoverSchema),
   VisionHead: mongoose.model("visionhead", visionheadingSchema),
   VisionPoint: mongoose.model("visionpoint", visionpointsSchema),
