@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Modal, Form, Input, Button, message, List, Spin } from "antd";
+import {
+  Modal,
+  Form,
+  Input,
+  Button,
+  message,
+  List,
+  Spin,
+  Skeleton,
+} from "antd";
 import axios from "axios";
 
 function AdminFaqs() {
@@ -131,7 +140,7 @@ function AdminFaqs() {
   );
 
   if (!faqData) {
-    return <Spin />;
+    return <Skeleton active />;
   }
 
   const { faq, faqcard } = faqData;
