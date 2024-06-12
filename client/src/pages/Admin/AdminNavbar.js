@@ -21,13 +21,17 @@ function AdminNavbar() {
   const dispatch = useDispatch();
   const images = useSelector((state) => state.root.images);
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchImages = async () => {
     try {
+      setLoading(true);
       const result = await axios.get("/api/getImage");
       dispatch(SetImages(result.data.data));
     } catch (error) {
       console.error("Error fetching images:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,18 +56,22 @@ function AdminNavbar() {
     <div>
       <input type="file" onChange={(e) => setFile(e.target.files[0])} />
       <button onClick={handleUpload}>Upload</button>
-      <div className="grid grid-cols-3 gap-4">
-        {images &&
-          images.map((image, index) => (
-            <motion.img
-              key={index}
-              whileHover={{ scale: 1.1 }}
-              src={allImages[image.image]}
-              alt={`Uploaded ${index + 1}`}
-              className="h-16 w-auto"
-            />
-          ))}
-      </div>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="grid grid-cols-3 gap-4">
+          {images &&
+            images.map((image, index) => (
+              <motion.img
+                key={index}
+                whileHover={{ scale: 1.1 }}
+                src={allImages[image.image]}
+                alt={`Uploaded ${index + 1}`}
+                className="h-16 w-auto"
+              />
+            ))}
+        </div>
+      )}
     </div>
   );
 }
