@@ -8,6 +8,8 @@ import {
   FaDollarSign,
   FaQuestionCircle,
   FaEnvelope,
+  FaImage,
+  FaSpinner,
 } from "react-icons/fa";
 import SkillnaavLogo from "../../assets/skillnaav_logo-250w.png";
 
@@ -18,13 +20,15 @@ const AdminTeam = lazy(() => import("./AdminTeam"));
 const AdminPricing = lazy(() => import("./AdminPricing"));
 const AdminFaqs = lazy(() => import("./AdminFaqs"));
 const AdminContact = lazy(() => import("./AdminContact"));
+const AdminNavbar = lazy(() => import("./AdminNavbar"));
 
 const Admin = () => {
   const { skillnaavData } = useSelector((state) => state.root);
-  const [selectedTab, setSelectedTab] = useState("Discover");
+  const [selectedTab, setSelectedTab] = useState("Navbar");
 
   const navItems = useMemo(
     () => [
+      { label: "Navbar", component: <AdminNavbar />, icon: <FaImage /> },
       { label: "Discover", component: <AdminDiscover />, icon: <FaHome /> },
       { label: "Vision", component: <AdminVision />, icon: <FaEye /> },
       { label: "Features", component: <AdminFeatures />, icon: <FaCog /> },
@@ -87,7 +91,13 @@ const Admin = () => {
         </aside>
 
         <main className="flex-1 p-10 bg-gray-100 shadow-inner">
-          <Suspense fallback={<div></div>}>
+          <Suspense
+            fallback={
+              <div className="flex justify-center items-center h-full">
+                <FaSpinner className="animate-spin text-4xl text-gray-600" />
+              </div>
+            }
+          >
             {navItems.map((item) =>
               item.label === selectedTab ? (
                 <div key={item.label}>{item.component}</div>
