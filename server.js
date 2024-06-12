@@ -49,10 +49,14 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
     .catch((err) => console.log(err));
 });
 
-app.get("/getImage", (req, res) => {
-  SkillNaavLogo.find()
-    .then((users) => res.json(users))
-    .catch((err) => res.json(err));
+app.get("/getImage", async (req, res) => {
+  try {
+    SkillNaavLogo.find({}).then((data) => {
+      res.send({ status: "ok", data: data });
+    });
+  } catch (err) {
+    res.json({ status: "error" });
+  }
 });
 
 app.listen(port, () => {
