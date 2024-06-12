@@ -10,6 +10,7 @@ import {
   FaEnvelope,
 } from "react-icons/fa";
 import SkillnaavLogo from "../../assets/skillnaav_logo-250w.png";
+import { Spinner } from "react-bootstrap";
 
 const AdminNavbar = lazy(() => import("./AdminNavbar"));
 const AdminDiscover = lazy(() => import("./AdminDiscover"));
@@ -94,7 +95,9 @@ const Admin = () => {
         </aside>
 
         <main className="flex-1 p-10 bg-gray-100 shadow-inner">
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Spinner animation="border" variant="primary" />}>
+            {" "}
+            {/* Use Spinner component */}
             {navItems.map((item) =>
               item.label === selectedTab ? (
                 <div key={item.label}>{item.component}</div>
