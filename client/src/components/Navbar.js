@@ -1,4 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import {
+  SetSkillNaavData,
+  SetImages,
+  ShowLoading,
+  HideLoading,
+} from "../redux/rootSlice";
 import SkillNaavLogo from "../assets/skillnaav_logo-250w.png";
 import Menu from "../assets/Menu.svg";
 import Close from "../assets/close.png";
@@ -13,11 +21,68 @@ const navLinks = [
 ];
 
 const Navbar = () => {
+  const dispatch = useDispatch();
+  const { skillnaavData, loading } = useSelector((state) => state.root);
+
+  const getImage = async () => {
+    try {
+      const result = await axios.get("/api/getImage");
+      dispatch(SetImages(result.data));
+    } catch (error) {
+      console.error("Error fetching images:", error);
+    }
+  };
+
+  const getData = async () => {
+    try {
+      dispatch(ShowLoading());
+      const result = await axios.get("/api/skillnaav");
+      dispatch(SetSkillNaavData(result.data));
+      dispatch(HideLoading());
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      dispatch(HideLoading());
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await getData();
+      await getImage();
+    };
+    fetchData();
+  }, [dispatch]);
+
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
+  function importAll(r) {
+    let images = {};
+    r.keys().map((item) => {
+      images[item.replace("./", "")] = r(item);
+      return null;
+    });
+    return images;
+  }
+
+  const SkillNaavImage = importAll(
+    require.context(
+      "../../src/UploadedImages/Navbar",
+      false,
+      /\.(png|jpe?g|svg)$/
+    )
+  );
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!skillnaavData) {
+    return <div>No data available</div>;
+  }
 
   return (
     <nav className="relative flex items-center justify-between px-5 py-4 lg:container lg:mx-auto lg:px-20">
