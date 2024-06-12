@@ -76,14 +76,6 @@ const Navbar = () => {
     )
   );
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!skillnaavData) {
-    return <div>No data available</div>;
-  }
-
   return (
     <nav className="relative flex items-center justify-between px-5 py-4 lg:container lg:mx-auto lg:px-20">
       <div className="flex items-center gap-x-5">
