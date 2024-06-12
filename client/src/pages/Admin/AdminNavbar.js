@@ -8,14 +8,16 @@ const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 function AdminNavbar() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState(null);
 
-  const formData = new FormData();
-  formData.append("file", file);
   const handleUpload = () => {
     if (!file) {
       message.error("Please select a file to upload");
       return;
     }
+
+    const formData = new FormData();
+    formData.append("file", file);
 
     setLoading(true);
 
@@ -26,6 +28,7 @@ function AdminNavbar() {
         message.success("File uploaded successfully");
         setLoading(false);
         setFile(null);
+        fetchImage();
       })
       .catch((err) => {
         console.error(err);
@@ -34,20 +37,26 @@ function AdminNavbar() {
       });
   };
 
-  useEffect(() => {
+  const fetchImage = () => {
+    setLoading(true);
     axios
       .get("/api/getImage")
       .then((res) => {
         console.log(res);
-        message.success("File uploaded successfully");
+        if (res.data && res.data.skillnaavlogo) {
+          setUploadedImage(`/ImageFolder/Images/${res.data.skillnaavlogo}`);
+        }
         setLoading(false);
-        setFile(null);
       })
       .catch((err) => {
         console.error(err);
-        message.error("Failed to upload file");
+        message.error("Failed to fetch image");
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchImage();
   }, []);
 
   return (
@@ -56,6 +65,13 @@ function AdminNavbar() {
       <button onClick={handleUpload} disabled={loading}>
         {loading ? <Spin indicator={antIcon} /> : "Upload"}
       </button>
+      {uploadedImage && (
+        <img
+          src={uploadedImage}
+          alt="Uploaded"
+          style={{ marginTop: "20px", width: "200px" }}
+        />
+      )}
     </div>
   );
 }
