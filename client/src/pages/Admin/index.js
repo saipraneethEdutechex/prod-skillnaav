@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import SkillnaavLogo from "../../assets/skillnaav_logo-250w.png";
 
+const AdminNavbar = lazy(() => import("./AdminNavbar"));
 const AdminDiscover = lazy(() => import("./AdminDiscover"));
 const AdminVision = lazy(() => import("./AdminVision"));
 const AdminFeatures = lazy(() => import("./AdminFeatures"));
@@ -21,14 +22,15 @@ const AdminContact = lazy(() => import("./AdminContact"));
 
 const Admin = () => {
   const { skillnaavData } = useSelector((state) => state.root);
-  const [selectedTab, setSelectedTab] = useState("Discover");
+  const [selectedTab, setSelectedTab] = useState("Navbar");
 
   const navItems = useMemo(
     () => [
-      { label: "Discover", component: <AdminDiscover />, icon: <FaHome /> },
-      { label: "Vision", component: <AdminVision />, icon: <FaEye /> },
-      { label: "Features", component: <AdminFeatures />, icon: <FaCog /> },
-      { label: "Team", component: <AdminTeam />, icon: <FaUsers /> },
+      { label: "Navbar", component: <AdminNavbar />, icon: <FaHome /> },
+      { label: "Discover", component: <AdminDiscover />, icon: <FaEye /> },
+      { label: "Vision", component: <AdminVision />, icon: <FaCog /> },
+      { label: "Features", component: <AdminFeatures />, icon: <FaUsers /> },
+      { label: "Team", component: <AdminTeam />, icon: <FaUsers /> }, // Example of using the same icon for multiple items
       { label: "Pricing", component: <AdminPricing />, icon: <FaDollarSign /> },
       { label: "FAQs", component: <AdminFaqs />, icon: <FaQuestionCircle /> },
       { label: "Contact", component: <AdminContact />, icon: <FaEnvelope /> },
@@ -44,6 +46,11 @@ const Admin = () => {
     if (!localStorage.getItem("token")) {
       window.location.href = "/admin-login";
     }
+  }, []);
+
+  useEffect(() => {
+    // Set the default selected tab to "Navbar" when the component mounts
+    setSelectedTab("Navbar");
   }, []);
 
   return (
@@ -79,7 +86,7 @@ const Admin = () => {
                 }`}
                 onClick={() => handleTabSelect(item.label)}
               >
-                <span className="mr-2">{item.icon}</span>
+                <span className="mr-2">{item.icon}</span> {/* Icon component */}
                 {item.label}
               </li>
             ))}
@@ -87,7 +94,7 @@ const Admin = () => {
         </aside>
 
         <main className="flex-1 p-10 bg-gray-100 shadow-inner">
-          <Suspense fallback={<div></div>}>
+          <Suspense fallback={<div>Loading...</div>}>
             {navItems.map((item) =>
               item.label === selectedTab ? (
                 <div key={item.label}>{item.component}</div>
