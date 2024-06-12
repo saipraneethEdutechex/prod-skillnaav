@@ -1,5 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, message, List } from "antd";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Modal,
+  Form,
+  Input,
+  Button,
+  message,
+  List,
+  Spin,
+  Skeleton,
+} from "antd";
 import axios from "axios";
 
 function AdminFaqs() {
@@ -7,6 +16,7 @@ function AdminFaqs() {
   const [modalVisible, setModalVisible] = useState({
     editFaqCard: false,
     addFaqCard: false,
+    editHeading: false,
   });
   const [selectedFaqCard, setSelectedFaqCard] = useState(null);
   const [editFaqCardForm] = Form.useForm();
@@ -17,7 +27,7 @@ function AdminFaqs() {
     fetchFaqData();
   }, []);
 
-  const fetchFaqData = async () => {
+  const fetchFaqData = useCallback(async () => {
     try {
       const response = await axios.get("/api/skillnaav/get-skillnaav-data");
       setFaqData(response.data);
@@ -25,89 +35,116 @@ function AdminFaqs() {
       console.error("Error fetching FAQ data:", error);
       message.error("Error fetching FAQ data");
     }
-  };
+  }, []);
+
+  const handleEditFaqCard = useCallback(
+    (faqCard) => {
+      setSelectedFaqCard(faqCard);
+      editFaqCardForm.setFieldsValue(faqCard);
+      setModalVisible((prevState) => ({
+        ...prevState,
+        editFaqCard: true,
+      }));
+    },
+    [editFaqCardForm]
+  );
+
+  const onDelete = useCallback(
+    async (faqCardId) => {
+      try {
+        const response = await axios.delete(
+          `/api/skillnaav/delete-faqcard/${faqCardId}`
+        );
+        if (response.data.success) {
+          message.success(response.data.message);
+          fetchFaqData();
+        } else {
+          message.error(response.data.message);
+        }
+      } catch (error) {
+        message.error("Error deleting FAQ card:", error.message);
+      }
+    },
+    [fetchFaqData]
+  );
+
+  const onFinishEdit = useCallback(
+    async (values) => {
+      try {
+        const response = await axios.post(
+          "/api/skillnaav/update-faqcard",
+          values
+        );
+        if (response.data.success) {
+          message.success(response.data.message);
+          setModalVisible((prevState) => ({
+            ...prevState,
+            editFaqCard: false,
+          }));
+          fetchFaqData();
+        } else {
+          message.error(response.data.message);
+        }
+      } catch (error) {
+        message.error("Error updating FAQ card:", error.message);
+      }
+    },
+    [fetchFaqData]
+  );
+
+  const onFinishAdd = useCallback(
+    async (values) => {
+      try {
+        const response = await axios.post("/api/skillnaav/add-faqcard", values);
+        if (response.data.success) {
+          message.success(response.data.message);
+          setModalVisible((prevState) => ({
+            ...prevState,
+            addFaqCard: false,
+          }));
+          fetchFaqData();
+          addFaqCardForm.resetFields();
+        } else {
+          message.error(response.data.message);
+        }
+      } catch (error) {
+        message.error("Error adding FAQ card:", error.message);
+      }
+    },
+    [fetchFaqData, addFaqCardForm]
+  );
+
+  const onFinishEditHeading = useCallback(
+    async (values) => {
+      try {
+        const { _id } = faqData.faq[0];
+        const response = await axios.post("/api/skillnaav/update-faqheading", {
+          _id,
+          faqheading: values.faqheading,
+        });
+        if (response.data.success) {
+          message.success(response.data.message);
+          setModalVisible((prevState) => ({
+            ...prevState,
+            editHeading: false,
+          }));
+          fetchFaqData();
+        } else {
+          message.error(response.data.message);
+        }
+      } catch (error) {
+        message.error("Error updating FAQ heading:", error.message);
+      }
+    },
+    [fetchFaqData, faqData]
+  );
 
   if (!faqData) {
-    return <div>Loading...</div>;
+    return <Skeleton active />;
   }
 
   const { faq, faqcard } = faqData;
   const { faqheading } = faq[0];
-
-  const handleEditFaqCard = (faqCard) => {
-    setSelectedFaqCard(faqCard);
-    editFaqCardForm.setFieldsValue(faqCard);
-    setModalVisible({ ...modalVisible, editFaqCard: true });
-  };
-
-  const onDelete = async (faqCardId) => {
-    try {
-      const response = await axios.delete(
-        `/api/skillnaav/delete-faqcard/${faqCardId}`
-      );
-      if (response.data.success) {
-        message.success(response.data.message);
-        fetchFaqData();
-      } else {
-        message.error(response.data.message);
-      }
-    } catch (error) {
-      message.error("Error deleting FAQ card:", error.message);
-    }
-  };
-
-  const onFinishEdit = async (values) => {
-    try {
-      const response = await axios.post(
-        "/api/skillnaav/update-faqcard",
-        values
-      );
-      if (response.data.success) {
-        message.success(response.data.message);
-        setModalVisible({ ...modalVisible, editFaqCard: false });
-        fetchFaqData();
-      } else {
-        message.error(response.data.message);
-      }
-    } catch (error) {
-      message.error("Error updating FAQ card:", error.message);
-    }
-  };
-
-  const onFinishAdd = async (values) => {
-    try {
-      const response = await axios.post("/api/skillnaav/add-faqcard", values);
-      if (response.data.success) {
-        message.success(response.data.message);
-        setModalVisible({ ...modalVisible, addFaqCard: false });
-        fetchFaqData();
-        addFaqCardForm.resetFields();
-      } else {
-        message.error(response.data.message);
-      }
-    } catch (error) {
-      message.error("Error adding FAQ card:", error.message);
-    }
-  };
-
-  const onFinishEditHeading = async (values) => {
-    try {
-      const { _id } = faqData.faq[0];
-      const response = await axios.post("/api/skillnaav/update-faqheading", {
-        _id,
-        faqheading: values.faqheading,
-      });
-      if (response.data.success) {
-        message.success(response.data.message);
-        setModalVisible({ ...modalVisible, editHeading: false });
-        fetchFaqData();
-      } else {
-        message.error(response.data.message);
-      }
-    } catch (error) {
-      message.error("Error updating FAQ heading:", error.message);
-    }
-  };
 
   return (
     <div>
@@ -124,7 +161,10 @@ function AdminFaqs() {
               <Button
                 type="primary"
                 onClick={() =>
-                  setModalVisible({ ...modalVisible, editHeading: true })
+                  setModalVisible((prevState) => ({
+                    ...prevState,
+                    editHeading: true,
+                  }))
                 }
               >
                 Edit Heading
@@ -166,7 +206,12 @@ function AdminFaqs() {
         <Button
           type="primary"
           className="mt-4"
-          onClick={() => setModalVisible({ ...modalVisible, addFaqCard: true })}
+          onClick={() =>
+            setModalVisible((prevState) => ({
+              ...prevState,
+              addFaqCard: true,
+            }))
+          }
         >
           Add FAQ Card
         </Button>
@@ -176,7 +221,10 @@ function AdminFaqs() {
         title="Edit FAQ Card"
         visible={modalVisible.editFaqCard}
         onCancel={() =>
-          setModalVisible({ ...modalVisible, editFaqCard: false })
+          setModalVisible((prevState) => ({
+            ...prevState,
+            editFaqCard: false,
+          }))
         }
         footer={null}
       >
@@ -201,7 +249,12 @@ function AdminFaqs() {
       <Modal
         title="Add FAQ Card"
         visible={modalVisible.addFaqCard}
-        onCancel={() => setModalVisible({ ...modalVisible, addFaqCard: false })}
+        onCancel={() =>
+          setModalVisible((prevState) => ({
+            ...prevState,
+            addFaqCard: false,
+          }))
+        }
         footer={null}
       >
         <Form form={addFaqCardForm} onFinish={onFinishAdd}>
@@ -223,7 +276,10 @@ function AdminFaqs() {
         title="Edit FAQ Heading"
         visible={modalVisible.editHeading}
         onCancel={() =>
-          setModalVisible({ ...modalVisible, editHeading: false })
+          setModalVisible((prevState) => ({
+            ...prevState,
+            editHeading: false,
+          }))
         }
         footer={null}
       >

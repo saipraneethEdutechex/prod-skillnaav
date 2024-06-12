@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, message, List } from "antd";
+import React, { useState, useEffect, useCallback } from "react";
+import { Modal, Form, Input, Button, message, List, Skeleton } from "antd";
 import axios from "axios";
 
 function AdminTeam() {
@@ -12,107 +12,122 @@ function AdminTeam() {
   const [form] = Form.useForm();
   const [headingForm] = Form.useForm();
 
-  useEffect(() => {
-    fetchSkillnaavData();
-  }, []);
-
-  const fetchSkillnaavData = async () => {
+  const fetchSkillnaavData = useCallback(async () => {
     try {
       const response = await axios.get("/api/skillnaav/get-skillnaav-data");
       setSkillnaavData(response.data);
     } catch (error) {
       console.error("Error fetching skillnaav data:", error);
     }
-  };
+  }, []);
 
-  const onFinishEdit = async (values) => {
-    try {
-      values._id = values._id || selectedTeamMember._id;
-      const response = await axios.post(
-        "/api/skillnaav/update-teammember",
-        values
-      );
-      if (response.data.success) {
-        message.success(response.data.message);
-        setIsEditTeamModalVisible(false);
-        fetchSkillnaavData();
-      } else {
-        message.error(response.data.message);
+  useEffect(() => {
+    fetchSkillnaavData();
+  }, [fetchSkillnaavData]);
+
+  const onFinishEdit = useCallback(
+    async (values) => {
+      try {
+        values._id = values._id || selectedTeamMember._id;
+        const response = await axios.post(
+          "/api/skillnaav/update-teammember",
+          values
+        );
+        if (response.data.success) {
+          message.success(response.data.message);
+          setIsEditTeamModalVisible(false);
+          fetchSkillnaavData();
+        } else {
+          message.error(response.data.message);
+        }
+      } catch (error) {
+        message.error("Error updating team member:", error.message);
       }
-    } catch (error) {
-      message.error("Error updating team member:", error.message);
-    }
-  };
+    },
+    [selectedTeamMember, fetchSkillnaavData]
+  );
 
-  const onFinishAdd = async (values) => {
-    try {
-      const response = await axios.post(
-        "/api/skillnaav/add-teammember",
-        values
-      );
-      if (response.data.success) {
-        message.success(response.data.message);
-        setIsAddTeamModalVisible(false);
-        fetchSkillnaavData();
-        form.resetFields();
-      } else {
-        message.error(response.data.message);
+  const onFinishAdd = useCallback(
+    async (values) => {
+      try {
+        const response = await axios.post(
+          "/api/skillnaav/add-teammember",
+          values
+        );
+        if (response.data.success) {
+          message.success(response.data.message);
+          setIsAddTeamModalVisible(false);
+          fetchSkillnaavData();
+          form.resetFields();
+        } else {
+          message.error(response.data.message);
+        }
+      } catch (error) {
+        message.error("Error adding team member:", error.message);
       }
-    } catch (error) {
-      message.error("Error adding team member:", error.message);
-    }
-  };
+    },
+    [fetchSkillnaavData, form]
+  );
 
-  const onFinishEditHeading = async (values) => {
-    try {
-      values._id = skillnaavData.team[0]._id;
-      const response = await axios.post(
-        "/api/skillnaav/update-teamheading",
-        values
-      );
-      if (response.data.success) {
-        message.success(response.data.message);
-        setIsEditHeadingModalVisible(false);
-        fetchSkillnaavData();
-      } else {
-        message.error(response.data.message);
+  const onFinishEditHeading = useCallback(
+    async (values) => {
+      try {
+        values._id = skillnaavData.team[0]._id;
+        const response = await axios.post(
+          "/api/skillnaav/update-teamheading",
+          values
+        );
+        if (response.data.success) {
+          message.success(response.data.message);
+          setIsEditHeadingModalVisible(false);
+          fetchSkillnaavData();
+        } else {
+          message.error(response.data.message);
+        }
+      } catch (error) {
+        message.error("Error updating team heading:", error.message);
       }
-    } catch (error) {
-      message.error("Error updating team heading:", error.message);
-    }
-  };
+    },
+    [skillnaavData, fetchSkillnaavData]
+  );
 
-  const onDelete = async (teammemberId) => {
-    try {
-      const response = await axios.delete(
-        `/api/skillnaav/delete-teammember/${teammemberId}`
-      );
-      if (response.data.success) {
-        message.success(response.data.message);
-        fetchSkillnaavData();
-      } else {
-        message.error(response.data.message);
+  const onDelete = useCallback(
+    async (teammemberId) => {
+      try {
+        const response = await axios.delete(
+          `/api/skillnaav/delete-teammember/${teammemberId}`
+        );
+        if (response.data.success) {
+          message.success(response.data.message);
+          fetchSkillnaavData();
+        } else {
+          message.error(response.data.message);
+        }
+      } catch (error) {
+        message.error("Error deleting team member:", error.message);
       }
-    } catch (error) {
-      message.error("Error deleting team member:", error.message);
-    }
-  };
+    },
+    [fetchSkillnaavData]
+  );
 
-  const handleEditTeamMember = (teammember) => {
-    setSelectedTeamMember(teammember);
-    form.setFieldsValue(teammember);
-    setIsEditTeamModalVisible(true);
-  };
+  const handleEditTeamMember = useCallback(
+    (teammember) => {
+      setSelectedTeamMember(teammember);
+      form.setFieldsValue(teammember);
+      setIsEditTeamModalVisible(true);
+    },
+    [form]
+  );
 
-  const handleEditHeading = () => {
+  const handleEditHeading = useCallback(() => {
     if (skillnaavData && skillnaavData.team && skillnaavData.team.length > 0) {
       headingForm.setFieldsValue(skillnaavData.team[0]);
       setIsEditHeadingModalVisible(true);
     }
-  };
+  }, [skillnaavData, headingForm]);
 
   if (!skillnaavData) {
-    return <div>Loading...</div>;
+    return <Skeleton active />;
   }
 
   const { team, teammember } = skillnaavData;
@@ -182,6 +197,7 @@ function AdminTeam() {
         </Button>
       </div>
 
+      {/* Edit Team Member Modal */}
       <Modal
         title="Edit Team Member"
         visible={isEditTeamModalVisible}
@@ -215,6 +231,7 @@ function AdminTeam() {
         </Form>
       </Modal>
 
+      {/* Add Team Member Modal */}
       <Modal
         title="Add Team Member"
         visible={isAddTeamModalVisible}
@@ -245,6 +262,7 @@ function AdminTeam() {
         </Form>
       </Modal>
 
+      {/* Edit Team Heading Modal */}
       <Modal
         title="Edit Team Heading"
         visible={isEditHeadingModalVisible}

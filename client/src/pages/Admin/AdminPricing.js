@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, message, List } from "antd";
+import { Modal, Form, Input, Button, message, List, Skeleton } from "antd";
 import axios from "axios";
 
 function AdminPricing() {
@@ -29,7 +29,7 @@ function AdminPricing() {
   };
 
   if (!pricingData) {
-    return <div>Loading...</div>;
+    return <Skeleton active />;
   }
 
   const { pricing, pricingcard } = pricingData;

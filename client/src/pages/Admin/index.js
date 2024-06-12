@@ -1,4 +1,4 @@
-import React, { useEffect, useState, lazy, Suspense, useMemo } from "react";
+import React, { useEffect, useState, lazy, useMemo, Suspense } from "react";
 import { useSelector } from "react-redux";
 import {
   FaHome,
@@ -87,13 +87,7 @@ const Admin = () => {
         </aside>
 
         <main className="flex-1 p-10 bg-gray-100 shadow-inner">
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center h-screen">
-                Loading...
-              </div>
-            }
-          >
+          <Suspense fallback={<div></div>}>
             {navItems.map((item) =>
               item.label === selectedTab ? (
                 <div key={item.label}>{item.component}</div>
@@ -106,4 +100,4 @@ const Admin = () => {
   );
 };
 
-export default Admin;
+export default React.memo(Admin);

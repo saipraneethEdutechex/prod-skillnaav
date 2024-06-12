@@ -1,116 +1,101 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, message, List } from "antd";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  startTransition,
+} from "react";
+import { Modal, Form, Input, Button, message, List, Skeleton } from "antd";
 import axios from "axios";
 
-function AdminVision() {
+const AdminVision = () => {
   const [skillnaavData, setSkillnaavData] = useState(null);
-  const [isEditHeadModalVisible, setIsEditHeadModalVisible] = useState(false); // descriptive variable name
-  const [isEditPointModalVisible, setIsEditPointModalVisible] = useState(false);
-  const [isAddPointModalVisible, setIsAddPointModalVisible] = useState(false);
-  const [selectedVisionHead, setSelectedVisionHead] = useState(null);
-  const [selectedVisionPoint, setSelectedVisionPoint] = useState(null);
+  const [modalData, setModalData] = useState({
+    isVisible: false,
+    type: "",
+    data: null,
+  });
   const [form] = Form.useForm();
-  const [pointForm] = Form.useForm();
 
   useEffect(() => {
     fetchSkillnaavData();
   }, []);
 
-  const fetchSkillnaavData = async () => {
+  const fetchSkillnaavData = useCallback(async () => {
     try {
       const response = await axios.get("/api/skillnaav/get-skillnaav-data");
       setSkillnaavData(response.data);
     } catch (error) {
       console.error("Error fetching skillnaav data:", error);
     }
-  };
+  }, []);
 
-  const onFinishEditHead = async (values) => {
-    try {
-      const response = await axios.post("/api/skillnaav/update-visionheading", {
-        ...values,
-        _id: selectedVisionHead._id,
-      });
-      if (response.data.success) {
-        message.success(response.data.message);
-        setIsEditHeadModalVisible(false);
-        fetchSkillnaavData();
-      } else {
-        message.error(response.data.message);
+  const handleFinish = useCallback(
+    async (values) => {
+      try {
+        let response;
+        if (modalData.type === "editHead") {
+          response = await axios.post("/api/skillnaav/update-visionheading", {
+            ...values,
+            _id: modalData.data._id,
+          });
+        } else if (modalData.type === "editPoint") {
+          values._id = modalData.data._id;
+          response = await axios.post(
+            "/api/skillnaav/update-visionpoint",
+            values
+          );
+        } else if (modalData.type === "addPoint") {
+          response = await axios.post("/api/skillnaav/add-visionpoint", values);
+        }
+
+        if (response.data.success) {
+          message.success(response.data.message);
+          setModalData({ isVisible: false, type: "", data: null });
+          fetchSkillnaavData();
+          form.resetFields();
+        } else {
+          message.error(response.data.message);
+        }
+      } catch (error) {
+        message.error(`Error ${modalData.type} vision data: ${error.message}`);
       }
-    } catch (error) {
-      message.error("Error updating vision head:", error.message);
-    }
-  };
+    },
+    [modalData, form, fetchSkillnaavData]
+  );
 
-  const onFinishEdit = async (values) => {
-    try {
-      values._id = values._id || selectedVisionPoint._id;
-      const response = await axios.post(
-        "/api/skillnaav/update-visionpoint",
-        values
-      );
-      if (response.data.success) {
-        message.success(response.data.message);
-        setIsEditPointModalVisible(false);
-        fetchSkillnaavData();
-      } else {
-        message.error(response.data.message);
+  const handleDelete = useCallback(
+    async (visionpointId) => {
+      try {
+        const response = await axios.delete(
+          `/api/skillnaav/delete-visionpoint/${visionpointId}`
+        );
+        if (response.data.success) {
+          message.success(response.data.message);
+          fetchSkillnaavData();
+        } else {
+          message.error(response.data.message);
+        }
+      } catch (error) {
+        message.error(`Error deleting vision point: ${error.message}`);
       }
-    } catch (error) {
-      message.error("Error updating vision point:", error.message);
-    }
-  };
+    },
+    [fetchSkillnaavData]
+  );
 
-  const onFinishAdd = async (values) => {
-    try {
-      const response = await axios.post(
-        "/api/skillnaav/add-visionpoint",
-        values
-      );
-      if (response.data.success) {
-        message.success(response.data.message);
-        setIsAddPointModalVisible(false);
-        fetchSkillnaavData();
-        form.resetFields();
-      } else {
-        message.error(response.data.message);
-      }
-    } catch (error) {
-      message.error("Error adding vision point:", error.message);
-    }
-  };
-
-  const onDelete = async (visionpointId) => {
-    try {
-      const response = await axios.delete(
-        `/api/skillnaav/delete-visionpoint/${visionpointId}`
-      );
-      if (response.data.success) {
-        message.success(response.data.message);
-        fetchSkillnaavData();
-      } else {
-        message.error(response.data.message);
-      }
-    } catch (error) {
-      message.error("Error deleting vision point:", error.message);
-    }
-  };
-
-  const handleEditHead = (visionHead) => {
-    setSelectedVisionHead(visionHead);
-    form.setFieldsValue(visionHead);
-    setIsEditHeadModalVisible(true);
-  };
-
-  const handleEditPoint = (visionPoint) => {
-    setSelectedVisionPoint(visionPoint);
-    pointForm.setFieldsValue(visionPoint);
-    setIsEditPointModalVisible(true);
-  };
+  const openModal = useCallback(
+    (type, data = null) => {
+      setModalData({ isVisible: true, type, data });
+      if (data) form.setFieldsValue(data);
+    },
+    [form]
+  );
 
   if (!skillnaavData) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-full">
+        <Skeleton active avatar />
+      </div>
+    );
   }
 
   const { visionhead, visionpoint } = skillnaavData;
@@ -135,7 +120,7 @@ function AdminVision() {
         <div className="flex justify-end mt-4">
           <Button
             type="primary"
-            onClick={() => handleEditHead(visionhead[0])}
+            onClick={() => openModal("editHead", visionhead[0])}
             className="mr-2"
           >
             Edit
@@ -154,14 +139,14 @@ function AdminVision() {
               actions={[
                 <Button
                   type="link"
-                  onClick={() => handleEditPoint(item)}
+                  onClick={() => openModal("editPoint", item)}
                   key="edit"
                 >
                   Edit
                 </Button>,
                 <Button
                   type="link"
-                  onClick={() => onDelete(item._id)}
+                  onClick={() => handleDelete(item._id)}
                   key="delete"
                 >
                   Delete
@@ -173,103 +158,80 @@ function AdminVision() {
           )}
         />
         <div className="flex justify-end mt-4">
-          <Button
-            type="primary"
-            onClick={() => setIsAddPointModalVisible(true)}
-          >
+          <Button type="primary" onClick={() => openModal("addPoint")}>
             Add Point
           </Button>
         </div>
       </div>
 
-      {/* Edit Vision Head Modal */}
+      {/* Edit/Add Vision Modal */}
       <Modal
-        visible={isEditHeadModalVisible}
-        title="Edit Vision Head"
-        onCancel={() => setIsEditHeadModalVisible(false)}
+        visible={modalData.isVisible}
+        title={
+          modalData.type === "editHead"
+            ? "Edit Vision Head"
+            : modalData.type === "editPoint"
+            ? "Edit Vision Point"
+            : "Add Vision Point"
+        }
+        onCancel={() =>
+          setModalData({ isVisible: false, type: "", data: null })
+        }
         footer={null}
       >
-        <Form layout="vertical" onFinish={onFinishEditHead} form={form}>
+        <Form layout="vertical" onFinish={handleFinish} form={form}>
+          {modalData.type === "editHead" && (
+            <>
+              <Form.Item
+                name="visionheading"
+                label="Vision Heading"
+                rules={[
+                  { required: true, message: "Please enter vision heading" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="visionsub"
+                label="Vision Sub Heading"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter vision sub heading",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="visionImg"
+                label="Vision Image"
+                rules={[
+                  { required: true, message: "Please enter vision image URL" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </>
+          )}
+          modalData.type !== "editHead" && (
           <Form.Item
-            name="visionheading"
-            label="Vision Heading"
+            name="visionpoint"
+            label="Vision Point"
             rules={[{ required: true, message: "Please enter vision heading" }]}
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            name="visionsub"
-            label="Vision Sub Heading"
-            rules={[
-              { required: true, message: "Please enter vision sub heading" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="visionImg"
-            label="Vision Image"
-            rules={[
-              { required: true, message: "Please enter vision image URL" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
+          )
           <div className="flex justify-end">
             <Button type="primary" htmlType="submit">
-              Save
-            </Button>
-          </div>
-        </Form>
-      </Modal>
-
-      {/* Edit Vision Point Modal */}
-      <Modal
-        visible={isEditPointModalVisible}
-        title="Edit Vision Point"
-        onCancel={() => setIsEditPointModalVisible(false)}
-        footer={null}
-      >
-        <Form layout="vertical" onFinish={onFinishEdit} form={pointForm}>
-          <Form.Item
-            name="visionpoint"
-            label="Vision Point"
-            rules={[{ required: true, message: "Please enter vision point" }]}
-          >
-            <Input />
-          </Form.Item>
-          <div className="flex justify-end">
-            <Button type="primary" htmlType="submit">
-              Save
-            </Button>
-          </div>
-        </Form>
-      </Modal>
-
-      {/* Add Vision Point Modal */}
-      <Modal
-        open={isAddPointModalVisible}
-        title="Add Vision Point"
-        onCancel={() => setIsAddPointModalVisible(false)}
-        footer={null}
-      >
-        <Form layout="vertical" onFinish={onFinishAdd} form={pointForm}>
-          <Form.Item
-            name="visionpoint"
-            label="Vision Point"
-            rules={[{ required: true, message: "Please enter vision point" }]}
-          >
-            <Input />
-          </Form.Item>
-          <div className="flex justify-end">
-            <Button type="primary" htmlType="submit">
-              Add
+              {modalData.type === "addPoint" ? "Add" : "Save"}
             </Button>
           </div>
         </Form>
       </Modal>
     </div>
   );
-}
+};
 
-export default AdminVision;
+export default React.memo(AdminVision);

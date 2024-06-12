@@ -1,7 +1,7 @@
 import React, { Suspense, lazy, useMemo } from "react";
 import Navbar from "../../components/Navbar";
 import { useSelector } from "react-redux";
-import ClipLoader from "react-spinners/ClipLoader";
+import { Skeleton } from "antd";
 
 const Discover = lazy(() => import("../../components/Discover"));
 const Vision = lazy(() => import("../../components/Vision"));
@@ -17,6 +17,20 @@ function Home() {
 
   const memoizedData = useMemo(() => skillnaavData, [skillnaavData]);
 
+  const cachedComponents = useMemo(
+    () => ({
+      Discover,
+      Vision,
+      Features,
+      Team,
+      Pricing,
+      Faq,
+      Contact,
+      Footer,
+    }),
+    []
+  );
+
   return (
     <div className="font-inter">
       <Navbar />
@@ -24,8 +38,8 @@ function Home() {
       {memoizedData ? (
         <Suspense
           fallback={
-            <div className="flex items-center justify-center h-screen">
-              <ClipLoader size={50} color={"#4328EB"} />
+            <div className="px-[20px] lg:px-20 mx-auto">
+              <Skeleton active />
             </div>
           }
         >
@@ -41,8 +55,8 @@ function Home() {
           </div>
         </Suspense>
       ) : (
-        <div className="flex items-center justify-center h-screen">
-          <ClipLoader size={50} color={"#4328EB"} />
+        <div className="px-[20px] lg:px-20 mx-auto">
+          <Skeleton active />
         </div>
       )}
     </div>
