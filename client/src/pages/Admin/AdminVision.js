@@ -1,4 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  startTransition,
+} from "react";
 import { Modal, Form, Input, Button, message, List, Skeleton } from "antd";
 import axios from "axios";
 
@@ -209,15 +214,15 @@ const AdminVision = () => {
               </Form.Item>
             </>
           )}
-          {modalData.type !== "editHead" && (
-            <Form.Item
-              name="visionpoint"
-              label="Vision Point"
-              rules={[{ required: true, message: "Please enter vision point" }]}
-            >
-              <Input />
-            </Form.Item>
-          )}
+          modalData.type !== "editHead" && (
+          <Form.Item
+            name="visionpoint"
+            label="Vision Point"
+            rules={[{ required: true, message: "Please enter vision heading" }]}
+          >
+            <Input />
+          </Form.Item>
+          )
           <div className="flex justify-end">
             <Button type="primary" htmlType="submit">
               {modalData.type === "addPoint" ? "Add" : "Save"}
