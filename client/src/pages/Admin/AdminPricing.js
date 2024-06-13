@@ -165,12 +165,19 @@ function AdminPricing() {
               ]}
             >
               <List.Item.Meta
-                title={card.plantype}
-                description={card.plantypesubhead}
+                title={
+                  <span style={{ color: card.color }}>{card.plantype}</span>
+                }
+                description={
+                  <span style={{ color: card.color }}>
+                    {card.plantypesubhead}
+                  </span>
+                }
               />
             </List.Item>
           )}
         />
+
         <Button
           type="primary"
           className="mt-4"
@@ -184,7 +191,7 @@ function AdminPricing() {
 
       <Modal
         title="Edit Pricing Card"
-        open={modalVisible.editPricingCard}
+        visible={modalVisible.editPricingCard}
         onCancel={() =>
           setModalVisible({ ...modalVisible, editPricingCard: false })
         }
@@ -215,12 +222,7 @@ function AdminPricing() {
           <Form.Item name="pricebtn" label="Button Text">
             <Input />
           </Form.Item>
-          <Form.Item name="bgcolor" label="Background Color">
-            <Input />
-          </Form.Item>
-          <Form.Item name="color" label="Text Color">
-            <Input />
-          </Form.Item>
+
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Update
@@ -231,7 +233,7 @@ function AdminPricing() {
 
       <Modal
         title="Add Pricing Card"
-        open={modalVisible.addPricingCard}
+        visible={modalVisible.addPricingCard}
         onCancel={() =>
           setModalVisible({ ...modalVisible, addPricingCard: false })
         }
@@ -275,7 +277,7 @@ function AdminPricing() {
 
       <Modal
         title="Edit Pricing Heading"
-        open={modalVisible.editHeading}
+        visible={modalVisible.editHeading}
         onCancel={() =>
           setModalVisible({ ...modalVisible, editHeading: false })
         }

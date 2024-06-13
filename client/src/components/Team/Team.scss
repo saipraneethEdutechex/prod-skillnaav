@@ -1,12 +1,3 @@
-body {
-  font-family: Arial, sans-serif;
-}
-
-.slick-prev:before,
-.slick-next:before {
-  color: white;
-}
-
 .team-section {
   display: flex;
   flex-direction: column;
@@ -39,11 +30,19 @@ body {
   align-items: center;
 }
 
-.team-card img {
+.team-card .team-image-container {
+  width: 120px; /* Adjusted width for smaller image */
+  height: 120px; /* Adjusted height for smaller image */
+  overflow: hidden;
   border-radius: 50%;
   margin-bottom: 1rem;
+}
+
+.team-card .team-image {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease-in-out;
 }
 
 .team-card h1 {
@@ -69,7 +68,7 @@ body {
   background: #2f855a;
 }
 
-.Modal {
+.modal {
   background: white;
   padding: 2rem;
   border-radius: 10px;
@@ -78,22 +77,32 @@ body {
   margin: auto;
 }
 
-.Modal img {
+.modal .modal-image-container {
+  width: 160px; /* Adjusted width for modal image */
+  height: 160px; /* Adjusted height for modal image */
+  overflow: hidden;
   border-radius: 50%;
   margin-bottom: 1rem;
 }
 
-.Modal h1 {
+.modal .modal-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease-in-out;
+}
+
+.modal h1 {
   color: #2d3748;
   margin-bottom: 0.5rem;
 }
 
-.Modal p {
+.modal p {
   color: #4a5568;
   margin-bottom: 1rem;
 }
 
-.Modal button {
+.modal button {
   background: #e53e3e;
   color: white;
   padding: 0.5rem 1rem;
@@ -103,7 +112,7 @@ body {
   transition: background 0.3s;
 }
 
-.Modal button:hover {
+.modal button:hover {
   background: #c53030;
 }
 
