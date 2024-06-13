@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Modal, Form, Input, Button, message, Skeleton } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
 import axios from "axios";
 
 function AdminFeatures() {
@@ -10,6 +9,8 @@ function AdminFeatures() {
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(true);
+  const [imageUrl, setImageUrl] = useState(""); // State for image URL
+  const [previewImageUrl, setPreviewImageUrl] = useState(""); // State for image preview URL
 
   useEffect(() => {
     fetchSkillnaavData();
@@ -31,14 +32,16 @@ function AdminFeatures() {
       if (!values._id) {
         values._id = selectedFeature._id;
       }
+      const payload = { ...values, featureImg: imageUrl }; // Use featureImg as per backend schema
       const response = await axios.post(
         "/api/skillnaav/update-feature",
-        values
+        payload
       );
       if (response.data.success) {
         message.success(response.data.message);
         setShowEditModal(false);
         fetchSkillnaavData();
+        setImageUrl(""); // Clear imageUrl after successful update
       } else {
         message.error(response.data.message);
       }
@@ -49,12 +52,14 @@ function AdminFeatures() {
 
   const onFinishAdd = async (values) => {
     try {
-      const response = await axios.post("/api/skillnaav/add-feature", values);
+      const payload = { ...values, featureImg: imageUrl }; // Use featureImg as per backend schema
+      const response = await axios.post("/api/skillnaav/add-feature", payload);
       if (response.data.success) {
         message.success(response.data.message);
         setShowAddModal(false);
         fetchSkillnaavData();
         form.resetFields();
+        setImageUrl(""); // Clear imageUrl after successful add
       } else {
         message.error(response.data.message);
       }
@@ -81,11 +86,19 @@ function AdminFeatures() {
 
   const handleEdit = (feature) => {
     setSelectedFeature(feature);
+    setImageUrl(feature.featureImg); // Set initial value of imageUrl for edit modal
+    setPreviewImageUrl(feature.featureImg); // Set preview image URL for edit modal
     setShowEditModal(true);
   };
 
   const handleAdd = () => {
     setShowAddModal(true);
+  };
+
+  const handleImageUrlChange = (e) => {
+    const url = e.target.value;
+    setPreviewImageUrl(url);
+    setImageUrl(url);
   };
 
   if (loading || !skillnaavData || !skillnaavData.features) {
@@ -135,6 +148,15 @@ function AdminFeatures() {
               <span className="font-semibold">Point 4: </span>
               {feat.point4}
             </p>
+            {feat.featureImg && (
+              <div className="mb-4">
+                <img
+                  src={feat.featureImg}
+                  alt="Feature Image"
+                  style={{ maxWidth: "100%", maxHeight: "200px" }}
+                />
+              </div>
+            )}
             <div className="flex justify-end mt-4">
               <Button
                 type="primary"
@@ -167,9 +189,84 @@ function AdminFeatures() {
           initialValues={selectedFeature}
           form={form}
         >
-          {/* Form fields */}
+          <Form.Item
+            name="feature"
+            label="Feature"
+            rules={[{ required: true, message: "Please enter feature" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="featuredesc"
+            label="Feature Description"
+            rules={[
+              { required: true, message: "Please enter feature description" },
+            ]}
+          >
+            <Input.TextArea />
+          </Form.Item>
+          <Form.Item
+            name="subfeature"
+            label="Sub Feature"
+            rules={[{ required: true, message: "Please enter sub feature" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="point1"
+            label="Point 1"
+            rules={[{ required: true, message: "Please enter point 1" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="point2"
+            label="Point 2"
+            rules={[{ required: true, message: "Please enter point 2" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="point3"
+            label="Point 3"
+            rules={[{ required: true, message: "Please enter point 3" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="point4"
+            label="Point 4"
+            rules={[{ required: true, message: "Please enter point 4" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="featureImg"
+            label="Image URL"
+            rules={[{ required: true, message: "Please enter image URL" }]}
+          >
+            <Input onChange={handleImageUrlChange} value={imageUrl} />
+          </Form.Item>
+          {previewImageUrl && (
+            <div className="mb-4">
+              <img
+                src={previewImageUrl}
+                alt="Preview Image"
+                style={{ maxWidth: "100%", maxHeight: "200px" }}
+              />
+            </div>
+          )}
+          <div className="flex justify-end">
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ backgroundColor: "#1890ff", color: "#FFFFFF" }}
+            >
+              Save
+            </Button>
+          </div>
         </Form>
-      </Modal>{" "}
+      </Modal>
       <Modal
         visible={showAddModal}
         title="Add Feature"
@@ -177,7 +274,82 @@ function AdminFeatures() {
         footer={null}
       >
         <Form layout="vertical" onFinish={onFinishAdd} form={form}>
-          {/* Form fields */}
+          <Form.Item
+            name="feature"
+            label="Feature"
+            rules={[{ required: true, message: "Please enter feature" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="featuredesc"
+            label="Feature Description"
+            rules={[
+              { required: true, message: "Please enter feature description" },
+            ]}
+          >
+            <Input.TextArea />
+          </Form.Item>
+          <Form.Item
+            name="subfeature"
+            label="Sub Feature"
+            rules={[{ required: true, message: "Please enter sub feature" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="point1"
+            label="Point 1"
+            rules={[{ required: true, message: "Please enter point 1" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="point2"
+            label="Point 2"
+            rules={[{ required: true, message: "Please enter point 2" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="point3"
+            label="Point 3"
+            rules={[{ required: true, message: "Please enter point 3" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="point4"
+            label="Point 4"
+            rules={[{ required: true, message: "Please enter point 4" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="featureImg"
+            label="Image URL"
+            rules={[{ required: true, message: "Please enter image URL" }]}
+          >
+            <Input onChange={handleImageUrlChange} value={imageUrl} />
+          </Form.Item>
+          {previewImageUrl && (
+            <div className="mb-4">
+              <img
+                src={previewImageUrl}
+                alt="Preview Image"
+                style={{ maxWidth: "100%", maxHeight: "200px" }}
+              />
+            </div>
+          )}
+          <div className="flex justify-end">
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ backgroundColor: "#1890ff", color: "#FFFFFF" }}
+            >
+              Add
+            </Button>
+          </div>
         </Form>
       </Modal>
     </div>
