@@ -48,28 +48,35 @@ const Admin = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
+      {/* Header */}
       <header className="bg-gradient-to-r from-blue-500 to-purple-500 shadow-md border-b">
-        <div className="container mx-auto flex justify-center items-center py-4 px-6">
-          <img
-            src={SkillnaavLogo}
-            alt="Skillnaav Logo"
-            className="w-32 h-20 mr-auto"
-          />
-          <span className="text-white text-2xl font-medium">Admin Panel</span>
+        <div className="container mx-auto flex justify-between items-center py-4 px-6">
+          <div className="flex items-center">
+            <img
+              src={SkillnaavLogo}
+              alt="Skillnaav Logo"
+              className="w-24 h-16 md:w-28 md:h-20 mr-3"
+            />
+            <span className="text-white text-lg md:text-xl font-medium">
+              Admin Panel
+            </span>
+          </div>
           <span
             onClick={() => {
               localStorage.removeItem("token");
               window.location.href = "/admin-login";
             }}
-            className="text-white text-xl font-medium ml-auto cursor-pointer"
+            className="text-white text-lg md:text-xl font-medium cursor-pointer"
           >
             Logout
           </span>
         </div>
       </header>
 
+      {/* Main Content */}
       <div className="flex flex-1">
-        <aside className="bg-gray-800 text-gray-200 w-64 py-6 shadow-md">
+        {/* Sidebar */}
+        <aside className="bg-gray-800 text-gray-200 w-16 md:w-64 py-6 shadow-md">
           <ul>
             {navItems.map((item, index) => (
               <li
@@ -80,17 +87,20 @@ const Admin = () => {
                 onClick={() => handleTabSelect(item.label)}
               >
                 <span className="mr-2">{item.icon}</span>
-                {item.label}
+                <span className="hidden md:block">{item.label}</span>
               </li>
             ))}
           </ul>
         </aside>
 
-        <main className="flex-1 p-10 bg-gray-100 shadow-inner">
-          <Suspense fallback={<div></div>}>
+        {/* Main Content Area */}
+        <main className="flex-1 p-4 md:p-10 bg-gray-100 overflow-y-auto">
+          <Suspense fallback={<div>Loading...</div>}>
             {navItems.map((item) =>
               item.label === selectedTab ? (
-                <div key={item.label}>{item.component}</div>
+                <div key={item.label} className="mb-4">
+                  {item.component}
+                </div>
               ) : null
             )}
           </Suspense>
