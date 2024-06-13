@@ -24,7 +24,7 @@ const Vision = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div className="mb-8 md:mb-0">
             <img
-              src={VisionImg}
+              src={visionhead[0].visionImg}
               alt="Vision"
               className="rounded-lg shadow-lg object-cover w-full md:w-auto h-auto" // Responsive image
             />
