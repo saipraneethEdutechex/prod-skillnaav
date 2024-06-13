@@ -59,7 +59,7 @@ const Features = () => {
         <div
           key={index}
           className={`flex flex-col gap-x-6 ${
-            index % 2 === 0 ? "sm:flex-row-reverse" : "sm:flex-row"
+            index % 2 === 0 ? "sm:flex-row" : "sm:flex-row-reverse"
           }`}
         >
           <div className="relative w-full sm:w-1/2 lg:px-12">
