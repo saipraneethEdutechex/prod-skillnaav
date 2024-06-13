@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import SkillnaavLogo from "../../assets/skillnaav_logo-250w.png";
 
+// Lazy-loaded components
 const AdminDiscover = lazy(() => import("./AdminDiscover"));
 const AdminVision = lazy(() => import("./AdminVision"));
 const AdminFeatures = lazy(() => import("./AdminFeatures"));
@@ -18,6 +19,13 @@ const AdminTeam = lazy(() => import("./AdminTeam"));
 const AdminPricing = lazy(() => import("./AdminPricing"));
 const AdminFaqs = lazy(() => import("./AdminFaqs"));
 const AdminContact = lazy(() => import("./AdminContact"));
+
+// Loader component for suspense fallback
+const Loader = () => (
+  <div className="flex justify-center items-center h-full">
+    <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-12 w-12"></div>
+  </div>
+);
 
 const Admin = () => {
   const { skillnaavData } = useSelector((state) => state.root);
@@ -95,7 +103,7 @@ const Admin = () => {
 
         {/* Main Content Area */}
         <main className="flex-1 p-4 md:p-10 bg-gray-100 overflow-y-auto">
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loader />}>
             {navItems.map((item) =>
               item.label === selectedTab ? (
                 <div key={item.label} className="mb-4">
