@@ -69,6 +69,10 @@ const featureSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  featureImg: {
+    type: String,
+    required: true,
+  },
 });
 
 const teamSchema = new mongoose.Schema({
