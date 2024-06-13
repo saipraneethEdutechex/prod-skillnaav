@@ -11,13 +11,16 @@ function AdminTeam() {
   const [selectedTeamMember, setSelectedTeamMember] = useState(null);
   const [form] = Form.useForm();
   const [headingForm] = Form.useForm();
+  const [loading, setLoading] = useState(true); // State for loading indicator
 
   const fetchSkillnaavData = useCallback(async () => {
     try {
       const response = await axios.get("/api/skillnaav/get-skillnaav-data");
       setSkillnaavData(response.data);
+      setLoading(false); // Set loading to false after data is fetched
     } catch (error) {
       console.error("Error fetching skillnaav data:", error);
+      setLoading(false); // Set loading to false even if there's an error
     }
   }, []);
 
@@ -126,7 +129,7 @@ function AdminTeam() {
     }
   }, [skillnaavData, headingForm]);
 
-  if (!skillnaavData) {
+  if (loading || !skillnaavData) {
     return <Skeleton active />;
   }
 
@@ -185,6 +188,13 @@ function AdminTeam() {
                 title={member.teammemberName}
                 description={member.teammemberDesgn}
               />
+              {member.image && (
+                <img
+                  src={member.image}
+                  alt={member.teammemberName}
+                  style={{ maxWidth: "100px", maxHeight: "100px" }}
+                />
+              )}
             </List.Item>
           )}
         />

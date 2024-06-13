@@ -18,17 +18,20 @@ function AdminFeatures() {
 
   const fetchSkillnaavData = useCallback(async () => {
     try {
+      setLoading(true); // Set loading state to true when fetching data
       const response = await axios.get("/api/skillnaav/get-skillnaav-data");
       setSkillnaavData(response.data);
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching skillnaav data:", error);
-      setLoading(false);
+      message.error("Failed to fetch data. Please try again later.");
+    } finally {
+      setLoading(false); // Always set loading state to false after fetching data
     }
   }, []);
 
   const onFinishEdit = async (values) => {
     try {
+      setLoading(true); // Set loading state to true when submitting form
       if (!values._id) {
         values._id = selectedFeature._id;
       }
@@ -42,34 +45,47 @@ function AdminFeatures() {
         setShowEditModal(false);
         fetchSkillnaavData();
         setImageUrl(""); // Clear imageUrl after successful update
+        form.resetFields(); // Reset form fields after successful update
       } else {
-        message.error(response.data.message);
+        message.error(response.data.message || "Failed to update feature.");
       }
     } catch (error) {
-      message.error("Error updating feature:", error.message);
+      message.error(
+        "Error updating feature:",
+        error.message || "Unknown error occurred."
+      );
+    } finally {
+      setLoading(false); // Always set loading state to false after submitting form
     }
   };
 
   const onFinishAdd = async (values) => {
     try {
+      setLoading(true); // Set loading state to true when submitting form
       const payload = { ...values, featureImg: imageUrl }; // Use featureImg as per backend schema
       const response = await axios.post("/api/skillnaav/add-feature", payload);
       if (response.data.success) {
         message.success(response.data.message);
         setShowAddModal(false);
         fetchSkillnaavData();
-        form.resetFields();
+        form.resetFields(); // Reset form fields after successful add
         setImageUrl(""); // Clear imageUrl after successful add
       } else {
-        message.error(response.data.message);
+        message.error(response.data.message || "Failed to add feature.");
       }
     } catch (error) {
-      message.error("Error adding feature:", error.message);
+      message.error(
+        "Error adding feature:",
+        error.message || "Unknown error occurred."
+      );
+    } finally {
+      setLoading(false); // Always set loading state to false after submitting form
     }
   };
 
   const onDelete = async (featureId) => {
     try {
+      setLoading(true); // Set loading state to true when deleting
       const response = await axios.delete(
         `/api/skillnaav/delete-feature/${featureId}`
       );
@@ -77,10 +93,15 @@ function AdminFeatures() {
         message.success(response.data.message);
         fetchSkillnaavData();
       } else {
-        message.error(response.data.message);
+        message.error(response.data.message || "Failed to delete feature.");
       }
     } catch (error) {
-      message.error("Error deleting feature:", error.message);
+      message.error(
+        "Error deleting feature:",
+        error.message || "Unknown error occurred."
+      );
+    } finally {
+      setLoading(false); // Always set loading state to false after deleting
     }
   };
 
@@ -92,7 +113,11 @@ function AdminFeatures() {
   };
 
   const handleAdd = () => {
-    setShowAddModal(true);
+    form.resetFields(); // Reset form fields
+    setSelectedFeature(null); // Clear selected feature
+    setImageUrl(""); // Clear imageUrl state
+    setPreviewImageUrl(""); // Clear previewImageUrl state
+    setShowAddModal(true); // Show the Add Feature modal
   };
 
   const handleImageUrlChange = (e) => {
