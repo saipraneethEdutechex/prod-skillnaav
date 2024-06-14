@@ -16,8 +16,6 @@ function AdminFeatures() {
     fetchSkillnaavData();
   }, []);
 
-  // Inside AdminFeatures component
-
   const fetchSkillnaavData = useCallback(async () => {
     try {
       setLoading(true);
@@ -121,6 +119,7 @@ function AdminFeatures() {
     setSelectedFeature(feature);
     setImageUrl(feature.featureImg); // Set initial value of imageUrl for edit modal
     setPreviewImageUrl(feature.featureImg); // Set preview image URL for edit modal
+    form.setFieldsValue(feature); // Set form fields value for editing
     setShowEditModal(true);
   };
 
@@ -217,7 +216,12 @@ function AdminFeatures() {
       <Modal
         visible={showEditModal}
         title="Edit Feature"
-        onCancel={() => setShowEditModal(false)}
+        onCancel={() => {
+          setShowEditModal(false);
+          form.resetFields();
+          setImageUrl("");
+          setPreviewImageUrl("");
+        }}
         footer={null}
       >
         <Form
@@ -307,7 +311,12 @@ function AdminFeatures() {
       <Modal
         visible={showAddModal}
         title="Add Feature"
-        onCancel={() => setShowAddModal(false)}
+        onCancel={() => {
+          setShowAddModal(false);
+          form.resetFields();
+          setImageUrl("");
+          setPreviewImageUrl("");
+        }}
         footer={null}
       >
         <Form layout="vertical" onFinish={onFinishAdd} form={form}>
