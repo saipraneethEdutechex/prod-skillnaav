@@ -1,4 +1,4 @@
-import React, { useEffect, useState, lazy, useMemo, Suspense } from "react";
+import React, { useEffect, useState, lazy, Suspense, useMemo } from "react";
 import { useSelector } from "react-redux";
 import {
   FaHome,
@@ -120,7 +120,7 @@ const Admin = () => {
 
 export default React.memo(Admin);
 
-// CSS styles
+// CSS styles for loader
 const styles = `
 .loader {
   display: inline-block;
