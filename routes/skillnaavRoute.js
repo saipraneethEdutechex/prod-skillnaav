@@ -139,11 +139,13 @@ router.delete("/delete-visionpoint/:id", async (req, res) => {
 // Update Feature
 router.post("/update-feature", async (req, res) => {
   try {
+    console.log("Updating feature with data:", req.body);
     const feature = await Feature.findOneAndUpdate(
       { _id: req.body._id },
       req.body,
       { new: true }
     );
+    console.log("Feature updated:", feature);
     res.status(200).send({
       data: feature,
       success: true,
@@ -158,8 +160,10 @@ router.post("/update-feature", async (req, res) => {
 // Add Feature
 router.post("/add-feature", async (req, res) => {
   try {
+    console.log("Adding feature with data:", req.body);
     const feature = new Feature(req.body);
     await feature.save();
+    console.log("Feature added:", feature);
     res.status(200).send({
       data: feature,
       success: true,
@@ -174,12 +178,15 @@ router.post("/add-feature", async (req, res) => {
 // Delete Feature
 router.delete("/delete-feature/:id", async (req, res) => {
   try {
+    console.log("Deleting feature with ID:", req.params.id);
     await Feature.findByIdAndDelete(req.params.id);
+    console.log("Feature deleted");
     res.status(200).send({
       success: true,
       message: "Feature deleted successfully",
     });
   } catch (error) {
+    console.error("Error deleting feature:", error);
     res.status(500).send(error);
   }
 });
