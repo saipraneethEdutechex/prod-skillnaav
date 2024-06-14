@@ -178,7 +178,7 @@ const faqcardSchema = new mongoose.Schema({
 });
 
 const contactSchema = new mongoose.Schema({
-  havequestions: {
+  name: {
     type: String,
     required: true,
   },
@@ -186,27 +186,11 @@ const contactSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  contactus: {
-    type: String,
-    required: true,
-  },
-  entername: {
-    type: String,
-    required: true,
-  },
-  enteremail: {
-    type: String,
-    required: true,
-  },
-  yourquestion: {
+  subject: {
     type: String,
     required: true,
   },
   message: {
-    type: String,
-    required: true,
-  },
-  submitbtn: {
     type: String,
     required: true,
   },

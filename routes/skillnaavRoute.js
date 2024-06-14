@@ -406,4 +406,26 @@ router.post("/admin-login", async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+// Save contact form data
+router.post("/", async (req, res) => {
+  try {
+    const newContact = new Contact(req.body);
+    await newContact.save();
+    res.status(201).send({ message: "Contact saved successfully!" });
+  } catch (error) {
+    res.status(500).send({ message: "Error saving contact data", error });
+  }
+});
+
+// Get all contact form data
+router.get("/", async (req, res) => {
+  try {
+    const contacts = await Contact.find();
+    res.status(200).send(contacts);
+  } catch (error) {
+    res.status(500).send({ message: "Error fetching contact data", error });
+  }
+});
+
 module.exports = router;

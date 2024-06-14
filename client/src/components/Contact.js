@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios"; // Import axios for HTTP requests
 
 export default function Contact() {
   const [name, setName] = useState("");
@@ -6,19 +7,26 @@ export default function Contact() {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted!");
-    console.log("Name:", name);
-    console.log("Email:", email);
-    console.log("Subject:", subject);
-    console.log("Message:", message);
+    try {
+      const response = await axios.post("/api/contact", {
+        name,
+        email,
+        subject,
+        message,
+      });
+      console.log("Form submitted successfully!");
+      console.log("Submitted data:", response.data); // Log the response data
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   return (
     <div
       id="contacts"
-      className=" bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 rounded-lg overflow-hidden shadow-lg"
+      className="bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 rounded-lg overflow-hidden shadow-lg"
     >
       <div className="flex flex-col lg:flex-row">
         {/* Left Section */}
@@ -32,7 +40,7 @@ export default function Contact() {
               href="mailto:info@navigatebi.com"
               className="text-white font-medium"
             >
-            Email to : info@skillnaav.com
+              Email to: info@skillnaav.com
             </a>
           </p>
         </div>
