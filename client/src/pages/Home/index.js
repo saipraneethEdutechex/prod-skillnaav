@@ -21,7 +21,6 @@ function Home() {
   // Filter components based on the existence of data
   const componentsToRender = useMemo(() => {
     const components = [
-      { Component: Discover, key: "discover" },
       { Component: Vision, key: "vision" },
       { Component: Features, key: "features" },
       { Component: Team, key: "team" },
@@ -44,7 +43,8 @@ function Home() {
           </div>
         }
       >
-        <div className=" mx-auto">
+        <Discover />
+        <div className="px-[20px] lg:px-20 mx-auto">
           {componentsToRender.map(({ Component, key }) => (
             <Component key={key} data={memoizedData[key]} />
           ))}
