@@ -6,6 +6,7 @@ export default function Contact() {
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,10 +19,32 @@ export default function Contact() {
       });
       console.log("Form submitted successfully!");
       console.log("Submitted data:", response.data); // Log the response data
+      setSubmitted(true); // Set submitted to true to trigger animation
     } catch (error) {
       console.error("Error submitting form:", error);
     }
   };
+
+  const SuccessAnimation = () => (
+    <div
+      className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6"
+      role="alert"
+    >
+      <strong className="font-bold">Success!</strong>
+      <span className="block sm:inline"> Your message has been submitted.</span>
+      <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+        <svg
+          className="fill-current h-6 w-6 text-green-500"
+          role="button"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+        >
+          <title>Close</title>
+          <path d="M14.348 5.652a.5.5 0 0 0-.707 0L10 9.293 6.36 5.652a.5.5 0 1 0-.708.708L9.293 10l-3.64 3.64a.5.5 0 1 0 .708.708L10 10.707l3.64 3.64a.5.5 0 1 0 .708-.708L10.707 10l3.64-3.64a.5.5 0 0 0 0-.708z" />
+        </svg>
+      </span>
+    </div>
+  );
 
   return (
     <div
@@ -35,7 +58,6 @@ export default function Contact() {
             Have Questions? Get in Touch
           </h1>
           <p className="text-white text-lg mb-6 text-center">
-            <br />
             <a
               href="mailto:info@navigatebi.com"
               className="text-white font-medium"
@@ -53,6 +75,7 @@ export default function Contact() {
           <h2 className="text-white text-3xl lg:text-4xl font-bold mb-8 text-center">
             Contact Us
           </h2>
+          {submitted && <SuccessAnimation />}
           <input
             type="text"
             placeholder="Enter Your Name*"
