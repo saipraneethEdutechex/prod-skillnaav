@@ -15,50 +15,41 @@ const Footer = lazy(() => import("../../components/Footer"));
 function Home() {
   const { skillnaavData } = useSelector((state) => state.root);
 
+  // Memoize the entire skillnaavData to avoid re-rendering of components unnecessarily
   const memoizedData = useMemo(() => skillnaavData, [skillnaavData]);
 
-  const cachedComponents = useMemo(
-    () => ({
-      Discover,
-      Vision,
-      Features,
-      Team,
-      Pricing,
-      Faq,
-      Contact,
-      Footer,
-    }),
-    []
-  );
+  // Filter components based on the existence of data
+  const componentsToRender = useMemo(() => {
+    const components = [
+      { Component: Discover, key: "discover" },
+      { Component: Vision, key: "vision" },
+      { Component: Features, key: "features" },
+      { Component: Team, key: "team" },
+      { Component: Pricing, key: "pricing" },
+      { Component: Faq, key: "faq" },
+      { Component: Contact, key: "contact" },
+      { Component: Footer, key: "footer" },
+    ];
+
+    return components.filter(({ key }) => memoizedData?.[key]);
+  }, [memoizedData]);
 
   return (
-    <div className="font-inter">
+    <div className="font-inter min-h-screen bg-gradient-to-b from-gray-100 to-white">
       <Navbar />
-
-      {memoizedData ? (
-        <Suspense
-          fallback={
-            <div className="px-[20px] lg:px-20 mx-auto">
-              <Skeleton active />
-            </div>
-          }
-        >
-          <Discover />
+      <Suspense
+        fallback={
           <div className="px-[20px] lg:px-20 mx-auto">
-            <Vision />
-            <Features />
-            <Team />
-            <Pricing />
-            <Faq />
-            <Contact />
-            <Footer />
+            <Skeleton active />
           </div>
-        </Suspense>
-      ) : (
-        <div className="px-[20px] lg:px-20 mx-auto">
-          <Skeleton active />
+        }
+      >
+        <div className=" mx-auto">
+          {componentsToRender.map(({ Component, key }) => (
+            <Component key={key} data={memoizedData[key]} />
+          ))}
         </div>
-      )}
+      </Suspense>
     </div>
   );
 }
