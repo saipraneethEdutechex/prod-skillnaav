@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Modal, Form, Input, Button, message, Skeleton } from "antd";
 import axios from "axios";
 
+const { TextArea } = Input;
+
 function AdminFeatures() {
   const [skillnaavData, setSkillnaavData] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -235,7 +237,7 @@ function AdminFeatures() {
             label="Feature"
             rules={[{ required: true, message: "Please enter feature" }]}
           >
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item
             name="featuredesc"
@@ -244,49 +246,53 @@ function AdminFeatures() {
               { required: true, message: "Please enter feature description" },
             ]}
           >
-            <Input.TextArea />
+            <TextArea rows={4} />
           </Form.Item>
           <Form.Item
             name="subfeature"
             label="Sub Feature"
             rules={[{ required: true, message: "Please enter sub feature" }]}
           >
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item
             name="point1"
             label="Point 1"
             rules={[{ required: true, message: "Please enter point 1" }]}
           >
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item
             name="point2"
             label="Point 2"
             rules={[{ required: true, message: "Please enter point 2" }]}
           >
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item
             name="point3"
             label="Point 3"
             rules={[{ required: true, message: "Please enter point 3" }]}
           >
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item
             name="point4"
             label="Point 4"
             rules={[{ required: true, message: "Please enter point 4" }]}
           >
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item
             name="featureImg"
             label="Image URL"
             rules={[{ required: true, message: "Please enter image URL" }]}
           >
-            <Input onChange={handleImageUrlChange} value={imageUrl} />
+            <TextArea
+              rows={2}
+              onChange={handleImageUrlChange}
+              value={imageUrl}
+            />
           </Form.Item>
           {previewImageUrl && (
             <div className="mb-4">
@@ -325,7 +331,7 @@ function AdminFeatures() {
             label="Feature"
             rules={[{ required: true, message: "Please enter feature" }]}
           >
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item
             name="featuredesc"
@@ -334,49 +340,53 @@ function AdminFeatures() {
               { required: true, message: "Please enter feature description" },
             ]}
           >
-            <Input.TextArea />
+            <TextArea rows={4} />
           </Form.Item>
           <Form.Item
             name="subfeature"
             label="Sub Feature"
             rules={[{ required: true, message: "Please enter sub feature" }]}
           >
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item
             name="point1"
             label="Point 1"
             rules={[{ required: true, message: "Please enter point 1" }]}
           >
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item
             name="point2"
             label="Point 2"
             rules={[{ required: true, message: "Please enter point 2" }]}
           >
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item
             name="point3"
             label="Point 3"
             rules={[{ required: true, message: "Please enter point 3" }]}
           >
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item
             name="point4"
             label="Point 4"
             rules={[{ required: true, message: "Please enter point 4" }]}
           >
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item
             name="featureImg"
             label="Image URL"
             rules={[{ required: true, message: "Please enter image URL" }]}
           >
-            <Input onChange={handleImageUrlChange} value={imageUrl} />
+            <TextArea
+              rows={2}
+              onChange={handleImageUrlChange}
+              value={imageUrl}
+            />
           </Form.Item>
           {previewImageUrl && (
             <div className="mb-4">

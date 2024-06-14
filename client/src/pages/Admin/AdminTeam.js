@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Modal, Form, Input, Button, message, List, Skeleton } from "antd";
 import axios from "axios";
 
+const { TextArea } = Input;
+
 function AdminTeam() {
   const [skillnaavData, setSkillnaavData] = useState(null);
   const [isEditTeamModalVisible, setIsEditTeamModalVisible] = useState(false);
@@ -219,19 +221,19 @@ function AdminTeam() {
             <Input />
           </Form.Item>
           <Form.Item name="teammemberName" label="Name">
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item name="teammemberDesgn" label="Position">
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item name="teammemberDesc" label="Description">
-            <Input />
+            <TextArea rows={4} />
           </Form.Item>
           <Form.Item name="teammemberLinkedin" label="LinkedIn">
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item name="image" label="Image URL">
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
@@ -250,19 +252,19 @@ function AdminTeam() {
       >
         <Form form={form} onFinish={onFinishAdd}>
           <Form.Item name="teammemberName" label="Name">
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item name="teammemberDesgn" label="Position">
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item name="teammemberDesc" label="Description">
-            <Input />
+            <TextArea rows={4} />
           </Form.Item>
           <Form.Item name="teammemberLinkedin" label="LinkedIn">
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item name="image" label="Image URL">
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
@@ -281,10 +283,10 @@ function AdminTeam() {
       >
         <Form form={headingForm} onFinish={onFinishEditHeading}>
           <Form.Item name="teamheading" label="Heading">
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item name="teamsubheading" label="Sub Heading">
-            <Input />
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
