@@ -198,7 +198,7 @@ const AdminVision = () => {
                   { required: true, message: "Please enter vision heading" },
                 ]}
               >
-                <Input />
+                <TextArea rows={4} />
               </Form.Item>
               <Form.Item
                 name="visionsub"
@@ -210,7 +210,7 @@ const AdminVision = () => {
                   },
                 ]}
               >
-                <Input />
+                <TextArea rows={4} />
               </Form.Item>
               <Form.Item
                 name="visionImg"
@@ -219,7 +219,7 @@ const AdminVision = () => {
                   { required: true, message: "Please enter vision image URL" },
                 ]}
               >
-                <Input />
+                <TextArea rows={4} />
               </Form.Item>
             </>
           ) : (
@@ -228,7 +228,7 @@ const AdminVision = () => {
               label="Vision Point"
               rules={[{ required: true, message: "Please enter vision point" }]}
             >
-              <Input />
+              <TextArea rows={4} />
             </Form.Item>
           )}
           <div className="flex justify-end">
