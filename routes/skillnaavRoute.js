@@ -427,11 +427,32 @@ router.post("/", async (req, res) => {
 
 // Get all contact form data
 router.get("/", async (req, res) => {
+  const { page = 1, pageSize = 10, search = "" } = req.query;
+  const skip = (page - 1) * pageSize;
+  const query = {
+    $or: [
+      { name: new RegExp(search, "i") },
+      { email: new RegExp(search, "i") },
+    ],
+  };
+
   try {
-    const contacts = await Contact.find();
-    res.status(200).send(contacts);
+    const contacts = await Contact.find(query)
+      .skip(skip)
+      .limit(parseInt(pageSize));
+    const totalContacts = await Contact.countDocuments(query);
+    res.status(200).send({ contacts, total: totalContacts });
   } catch (error) {
     res.status(500).send({ message: "Error fetching contact data", error });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    await Contact.findByIdAndDelete(req.params.id);
+    res.status(200).send({ message: "Contact deleted successfully" });
+  } catch (error) {
+    res.status(500).send({ message: "Error deleting contact", error });
   }
 });
 
