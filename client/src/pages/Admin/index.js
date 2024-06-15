@@ -12,8 +12,24 @@ import {
 import SkillnaavLogo from "../../assets/skillnaav_logo-250w.png";
 
 // Lazy-loaded components
-const AdminDiscover = lazy(() => import("./AdminDiscover"));
-const AdminVision = lazy(() => import("./AdminVision"));
+const AdminDiscover = lazy(() => {
+  console.log("Loading AdminDiscover...");
+  const start = performance.now();
+  return import("./AdminDiscover").then((module) => {
+    console.log(`AdminDiscover loaded in ${performance.now() - start}ms`);
+    return module;
+  });
+});
+
+const AdminVision = lazy(() => {
+  console.log("Loading AdminVision...");
+  const start = performance.now();
+  return import("./AdminVision").then((module) => {
+    console.log(`AdminVision loaded in ${performance.now() - start}ms`);
+    return module;
+  });
+});
+
 const AdminFeatures = lazy(() => import("./AdminFeatures"));
 const AdminTeam = lazy(() => import("./AdminTeam"));
 const AdminPricing = lazy(() => import("./AdminPricing"));
@@ -26,6 +42,35 @@ const Loader = () => (
     <div className="loader"></div>
   </div>
 );
+
+// Custom hook for fetching data with caching
+const useFetchWithCache = (url, cacheKey) => {
+  const [data, setData] = useState(() => {
+    const cachedData = localStorage.getItem(cacheKey);
+    return cachedData ? JSON.parse(cachedData) : null;
+  });
+  const [loading, setLoading] = useState(!data);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!data) {
+      setLoading(true);
+      fetch(url)
+        .then((response) => response.json())
+        .then((result) => {
+          localStorage.setItem(cacheKey, JSON.stringify(result));
+          setData(result);
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err);
+          setLoading(false);
+        });
+    }
+  }, [url, cacheKey, data]);
+
+  return { data, loading, error };
+};
 
 const Admin = () => {
   const { skillnaavData } = useSelector((state) => state.root);
@@ -46,6 +91,17 @@ const Admin = () => {
 
   const handleTabSelect = (label) => {
     setSelectedTab(label);
+
+    // Pre-fetch the next likely component
+    switch (label) {
+      case "Discover":
+        import("./AdminVision");
+        break;
+      case "Vision":
+        import("./AdminFeatures");
+        break;
+      // Add more cases as needed
+    }
   };
 
   useEffect(() => {

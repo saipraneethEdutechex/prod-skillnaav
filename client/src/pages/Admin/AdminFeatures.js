@@ -4,59 +4,49 @@ import axios from "axios";
 
 const { TextArea } = Input;
 
-function AdminFeatures() {
+const AdminFeatures = React.memo(() => {
   const [skillnaavData, setSkillnaavData] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(true);
-  const [imageUrl, setImageUrl] = useState(""); // State for image URL
-  const [previewImageUrl, setPreviewImageUrl] = useState(""); // State for image preview URL
-
-  useEffect(() => {
-    fetchSkillnaavData();
-  }, []);
+  const [imageUrl, setImageUrl] = useState("");
+  const [previewImageUrl, setPreviewImageUrl] = useState("");
 
   const fetchSkillnaavData = useCallback(async () => {
     try {
       setLoading(true);
-      console.log("Fetching skillnaav data...");
       const response = await axios.get("/api/skillnaav/get-skillnaav-data");
-      console.log("Skillnaav data fetched:", response.data);
       setSkillnaavData(response.data);
     } catch (error) {
-      console.error("Error fetching skillnaav data:", error);
       message.error("Failed to fetch data. Please try again later.");
     } finally {
       setLoading(false);
     }
   }, []);
 
+  useEffect(() => {
+    fetchSkillnaavData();
+  }, [fetchSkillnaavData]);
+
   const onFinishEdit = async (values) => {
     try {
       setLoading(true);
-      if (!values._id) {
-        values._id = selectedFeature._id;
-      }
       const payload = { ...values, featureImg: imageUrl };
-      console.log("Updating feature with payload:", payload);
       const response = await axios.post(
         "/api/skillnaav/update-feature",
         payload
       );
-      console.log("Feature update response:", response.data);
       if (response.data.success) {
         message.success(response.data.message);
         setShowEditModal(false);
         fetchSkillnaavData();
-        setImageUrl("");
         form.resetFields();
       } else {
         message.error(response.data.message || "Failed to update feature.");
       }
     } catch (error) {
-      console.error("Error updating feature:", error);
       message.error(
         "Error updating feature: " +
           (error.message || "Unknown error occurred.")
@@ -70,20 +60,16 @@ function AdminFeatures() {
     try {
       setLoading(true);
       const payload = { ...values, featureImg: imageUrl };
-      console.log("Adding feature with payload:", payload);
       const response = await axios.post("/api/skillnaav/add-feature", payload);
-      console.log("Feature add response:", response.data);
       if (response.data.success) {
         message.success(response.data.message);
         setShowAddModal(false);
         fetchSkillnaavData();
         form.resetFields();
-        setImageUrl("");
       } else {
         message.error(response.data.message || "Failed to add feature.");
       }
     } catch (error) {
-      console.error("Error adding feature:", error);
       message.error(
         "Error adding feature: " + (error.message || "Unknown error occurred.")
       );
@@ -95,11 +81,9 @@ function AdminFeatures() {
   const onDelete = async (featureId) => {
     try {
       setLoading(true);
-      console.log("Deleting feature with ID:", featureId);
       const response = await axios.delete(
         `/api/skillnaav/delete-feature/${featureId}`
       );
-      console.log("Feature delete response:", response.data);
       if (response.data.success) {
         message.success(response.data.message);
         fetchSkillnaavData();
@@ -107,7 +91,6 @@ function AdminFeatures() {
         message.error(response.data.message || "Failed to delete feature.");
       }
     } catch (error) {
-      console.error("Error deleting feature:", error);
       message.error(
         "Error deleting feature: " +
           (error.message || "Unknown error occurred.")
@@ -119,18 +102,18 @@ function AdminFeatures() {
 
   const handleEdit = (feature) => {
     setSelectedFeature(feature);
-    setImageUrl(feature.featureImg); // Set initial value of imageUrl for edit modal
-    setPreviewImageUrl(feature.featureImg); // Set preview image URL for edit modal
-    form.setFieldsValue(feature); // Set form fields value for editing
+    setImageUrl(feature.featureImg);
+    setPreviewImageUrl(feature.featureImg);
+    form.setFieldsValue(feature);
     setShowEditModal(true);
   };
 
   const handleAdd = () => {
-    form.resetFields(); // Reset form fields
-    setSelectedFeature(null); // Clear selected feature
-    setImageUrl(""); // Clear imageUrl state
-    setPreviewImageUrl(""); // Clear previewImageUrl state
-    setShowAddModal(true); // Show the Add Feature modal
+    form.resetFields();
+    setSelectedFeature(null);
+    setImageUrl("");
+    setPreviewImageUrl("");
+    setShowAddModal(true);
   };
 
   const handleImageUrlChange = (e) => {
@@ -288,30 +271,32 @@ function AdminFeatures() {
             label="Image URL"
             rules={[{ required: true, message: "Please enter image URL" }]}
           >
-            <TextArea
-              rows={2}
-              onChange={handleImageUrlChange}
+            <Input
+              placeholder="Enter image URL"
               value={imageUrl}
+              onChange={handleImageUrlChange}
             />
           </Form.Item>
           {previewImageUrl && (
             <div className="mb-4">
               <img
                 src={previewImageUrl}
-                alt="Preview Image"
+                alt="Preview"
                 style={{ maxWidth: "100%", maxHeight: "200px" }}
               />
             </div>
           )}
-          <div className="flex justify-end">
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{ backgroundColor: "#1890ff", color: "#FFFFFF" }}
-            >
-              Save
-            </Button>
-          </div>
+          <Form.Item>
+            <div className="flex justify-end">
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ backgroundColor: "#1890ff", color: "#FFFFFF" }}
+              >
+                Save
+              </Button>
+            </div>
+          </Form.Item>
         </Form>
       </Modal>
       <Modal
@@ -382,34 +367,36 @@ function AdminFeatures() {
             label="Image URL"
             rules={[{ required: true, message: "Please enter image URL" }]}
           >
-            <TextArea
-              rows={2}
-              onChange={handleImageUrlChange}
+            <Input
+              placeholder="Enter image URL"
               value={imageUrl}
+              onChange={handleImageUrlChange}
             />
           </Form.Item>
           {previewImageUrl && (
             <div className="mb-4">
               <img
                 src={previewImageUrl}
-                alt="Preview Image"
+                alt="Preview"
                 style={{ maxWidth: "100%", maxHeight: "200px" }}
               />
             </div>
           )}
-          <div className="flex justify-end">
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{ backgroundColor: "#1890ff", color: "#FFFFFF" }}
-            >
-              Add
-            </Button>
-          </div>
+          <Form.Item>
+            <div className="flex justify-end">
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ backgroundColor: "#1890ff", color: "#FFFFFF" }}
+              >
+                Save
+              </Button>
+            </div>
+          </Form.Item>
         </Form>
       </Modal>
     </div>
   );
-}
+});
 
-export default React.memo(AdminFeatures);
+export default AdminFeatures;

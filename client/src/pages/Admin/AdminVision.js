@@ -4,7 +4,7 @@ import axios from "axios";
 
 const { TextArea } = Input;
 
-const AdminVision = () => {
+const AdminVision = React.memo(() => {
   const [skillnaavData, setSkillnaavData] = useState(null);
   const [modalData, setModalData] = useState({
     isVisible: false,
@@ -12,19 +12,24 @@ const AdminVision = () => {
     data: null,
   });
   const [form] = Form.useForm();
-
-  useEffect(() => {
-    fetchSkillnaavData();
-  }, []);
+  const [loading, setLoading] = useState(true);
 
   const fetchSkillnaavData = useCallback(async () => {
     try {
+      setLoading(true);
       const response = await axios.get("/api/skillnaav/get-skillnaav-data");
       setSkillnaavData(response.data);
     } catch (error) {
+      message.error("Error fetching skillnaav data.");
       console.error("Error fetching skillnaav data:", error);
+    } finally {
+      setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    fetchSkillnaavData();
+  }, [fetchSkillnaavData]);
 
   const handleFinish = useCallback(
     async (values) => {
@@ -87,7 +92,7 @@ const AdminVision = () => {
     [form]
   );
 
-  if (!skillnaavData) {
+  if (loading || !skillnaavData) {
     return (
       <div className="flex justify-center items-center h-full">
         <Skeleton active avatar />
@@ -244,6 +249,6 @@ const AdminVision = () => {
       </Modal>
     </div>
   );
-};
+});
 
-export default React.memo(AdminVision);
+export default AdminVision;
