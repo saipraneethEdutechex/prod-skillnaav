@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, message, List, Skeleton } from "antd";
+import { message, List, Button, Modal, Form, Input, Skeleton } from "antd";
 import axios from "axios";
 
-function AdminPricing() {
+const AdminPricing = () => {
   const [pricingData, setPricingData] = useState(null);
   const [modalVisible, setModalVisible] = useState({
     editPricingCard: false,
@@ -300,6 +300,6 @@ function AdminPricing() {
       </Modal>
     </div>
   );
-}
+};
 
 export default AdminPricing;

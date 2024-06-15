@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Table, Space, Spin } from "antd";
+import { Table, Spin } from "antd";
 
 const AdminContact = () => {
   const [contacts, setContacts] = useState([]);
@@ -46,7 +46,7 @@ const AdminContact = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 text-center">
+      <div className="container mx-auto py-8 flex justify-center items-center h-screen">
         <Spin size="large" />
       </div>
     );

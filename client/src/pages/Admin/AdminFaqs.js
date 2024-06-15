@@ -11,7 +11,7 @@ import {
 } from "antd";
 import axios from "axios";
 
-function AdminFaqs() {
+const AdminFaqs = () => {
   const [faqData, setFaqData] = useState(null);
   const [modalVisible, setModalVisible] = useState({
     editFaqCard: false,
@@ -22,6 +22,7 @@ function AdminFaqs() {
   const [editFaqCardForm] = Form.useForm();
   const [addFaqCardForm] = Form.useForm();
   const [editHeadingForm] = Form.useForm();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchFaqData();
@@ -29,11 +30,14 @@ function AdminFaqs() {
 
   const fetchFaqData = useCallback(async () => {
     try {
+      setLoading(true);
       const response = await axios.get("/api/skillnaav/get-skillnaav-data");
       setFaqData(response.data);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching FAQ data:", error);
       message.error("Error fetching FAQ data");
+      setLoading(false);
     }
   }, []);
 
@@ -138,6 +142,21 @@ function AdminFaqs() {
     },
     [fetchFaqData, faqData]
   );
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "60vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   if (!faqData) {
     return <Skeleton active />;
@@ -300,6 +319,6 @@ function AdminFaqs() {
       </Modal>
     </div>
   );
-}
+};
 
 export default AdminFaqs;
