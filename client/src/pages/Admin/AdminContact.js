@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Table, Input, Button, message, Modal } from "antd";
 import axios from "axios";
+import moment from "moment";
 
 const { Search } = Input;
 const { confirm } = Modal;
@@ -75,10 +76,21 @@ function AdminContact() {
   };
 
   const columns = [
+    {
+      title: "S. No",
+      key: "serialNumber",
+      render: (text, record, index) => (currentPage - 1) * pageSize + index + 1,
+    },
     { title: "Name", dataIndex: "name", key: "name" },
     { title: "Email", dataIndex: "email", key: "email" },
     { title: "Subject", dataIndex: "subject", key: "subject" },
     { title: "Message", dataIndex: "message", key: "message" },
+    {
+      title: "Time",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => moment(text).format("YYYY-MM-DD HH:mm:ss"),
+    },
     {
       title: "Action",
       key: "action",
