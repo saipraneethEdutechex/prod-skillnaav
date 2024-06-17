@@ -1,4 +1,4 @@
-import React, { useEffect, useState, lazy, useMemo, Suspense } from "react";
+import React, { useEffect, useState, useMemo, lazy, Suspense } from "react";
 import { useSelector } from "react-redux";
 import {
   FaHome,
@@ -23,7 +23,7 @@ const AdminContact = lazy(() => import("./AdminContact"));
 // Loader component for suspense fallback
 const Loader = () => (
   <div className="flex justify-center items-center h-full">
-    <div className="loader"></div>
+    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-gray-900"></div>
   </div>
 );
 
@@ -74,7 +74,8 @@ const Admin = () => {
               localStorage.removeItem("token");
               window.location.href = "/admin-login";
             }}
-            className="text-white text-lg md:text-xl font-medium cursor-pointer"
+            className="text-white text-lg md:text-xl font-medium cursor-pointer hover:underline"
+            style={{ marginRight: "20px" }}
           >
             Logout
           </span>
@@ -118,40 +119,4 @@ const Admin = () => {
   );
 };
 
-export default React.memo(Admin);
-
-// CSS styles
-const styles = `
-.loader {
-  display: inline-block;
-  width: 80px;
-  height: 80px;
-}
-
-.loader:after {
-  content: " ";
-  display: block;
-  width: 64px;
-  height: 64px;
-  margin: 8px;
-  border-radius: 50%;
-  border: 6px dotted #3498db;
-  border-color: #3498db transparent #3498db transparent;
-  animation: loader-spin 1.2s linear infinite;
-}
-
-@keyframes loader-spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-`;
-
-// Inject CSS into the document head
-const styleSheet = document.createElement("style");
-styleSheet.type = "text/css";
-styleSheet.innerText = styles;
-document.head.appendChild(styleSheet);
+export default Admin;
