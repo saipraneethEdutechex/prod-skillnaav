@@ -26,6 +26,7 @@ function AdminContact() {
           page: currentPage,
           pageSize: pageSize,
           search: searchTerm,
+          sort: "-createdAt",
         },
       });
       setContacts(response.data.contacts);

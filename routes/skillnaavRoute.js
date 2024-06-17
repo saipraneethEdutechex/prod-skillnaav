@@ -438,6 +438,7 @@ router.get("/", async (req, res) => {
 
   try {
     const contacts = await Contact.find(query)
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(pageSize));
     const totalContacts = await Contact.countDocuments(query);
