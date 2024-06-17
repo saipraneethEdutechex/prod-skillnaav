@@ -1,8 +1,8 @@
-const router = require("express").Router();
-const NodeCache = require("node-cache");
-const cache = new NodeCache({ stdTTL: 60 * 60 }); // Cache TTL set to 1 hour (in seconds)
+// routes/skillnaavRoutes.js
 
-// Import models and User model
+const express = require("express");
+const mongoose = require("mongoose");
+const NodeCache = require("node-cache");
 const {
   Discover,
   VisionHead,
@@ -18,7 +18,8 @@ const {
   Footer,
 } = require("../models/skillnaavModel");
 
-const User = require("../models/userModel");
+const router = express.Router();
+const cache = new NodeCache({ stdTTL: 3600 }); // Cache TTL set to 1 hour (in seconds)
 
 // Helper function to handle CRUD operations with caching
 const handleCRUDWithCache = (Model, action) => async (req, res) => {
@@ -117,6 +118,8 @@ router.get("/get-skillnaav-data", async (req, res) => {
 
 // CRUD routes with caching
 
+// CRUD routes with caching
+
 // CRUD routes for Discover model
 router.post(
   "/update-discover",
@@ -201,12 +204,10 @@ router.delete(
 // Admin login route
 router.post("/admin-login", async (req, res) => {
   try {
-    const user = await User.findOne({
-      username: req.body.username,
-      password: req.body.password,
-    });
+    const { username, password } = req.body;
+    const user = await User.findOne({ username, password }).lean();
     if (user) {
-      user.password = ""; // Remove password for security
+      delete user.password; // Remove password for security
       res
         .status(200)
         .send({ data: user, success: true, message: "Login Successfully" });
