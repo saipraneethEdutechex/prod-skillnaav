@@ -16,52 +16,18 @@ const {
 
 const User = require("../models/userModel");
 
-// Generalized async handler for routes
+// Middleware for handling asynchronous route handlers
 const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next);
 };
 
-// Middleware for error handling
+// Error handling middleware
 const errorHandler = (err, req, res, next) => {
   console.error(err.stack);
   res
     .status(500)
     .json({ success: false, message: "Server Error", error: err.message });
 };
-
-// Get all SkillNaav data
-router.get(
-  "/get-skillnaav-data",
-  asyncHandler(async (req, res) => {
-    const discovers = await Discover.find();
-    const visionhead = await VisionHead.find();
-    const visionpoint = await VisionPoint.find();
-    const features = await Feature.find();
-    const team = await Team.find();
-    const teammember = await TeamMember.find();
-    const pricing = await Pricing.find();
-    const pricingcard = await PricingCard.find();
-    const faq = await FAQ.find();
-    const faqcard = await FAQCard.find();
-    const contact = await Contact.find();
-    const footer = await Footer.find();
-
-    res.status(200).json({
-      discover: discovers,
-      visionhead: visionhead,
-      visionpoint: visionpoint,
-      features: features,
-      team: team,
-      teammember: teammember,
-      pricing: pricing,
-      pricingcard: pricingcard,
-      faq: faq,
-      faqcard: faqcard,
-      contact: contact,
-      footer: footer,
-    });
-  })
-);
 
 // Generalized CRUD operations
 const createOne = async (model, data) => {
@@ -75,288 +41,130 @@ const updateOne = async (model, filter, data) => {
   return instance;
 };
 
-const deleteOne = async (model, id) => {
+const deleteOneById = async (model, id) => {
   await model.findByIdAndDelete(id);
 };
 
-// Routes for specific operations
-router.post(
-  "/update-discover",
+// Route to get all SkillNaav data
+router.get(
+  "/get-skillnaav-data",
   asyncHandler(async (req, res) => {
-    const discover = await updateOne(Discover, { _id: req.body._id }, req.body);
-    res
-      .status(200)
-      .json({
-        data: discover,
+    const [
+      discovers,
+      visionhead,
+      visionpoint,
+      features,
+      team,
+      teammember,
+      pricing,
+      pricingcard,
+      faq,
+      faqcard,
+      contact,
+      footer,
+    ] = await Promise.all([
+      Discover.find(),
+      VisionHead.find(),
+      VisionPoint.find(),
+      Feature.find(),
+      Team.find(),
+      TeamMember.find(),
+      Pricing.find(),
+      PricingCard.find(),
+      FAQ.find(),
+      FAQCard.find(),
+      Contact.find(),
+      Footer.find(),
+    ]);
+
+    res.status(200).json({
+      discover: discovers,
+      visionhead,
+      visionpoint,
+      features,
+      team,
+      teammember,
+      pricing,
+      pricingcard,
+      faq,
+      faqcard,
+      contact,
+      footer,
+    });
+  })
+);
+
+// Generalized CRUD routes
+const createRoute = (path, model) => {
+  router.post(
+    path,
+    asyncHandler(async (req, res) => {
+      const instance = await createOne(model, req.body);
+      res.status(200).json({
+        data: instance,
         success: true,
-        message: "Discover updated successfully",
+        message: `${model.modelName} added successfully`,
       });
-  })
-);
+    })
+  );
+};
 
-router.post(
-  "/update-visionheading",
-  asyncHandler(async (req, res) => {
-    const visionhead = await updateOne(
-      VisionHead,
-      { _id: req.body._id },
-      req.body
-    );
-    res
-      .status(200)
-      .json({
-        data: visionhead,
+const updateRoute = (path, model) => {
+  router.post(
+    path,
+    asyncHandler(async (req, res) => {
+      const instance = await updateOne(model, { _id: req.body._id }, req.body);
+      res.status(200).json({
+        data: instance,
         success: true,
-        message: "Vision Heading updated successfully",
+        message: `${model.modelName} updated successfully`,
       });
-  })
-);
+    })
+  );
+};
 
-router.post(
-  "/add-visionpoint",
-  asyncHandler(async (req, res) => {
-    const visionpoint = await createOne(VisionPoint, req.body);
-    res
-      .status(200)
-      .json({
-        data: visionpoint,
+const deleteRoute = (path, model) => {
+  router.delete(
+    path,
+    asyncHandler(async (req, res) => {
+      await deleteOneById(model, req.params.id);
+      res.status(200).json({
         success: true,
-        message: "Vision Point added successfully",
+        message: `${model.modelName} deleted successfully`,
       });
-  })
-);
+    })
+  );
+};
 
-router.post(
-  "/update-visionpoint",
-  asyncHandler(async (req, res) => {
-    const visionpoint = await updateOne(
-      VisionPoint,
-      { _id: req.body._id },
-      req.body
-    );
-    res
-      .status(200)
-      .json({
-        data: visionpoint,
-        success: true,
-        message: "Vision Point updated successfully",
-      });
-  })
-);
+// Define specific CRUD routes
+createRoute("/add-visionpoint", VisionPoint);
+updateRoute("/update-visionpoint", VisionPoint);
+deleteRoute("/delete-visionpoint/:id", VisionPoint);
 
-router.delete(
-  "/delete-visionpoint/:id",
-  asyncHandler(async (req, res) => {
-    await deleteOne(VisionPoint, req.params.id);
-    res
-      .status(200)
-      .json({ success: true, message: "Vision Point deleted successfully" });
-  })
-);
+createRoute("/add-feature", Feature);
+updateRoute("/update-feature", Feature);
+deleteRoute("/delete-feature/:id", Feature);
 
-router.post(
-  "/update-feature",
-  asyncHandler(async (req, res) => {
-    const feature = await updateOne(Feature, { _id: req.body._id }, req.body);
-    res
-      .status(200)
-      .json({
-        data: feature,
-        success: true,
-        message: "Feature updated successfully",
-      });
-  })
-);
+createRoute("/add-teammember", TeamMember);
+updateRoute("/update-teammember", TeamMember);
+deleteRoute("/delete-teammember/:id", TeamMember);
 
-router.post(
-  "/add-feature",
-  asyncHandler(async (req, res) => {
-    const feature = await createOne(Feature, req.body);
-    res
-      .status(200)
-      .json({
-        data: feature,
-        success: true,
-        message: "Feature added successfully",
-      });
-  })
-);
+createRoute("/add-pricingcard", PricingCard);
+updateRoute("/update-pricingcard", PricingCard);
+deleteRoute("/delete-pricingcard/:id", PricingCard);
 
-router.delete(
-  "/delete-feature/:id",
-  asyncHandler(async (req, res) => {
-    await deleteOne(Feature, req.params.id);
-    res
-      .status(200)
-      .json({ success: true, message: "Feature deleted successfully" });
-  })
-);
+createRoute("/add-faqcard", FAQCard);
+updateRoute("/update-faqcard", FAQCard);
+deleteRoute("/delete-faqcard/:id", FAQCard);
 
-router.post(
-  "/update-teamheading",
-  asyncHandler(async (req, res) => {
-    const teamhead = await updateOne(Team, { _id: req.body._id }, req.body);
-    res
-      .status(200)
-      .json({
-        data: teamhead,
-        success: true,
-        message: "Team Heading updated successfully",
-      });
-  })
-);
+// Additional routes
+updateRoute("/update-discover", Discover);
+updateRoute("/update-visionheading", VisionHead);
+updateRoute("/update-teamheading", Team);
+updateRoute("/update-priceheading", Pricing);
+updateRoute("/update-faqheading", FAQ);
 
-router.post(
-  "/add-teammember",
-  asyncHandler(async (req, res) => {
-    const teammember = await createOne(TeamMember, req.body);
-    res
-      .status(200)
-      .json({
-        data: teammember,
-        success: true,
-        message: "Team Member added successfully",
-      });
-  })
-);
-
-router.post(
-  "/update-teammember",
-  asyncHandler(async (req, res) => {
-    const teammember = await updateOne(
-      TeamMember,
-      { _id: req.body._id },
-      req.body
-    );
-    res
-      .status(200)
-      .json({
-        data: teammember,
-        success: true,
-        message: "Team member updated successfully",
-      });
-  })
-);
-
-router.delete(
-  "/delete-teammember/:id",
-  asyncHandler(async (req, res) => {
-    await deleteOne(TeamMember, req.params.id);
-    res
-      .status(200)
-      .json({ success: true, message: "Team Member deleted successfully" });
-  })
-);
-
-router.post(
-  "/update-priceheading",
-  asyncHandler(async (req, res) => {
-    const pricing = await updateOne(Pricing, { _id: req.body._id }, req.body);
-    res
-      .status(200)
-      .json({
-        data: pricing,
-        success: true,
-        message: "Price Heading updated successfully",
-      });
-  })
-);
-
-router.post(
-  "/add-pricingcard",
-  asyncHandler(async (req, res) => {
-    const pricingcard = await createOne(PricingCard, req.body);
-    res
-      .status(200)
-      .json({
-        data: pricingcard,
-        success: true,
-        message: "Price Card added successfully",
-      });
-  })
-);
-
-router.post(
-  "/update-pricingcard",
-  asyncHandler(async (req, res) => {
-    const pricingcard = await updateOne(
-      PricingCard,
-      { _id: req.body._id },
-      req.body
-    );
-    res
-      .status(200)
-      .json({
-        data: pricingcard,
-        success: true,
-        message: "Pricing Card updated successfully",
-      });
-  })
-);
-
-router.delete(
-  "/delete-pricingcard/:id",
-  asyncHandler(async (req, res) => {
-    await deleteOne(PricingCard, req.params.id);
-    res
-      .status(200)
-      .json({ success: true, message: "Pricing Card deleted successfully" });
-  })
-);
-
-router.post(
-  "/update-faqheading",
-  asyncHandler(async (req, res) => {
-    const faq = await updateOne(FAQ, { _id: req.body._id }, req.body);
-    res
-      .status(200)
-      .json({
-        data: faq,
-        success: true,
-        message: "FAQ Heading updated successfully",
-      });
-  })
-);
-
-router.post(
-  "/add-faqcard",
-  asyncHandler(async (req, res) => {
-    const faqcard = await createOne(FAQCard, req.body);
-    res
-      .status(200)
-      .json({
-        data: faqcard,
-        success: true,
-        message: "FAQ Card added successfully",
-      });
-  })
-);
-
-router.post(
-  "/update-faqcard",
-  asyncHandler(async (req, res) => {
-    const faqcard = await updateOne(FAQCard, { _id: req.body._id }, req.body);
-    res
-      .status(200)
-      .json({
-        data: faqcard,
-        success: true,
-        message: "FAQ Card updated successfully",
-      });
-  })
-);
-
-router.delete(
-  "/delete-faqcard/:id",
-  asyncHandler(async (req, res) => {
-    await deleteOne(FAQCard, req.params.id);
-    res
-      .status(200)
-      .json({ success: true, message: "FAQ Card deleted successfully" });
-  })
-);
-
-// Admin login
+// Admin login route
 router.post(
   "/admin-login",
   asyncHandler(async (req, res) => {
@@ -369,13 +177,13 @@ router.post(
         .json({ data: user, success: true, message: "Login Successfully" });
     } else {
       res
-        .status(200)
+        .status(401)
         .json({ success: false, message: "Invalid username or password" });
     }
   })
 );
 
-// Save contact form data
+// Save contact form data route
 router.post(
   "/",
   asyncHandler(async (req, res) => {
@@ -385,7 +193,7 @@ router.post(
   })
 );
 
-// Get all contact form data
+// Get all contact form data route
 router.get(
   "/",
   asyncHandler(async (req, res) => {
@@ -407,7 +215,7 @@ router.get(
   })
 );
 
-// Delete contact form data
+// Delete contact form data route
 router.delete(
   "/:id",
   asyncHandler(async (req, res) => {
