@@ -2,7 +2,7 @@ const router = require("express").Router();
 const NodeCache = require("node-cache");
 const cache = new NodeCache({ stdTTL: 60 * 60 }); // Cache TTL set to 1 hour (in seconds)
 
-// Import your models and User model
+// Import models and User model
 const {
   Discover,
   VisionHead,
@@ -42,13 +42,13 @@ const handleCRUDWithCache = (Model, action) => async (req, res) => {
 
     switch (action) {
       case "getAll":
-        result = await Model.find();
+        result = await Model.find().lean();
         cache.set(cacheKey, result);
         break;
       case "findByIdAndUpdate":
         result = await Model.findByIdAndUpdate(req.body._id, req.body, {
           new: true,
-        });
+        }).lean();
         cache.del(cacheKey); // Invalidate cache on update
         break;
       case "create":
@@ -77,24 +77,22 @@ const handleCRUDWithCache = (Model, action) => async (req, res) => {
   }
 };
 
-// CRUD routes with caching
-
-// Get all skillnaav data
+// Get all skillnaav data with caching
 router.get("/get-skillnaav-data", async (req, res) => {
   try {
     const data = await Promise.all([
-      Discover.find(),
-      VisionHead.find(),
-      VisionPoint.find(),
-      Feature.find(),
-      Team.find(),
-      TeamMember.find(),
-      Pricing.find(),
-      PricingCard.find(),
-      FAQ.find(),
-      FAQCard.find(),
-      Contact.find(),
-      Footer.find(),
+      Discover.find().lean(),
+      VisionHead.find().lean(),
+      VisionPoint.find().lean(),
+      Feature.find().lean(),
+      Team.find().lean(),
+      TeamMember.find().lean(),
+      Pricing.find().lean(),
+      PricingCard.find().lean(),
+      FAQ.find().lean(),
+      FAQCard.find().lean(),
+      Contact.find().lean(),
+      Footer.find().lean(),
     ]);
 
     res.status(200).send({
@@ -116,6 +114,8 @@ router.get("/get-skillnaav-data", async (req, res) => {
     res.status(500).send({ message: "Error fetching skillnaav data", error });
   }
 });
+
+// CRUD routes with caching
 
 // CRUD routes for Discover model
 router.post(
