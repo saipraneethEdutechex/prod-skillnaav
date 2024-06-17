@@ -1,4 +1,8 @@
 const router = require("express").Router();
+const NodeCache = require("node-cache");
+const cache = new NodeCache({ stdTTL: 60 * 60 }); // Cache TTL set to 1 hour (in seconds)
+
+// Import your models and User model
 const {
   Discover,
   VisionHead,
@@ -16,25 +20,45 @@ const {
 
 const User = require("../models/userModel");
 
-// Helper function to handle CRUD operations
-const handleCRUD = (Model, action) => async (req, res) => {
+// Helper function to handle CRUD operations with caching
+const handleCRUDWithCache = (Model, action) => async (req, res) => {
   try {
     let result;
+    const cacheKey = `${Model.modelName}_${action}_${
+      req.params.id || req.body._id || ""
+    }`;
+
+    // Check cache for existing data
+    if (action === "getAll") {
+      const cachedData = cache.get(cacheKey);
+      if (cachedData) {
+        return res.status(200).send({
+          data: cachedData,
+          success: true,
+          message: "Data retrieved from cache",
+        });
+      }
+    }
+
     switch (action) {
       case "getAll":
         result = await Model.find();
+        cache.set(cacheKey, result);
         break;
       case "findByIdAndUpdate":
         result = await Model.findByIdAndUpdate(req.body._id, req.body, {
           new: true,
         });
+        cache.del(cacheKey); // Invalidate cache on update
         break;
       case "create":
         result = new Model(req.body);
         await result.save();
+        cache.del(cacheKey); // Invalidate cache on create
         break;
       case "findByIdAndDelete":
         await Model.findByIdAndDelete(req.params.id);
+        cache.del(cacheKey); // Invalidate cache on delete
         result = {
           success: true,
           message: `${Model.modelName} deleted successfully`,
@@ -43,6 +67,7 @@ const handleCRUD = (Model, action) => async (req, res) => {
       default:
         return res.status(400).send({ message: "Invalid action" });
     }
+
     res.status(200).send({ data: result, success: true });
   } catch (error) {
     console.error(`Error with ${Model.modelName} ${action}:`, error);
@@ -52,7 +77,9 @@ const handleCRUD = (Model, action) => async (req, res) => {
   }
 };
 
-// Get all SkillNaav data
+// CRUD routes with caching
+
+// Get all skillnaav data
 router.get("/get-skillnaav-data", async (req, res) => {
   try {
     const data = await Promise.all([
@@ -85,51 +112,93 @@ router.get("/get-skillnaav-data", async (req, res) => {
       footer: data[11],
     });
   } catch (error) {
-    res.status(500).send(error);
+    console.error("Error fetching skillnaav data:", error);
+    res.status(500).send({ message: "Error fetching skillnaav data", error });
   }
 });
 
-// CRUD routes
-router.post("/update-discover", handleCRUD(Discover, "findByIdAndUpdate"));
+// CRUD routes for Discover model
+router.post(
+  "/update-discover",
+  handleCRUDWithCache(Discover, "findByIdAndUpdate")
+);
+
+// CRUD routes for VisionHead model
 router.post(
   "/update-visionheading",
-  handleCRUD(VisionHead, "findByIdAndUpdate")
+  handleCRUDWithCache(VisionHead, "findByIdAndUpdate")
 );
-router.post("/add-visionpoint", handleCRUD(VisionPoint, "create"));
+
+// CRUD routes for VisionPoint model
+router.post("/add-visionpoint", handleCRUDWithCache(VisionPoint, "create"));
 router.post(
   "/update-visionpoint",
-  handleCRUD(VisionPoint, "findByIdAndUpdate")
+  handleCRUDWithCache(VisionPoint, "findByIdAndUpdate")
 );
 router.delete(
   "/delete-visionpoint/:id",
-  handleCRUD(VisionPoint, "findByIdAndDelete")
+  handleCRUDWithCache(VisionPoint, "findByIdAndDelete")
 );
-router.post("/update-feature", handleCRUD(Feature, "findByIdAndUpdate"));
-router.post("/add-feature", handleCRUD(Feature, "create"));
-router.delete("/delete-feature/:id", handleCRUD(Feature, "findByIdAndDelete"));
-router.post("/update-teamheading", handleCRUD(Team, "findByIdAndUpdate"));
-router.post("/add-teammember", handleCRUD(TeamMember, "create"));
-router.post("/update-teammember", handleCRUD(TeamMember, "findByIdAndUpdate"));
+
+// CRUD routes for Feature model
+router.post(
+  "/update-feature",
+  handleCRUDWithCache(Feature, "findByIdAndUpdate")
+);
+router.post("/add-feature", handleCRUDWithCache(Feature, "create"));
+router.delete(
+  "/delete-feature/:id",
+  handleCRUDWithCache(Feature, "findByIdAndDelete")
+);
+
+// CRUD routes for Team model
+router.post(
+  "/update-teamheading",
+  handleCRUDWithCache(Team, "findByIdAndUpdate")
+);
+
+// CRUD routes for TeamMember model
+router.post("/add-teammember", handleCRUDWithCache(TeamMember, "create"));
+router.post(
+  "/update-teammember",
+  handleCRUDWithCache(TeamMember, "findByIdAndUpdate")
+);
 router.delete(
   "/delete-teammember/:id",
-  handleCRUD(TeamMember, "findByIdAndDelete")
+  handleCRUDWithCache(TeamMember, "findByIdAndDelete")
 );
-router.post("/update-priceheading", handleCRUD(Pricing, "findByIdAndUpdate"));
-router.post("/add-pricingcard", handleCRUD(PricingCard, "create"));
+
+// CRUD routes for Pricing model
+router.post(
+  "/update-priceheading",
+  handleCRUDWithCache(Pricing, "findByIdAndUpdate")
+);
+router.post("/add-pricingcard", handleCRUDWithCache(PricingCard, "create"));
 router.post(
   "/update-pricingcard",
-  handleCRUD(PricingCard, "findByIdAndUpdate")
+  handleCRUDWithCache(PricingCard, "findByIdAndUpdate")
 );
 router.delete(
   "/delete-pricingcard/:id",
-  handleCRUD(PricingCard, "findByIdAndDelete")
+  handleCRUDWithCache(PricingCard, "findByIdAndDelete")
 );
-router.post("/update-faqheading", handleCRUD(FAQ, "findByIdAndUpdate"));
-router.post("/add-faqcard", handleCRUD(FAQCard, "create"));
-router.post("/update-faqcard", handleCRUD(FAQCard, "findByIdAndUpdate"));
-router.delete("/delete-faqcard/:id", handleCRUD(FAQCard, "findByIdAndDelete"));
 
-// Admin login
+// CRUD routes for FAQ model
+router.post(
+  "/update-faqheading",
+  handleCRUDWithCache(FAQ, "findByIdAndUpdate")
+);
+router.post("/add-faqcard", handleCRUDWithCache(FAQCard, "create"));
+router.post(
+  "/update-faqcard",
+  handleCRUDWithCache(FAQCard, "findByIdAndUpdate")
+);
+router.delete(
+  "/delete-faqcard/:id",
+  handleCRUDWithCache(FAQCard, "findByIdAndDelete")
+);
+
+// Admin login route
 router.post("/admin-login", async (req, res) => {
   try {
     const user = await User.findOne({
@@ -137,7 +206,7 @@ router.post("/admin-login", async (req, res) => {
       password: req.body.password,
     });
     if (user) {
-      user.password = "";
+      user.password = ""; // Remove password for security
       res
         .status(200)
         .send({ data: user, success: true, message: "Login Successfully" });
@@ -147,22 +216,25 @@ router.post("/admin-login", async (req, res) => {
         .send({ success: false, message: "Invalid username or password" });
     }
   } catch (error) {
-    res.status(500).send(error);
+    console.error("Error in admin login:", error);
+    res.status(500).send({ message: "Error in admin login", error });
   }
 });
 
-// Save contact form data
+// Save contact form data route
 router.post("/", async (req, res) => {
   try {
     const newContact = new Contact(req.body);
     await newContact.save();
+    cache.del("contacts"); // Invalidate contacts cache
     res.status(201).send({ message: "Contact saved successfully!" });
   } catch (error) {
+    console.error("Error saving contact data:", error);
     res.status(500).send({ message: "Error saving contact data", error });
   }
 });
 
-// Get all contact form data
+// Get all contact form data route with pagination
 router.get("/", async (req, res) => {
   const { page = 1, pageSize = 10, search = "" } = req.query;
   const skip = (page - 1) * pageSize;
@@ -174,17 +246,33 @@ router.get("/", async (req, res) => {
   };
 
   try {
-    const contacts = await Contact.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(pageSize));
+    // Key for caching this specific query
+    const cacheKey = `contacts_${page}_${pageSize}_${search}`;
+
+    let contacts;
+    const cachedContacts = cache.get(cacheKey);
+    if (cachedContacts) {
+      contacts = cachedContacts;
+    } else {
+      // Fetch contacts with pagination and cache the result
+      contacts = await Contact.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(pageSize))
+        .lean(); // Convert Mongoose documents to plain objects for better caching
+
+      cache.set(cacheKey, contacts); // Cache the contacts
+    }
+
     const totalContacts = await Contact.countDocuments(query);
     res.status(200).send({ contacts, total: totalContacts });
   } catch (error) {
+    console.error("Error fetching contact data:", error);
     res.status(500).send({ message: "Error fetching contact data", error });
   }
 });
 
-router.delete("/:id", handleCRUD(Contact, "findByIdAndDelete"));
+// Delete contact form data route
+router.delete("/:id", handleCRUDWithCache(Contact, "findByIdAndDelete"));
 
 module.exports = router;
