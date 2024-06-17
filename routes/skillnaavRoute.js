@@ -16,9 +16,23 @@ const {
 
 const User = require("../models/userModel");
 
-// get all SkillNaav data
-router.get("/get-skillnaav-data", async (req, res) => {
-  try {
+// Generalized async handler for routes
+const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+// Middleware for error handling
+const errorHandler = (err, req, res, next) => {
+  console.error(err.stack);
+  res
+    .status(500)
+    .json({ success: false, message: "Server Error", error: err.message });
+};
+
+// Get all SkillNaav data
+router.get(
+  "/get-skillnaav-data",
+  asyncHandler(async (req, res) => {
     const discovers = await Discover.find();
     const visionhead = await VisionHead.find();
     const visionpoint = await VisionPoint.find();
@@ -32,7 +46,7 @@ router.get("/get-skillnaav-data", async (req, res) => {
     const contact = await Contact.find();
     const footer = await Footer.find();
 
-    res.status(200).send({
+    res.status(200).json({
       discover: discovers,
       visionhead: visionhead,
       visionpoint: visionpoint,
@@ -46,415 +60,363 @@ router.get("/get-skillnaav-data", async (req, res) => {
       contact: contact,
       footer: footer,
     });
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+  })
+);
 
-// Update discover
-router.post("/update-discover", async (req, res) => {
-  try {
-    const discover = await Discover.findOneAndUpdate(
-      { _id: req.body._id },
-      req.body,
-      { new: true }
-    );
-    res.status(200).send({
-      data: discover,
-      success: true,
-      message: "Discover updated successfully",
-    });
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+// Generalized CRUD operations
+const createOne = async (model, data) => {
+  const instance = new model(data);
+  await instance.save();
+  return instance;
+};
 
-// Update Vision Heading
-router.post("/update-visionheading", async (req, res) => {
-  try {
-    const visionhead = await VisionHead.findByIdAndUpdate(
-      { _id: req.body._id },
-      req.body,
-      { new: true }
-    );
-    res.status(200).send({
-      data: visionhead,
-      success: true,
-      message: "Vision Heading updated successfully",
-    });
-  } catch (error) {
-    console.error("Error updating Vision Heading:", error);
-    res.status(500).send(error);
-  }
-});
+const updateOne = async (model, filter, data) => {
+  const instance = await model.findOneAndUpdate(filter, data, { new: true });
+  return instance;
+};
 
-// Add Vision Point
-router.post("/add-visionpoint", async (req, res) => {
-  try {
-    const visionpoint = new VisionPoint(req.body);
-    await visionpoint.save();
-    res.status(200).send({
-      data: visionpoint,
-      success: true,
-      message: "Feature added successfully",
-    });
-  } catch (error) {
-    console.error("Error adding vision:", error);
-    res.status(500).send(error);
-  }
-});
+const deleteOne = async (model, id) => {
+  await model.findByIdAndDelete(id);
+};
 
-// Update Vision Point
-router.post("/update-visionpoint", async (req, res) => {
-  try {
-    const visionpoint = await VisionPoint.findOneAndUpdate(
-      { _id: req.body._id },
-      req.body,
-      { new: true }
-    );
-    res.status(200).send({
-      data: visionpoint,
-      success: true,
-      message: "Vision Point updated successfully",
-    });
-  } catch (error) {
-    console.error("Error updating vision point:", error);
-    res.status(500).send(error);
-  }
-});
-
-// Delete Vision Point
-router.delete("/delete-visionpoint/:id", async (req, res) => {
-  try {
-    await VisionPoint.findByIdAndDelete(req.params.id);
-    res.status(200).send({
-      success: true,
-      message: "Vision Point deleted successfully",
-    });
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-// Update Feature
-router.post("/update-feature", async (req, res) => {
-  try {
-    console.log("Updating feature with data:", req.body);
-    const feature = await Feature.findOneAndUpdate(
-      { _id: req.body._id },
-      req.body,
-      { new: true }
-    );
-    console.log("Feature updated:", feature);
-    res.status(200).send({
-      data: feature,
-      success: true,
-      message: "Feature updated successfully",
-    });
-  } catch (error) {
-    console.error("Error updating feature:", error);
-    res.status(500).send(error);
-  }
-});
-
-// Add Feature
-router.post("/add-feature", async (req, res) => {
-  try {
-    console.log("Adding feature with data:", req.body);
-    const feature = new Feature(req.body);
-    await feature.save();
-    console.log("Feature added:", feature);
-    res.status(200).send({
-      data: feature,
-      success: true,
-      message: "Feature added successfully",
-    });
-  } catch (error) {
-    console.error("Error adding feature:", error);
-    res.status(500).send(error);
-  }
-});
-
-// Delete Feature
-router.delete("/delete-feature/:id", async (req, res) => {
-  try {
-    console.log("Deleting feature with ID:", req.params.id);
-    await Feature.findByIdAndDelete(req.params.id);
-    console.log("Feature deleted");
-    res.status(200).send({
-      success: true,
-      message: "Feature deleted successfully",
-    });
-  } catch (error) {
-    console.error("Error deleting feature:", error);
-    res.status(500).send(error);
-  }
-});
-
-// Update Team Heading
-router.post("/update-teamheading", async (req, res) => {
-  try {
-    const teamhead = await Team.findByIdAndUpdate(
-      { _id: req.body._id },
-      req.body,
-      { new: true }
-    );
-    res.status(200).send({
-      data: teamhead,
-      success: true,
-      message: "Team Heading updated successfully",
-    });
-  } catch (error) {
-    console.error("Error updating Team Heading:", error);
-    res.status(500).send(error);
-  }
-});
-
-// Add Team Member
-router.post("/add-teammember", async (req, res) => {
-  try {
-    const teammember = new TeamMember(req.body);
-    await teammember.save();
-    res.status(200).send({
-      data: teammember,
-      success: true,
-      message: "Team Member added successfully",
-    });
-  } catch (error) {
-    console.error("Error adding team member:", error);
-    res.status(500).send(error);
-  }
-});
-
-// Update Team Member
-router.post("/update-teammember", async (req, res) => {
-  try {
-    const teammember = await TeamMember.findByIdAndUpdate(
-      req.body._id,
-      req.body,
-      { new: true }
-    );
-    res.status(200).send({
-      data: teammember,
-      success: true,
-      message: "Team member updated successfully",
-    });
-  } catch (error) {
-    console.error("Error updating team member:", error);
-    res.status(500).send(error);
-  }
-});
-
-// Delete Team Member
-router.delete("/delete-teammember/:id", async (req, res) => {
-  try {
-    await TeamMember.findByIdAndDelete(req.params.id);
-    res.status(200).send({
-      success: true,
-      message: "Team Member deleted successfully",
-    });
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-// Update Price Heading
-router.post("/update-priceheading", async (req, res) => {
-  try {
-    const pricing = await Pricing.findByIdAndUpdate(
-      { _id: req.body._id },
-      req.body,
-      { new: true }
-    );
-    res.status(200).send({
-      data: pricing,
-      success: true,
-      message: "Price Heading updated successfully",
-    });
-  } catch (error) {
-    console.error("Error updating Price Heading:", error);
-    res.status(500).send(error);
-  }
-});
-
-// Add Price Card
-router.post("/add-pricingcard", async (req, res) => {
-  try {
-    const pricingcard = new PricingCard(req.body);
-    await pricingcard.save();
-    res.status(200).send({
-      data: pricingcard,
-      success: true,
-      message: "Price Card added successfully",
-    });
-  } catch (error) {
-    console.error("Error adding Price Card :", error);
-    res.status(500).send(error);
-  }
-});
-
-// Update Price Card
-router.post("/update-pricingcard", async (req, res) => {
-  try {
-    const pricingcard = await PricingCard.findByIdAndUpdate(
-      req.body._id,
-      req.body,
-      { new: true }
-    );
-    res.status(200).send({
-      data: pricingcard,
-      success: true,
-      message: "Pricing Card updated successfully",
-    });
-  } catch (error) {
-    console.error("Error updating Pricing Card:", error);
-    res.status(500).send(error);
-  }
-});
-
-// Delete Price Card
-router.delete("/delete-pricingcard/:id", async (req, res) => {
-  try {
-    await PricingCard.findByIdAndDelete(req.params.id);
-    res.status(200).send({
-      success: true,
-      message: "Pricing Card deleted successfully",
-    });
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-// Update FAQ Heading
-router.post("/update-faqheading", async (req, res) => {
-  try {
-    const faq = await FAQ.findByIdAndUpdate({ _id: req.body._id }, req.body, {
-      new: true,
-    });
-    res.status(200).send({
-      data: faq,
-      success: true,
-      message: "FAQ Heading updated successfully",
-    });
-  } catch (error) {
-    console.error("Error updating FAQ Heading:", error);
-    res.status(500).send(error);
-  }
-});
-
-// Add FAQ Card
-router.post("/add-faqcard", async (req, res) => {
-  try {
-    const faqcard = new FAQCard(req.body);
-    await faqcard.save();
-    res.status(200).send({
-      data: faqcard,
-      success: true,
-      message: "FAQ Card added successfully",
-    });
-  } catch (error) {
-    console.error("Error adding FAQ Card :", error);
-    res.status(500).send(error);
-  }
-});
-
-// Update FAQ Card
-router.post("/update-faqcard", async (req, res) => {
-  try {
-    const faqcard = await FAQCard.findByIdAndUpdate(req.body._id, req.body, {
-      new: true,
-    });
-    res.status(200).send({
-      data: faqcard,
-      success: true,
-      message: "FAQ Card updated successfully",
-    });
-  } catch (error) {
-    console.error("Error updating FAQ Card:", error);
-    res.status(500).send(error);
-  }
-});
-
-// Delete FAQ Card
-router.delete("/delete-faqcard/:id", async (req, res) => {
-  try {
-    await FAQCard.findByIdAndDelete(req.params.id);
-    res.status(200).send({
-      success: true,
-      message: "FAQ Card deleted successfully",
-    });
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-//admin login
-router.post("/admin-login", async (req, res) => {
-  try {
-    const user = await User.findOne({
-      username: req.body.username,
-      password: req.body.password,
-    });
-    user.password = "";
-    if (user) {
-      res.status(200).send({
-        data: user,
+// Routes for specific operations
+router.post(
+  "/update-discover",
+  asyncHandler(async (req, res) => {
+    const discover = await updateOne(Discover, { _id: req.body._id }, req.body);
+    res
+      .status(200)
+      .json({
+        data: discover,
         success: true,
-        message: "Login Successfully",
+        message: "Discover updated successfully",
       });
+  })
+);
+
+router.post(
+  "/update-visionheading",
+  asyncHandler(async (req, res) => {
+    const visionhead = await updateOne(
+      VisionHead,
+      { _id: req.body._id },
+      req.body
+    );
+    res
+      .status(200)
+      .json({
+        data: visionhead,
+        success: true,
+        message: "Vision Heading updated successfully",
+      });
+  })
+);
+
+router.post(
+  "/add-visionpoint",
+  asyncHandler(async (req, res) => {
+    const visionpoint = await createOne(VisionPoint, req.body);
+    res
+      .status(200)
+      .json({
+        data: visionpoint,
+        success: true,
+        message: "Vision Point added successfully",
+      });
+  })
+);
+
+router.post(
+  "/update-visionpoint",
+  asyncHandler(async (req, res) => {
+    const visionpoint = await updateOne(
+      VisionPoint,
+      { _id: req.body._id },
+      req.body
+    );
+    res
+      .status(200)
+      .json({
+        data: visionpoint,
+        success: true,
+        message: "Vision Point updated successfully",
+      });
+  })
+);
+
+router.delete(
+  "/delete-visionpoint/:id",
+  asyncHandler(async (req, res) => {
+    await deleteOne(VisionPoint, req.params.id);
+    res
+      .status(200)
+      .json({ success: true, message: "Vision Point deleted successfully" });
+  })
+);
+
+router.post(
+  "/update-feature",
+  asyncHandler(async (req, res) => {
+    const feature = await updateOne(Feature, { _id: req.body._id }, req.body);
+    res
+      .status(200)
+      .json({
+        data: feature,
+        success: true,
+        message: "Feature updated successfully",
+      });
+  })
+);
+
+router.post(
+  "/add-feature",
+  asyncHandler(async (req, res) => {
+    const feature = await createOne(Feature, req.body);
+    res
+      .status(200)
+      .json({
+        data: feature,
+        success: true,
+        message: "Feature added successfully",
+      });
+  })
+);
+
+router.delete(
+  "/delete-feature/:id",
+  asyncHandler(async (req, res) => {
+    await deleteOne(Feature, req.params.id);
+    res
+      .status(200)
+      .json({ success: true, message: "Feature deleted successfully" });
+  })
+);
+
+router.post(
+  "/update-teamheading",
+  asyncHandler(async (req, res) => {
+    const teamhead = await updateOne(Team, { _id: req.body._id }, req.body);
+    res
+      .status(200)
+      .json({
+        data: teamhead,
+        success: true,
+        message: "Team Heading updated successfully",
+      });
+  })
+);
+
+router.post(
+  "/add-teammember",
+  asyncHandler(async (req, res) => {
+    const teammember = await createOne(TeamMember, req.body);
+    res
+      .status(200)
+      .json({
+        data: teammember,
+        success: true,
+        message: "Team Member added successfully",
+      });
+  })
+);
+
+router.post(
+  "/update-teammember",
+  asyncHandler(async (req, res) => {
+    const teammember = await updateOne(
+      TeamMember,
+      { _id: req.body._id },
+      req.body
+    );
+    res
+      .status(200)
+      .json({
+        data: teammember,
+        success: true,
+        message: "Team member updated successfully",
+      });
+  })
+);
+
+router.delete(
+  "/delete-teammember/:id",
+  asyncHandler(async (req, res) => {
+    await deleteOne(TeamMember, req.params.id);
+    res
+      .status(200)
+      .json({ success: true, message: "Team Member deleted successfully" });
+  })
+);
+
+router.post(
+  "/update-priceheading",
+  asyncHandler(async (req, res) => {
+    const pricing = await updateOne(Pricing, { _id: req.body._id }, req.body);
+    res
+      .status(200)
+      .json({
+        data: pricing,
+        success: true,
+        message: "Price Heading updated successfully",
+      });
+  })
+);
+
+router.post(
+  "/add-pricingcard",
+  asyncHandler(async (req, res) => {
+    const pricingcard = await createOne(PricingCard, req.body);
+    res
+      .status(200)
+      .json({
+        data: pricingcard,
+        success: true,
+        message: "Price Card added successfully",
+      });
+  })
+);
+
+router.post(
+  "/update-pricingcard",
+  asyncHandler(async (req, res) => {
+    const pricingcard = await updateOne(
+      PricingCard,
+      { _id: req.body._id },
+      req.body
+    );
+    res
+      .status(200)
+      .json({
+        data: pricingcard,
+        success: true,
+        message: "Pricing Card updated successfully",
+      });
+  })
+);
+
+router.delete(
+  "/delete-pricingcard/:id",
+  asyncHandler(async (req, res) => {
+    await deleteOne(PricingCard, req.params.id);
+    res
+      .status(200)
+      .json({ success: true, message: "Pricing Card deleted successfully" });
+  })
+);
+
+router.post(
+  "/update-faqheading",
+  asyncHandler(async (req, res) => {
+    const faq = await updateOne(FAQ, { _id: req.body._id }, req.body);
+    res
+      .status(200)
+      .json({
+        data: faq,
+        success: true,
+        message: "FAQ Heading updated successfully",
+      });
+  })
+);
+
+router.post(
+  "/add-faqcard",
+  asyncHandler(async (req, res) => {
+    const faqcard = await createOne(FAQCard, req.body);
+    res
+      .status(200)
+      .json({
+        data: faqcard,
+        success: true,
+        message: "FAQ Card added successfully",
+      });
+  })
+);
+
+router.post(
+  "/update-faqcard",
+  asyncHandler(async (req, res) => {
+    const faqcard = await updateOne(FAQCard, { _id: req.body._id }, req.body);
+    res
+      .status(200)
+      .json({
+        data: faqcard,
+        success: true,
+        message: "FAQ Card updated successfully",
+      });
+  })
+);
+
+router.delete(
+  "/delete-faqcard/:id",
+  asyncHandler(async (req, res) => {
+    await deleteOne(FAQCard, req.params.id);
+    res
+      .status(200)
+      .json({ success: true, message: "FAQ Card deleted successfully" });
+  })
+);
+
+// Admin login
+router.post(
+  "/admin-login",
+  asyncHandler(async (req, res) => {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username, password });
+    if (user) {
+      user.password = ""; // Remove password from response
+      res
+        .status(200)
+        .json({ data: user, success: true, message: "Login Successfully" });
     } else {
-      res.status(200).send({
-        data: user,
-        success: false,
-        message: "Invalid username or password",
-      });
+      res
+        .status(200)
+        .json({ success: false, message: "Invalid username or password" });
     }
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+  })
+);
 
 // Save contact form data
-router.post("/", async (req, res) => {
-  try {
+router.post(
+  "/",
+  asyncHandler(async (req, res) => {
     const newContact = new Contact(req.body);
     await newContact.save();
-    res.status(201).send({ message: "Contact saved successfully!" });
-  } catch (error) {
-    res.status(500).send({ message: "Error saving contact data", error });
-  }
-});
+    res.status(201).json({ message: "Contact saved successfully!" });
+  })
+);
 
 // Get all contact form data
-router.get("/", async (req, res) => {
-  const { page = 1, pageSize = 10, search = "" } = req.query;
-  const skip = (page - 1) * pageSize;
-  const query = {
-    $or: [
-      { name: new RegExp(search, "i") },
-      { email: new RegExp(search, "i") },
-    ],
-  };
+router.get(
+  "/",
+  asyncHandler(async (req, res) => {
+    const { page = 1, pageSize = 10, search = "" } = req.query;
+    const skip = (page - 1) * pageSize;
+    const query = {
+      $or: [
+        { name: new RegExp(search, "i") },
+        { email: new RegExp(search, "i") },
+      ],
+    };
 
-  try {
     const contacts = await Contact.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(pageSize));
     const totalContacts = await Contact.countDocuments(query);
-    res.status(200).send({ contacts, total: totalContacts });
-  } catch (error) {
-    res.status(500).send({ message: "Error fetching contact data", error });
-  }
-});
+    res.status(200).json({ contacts, total: totalContacts });
+  })
+);
 
-router.delete("/:id", async (req, res) => {
-  try {
+// Delete contact form data
+router.delete(
+  "/:id",
+  asyncHandler(async (req, res) => {
     await Contact.findByIdAndDelete(req.params.id);
-    res.status(200).send({ message: "Contact deleted successfully" });
-  } catch (error) {
-    res.status(500).send({ message: "Error deleting contact", error });
-  }
-});
+    res.status(200).json({ message: "Contact deleted successfully" });
+  })
+);
+
+// Apply error handling middleware
+router.use(errorHandler);
 
 module.exports = router;
