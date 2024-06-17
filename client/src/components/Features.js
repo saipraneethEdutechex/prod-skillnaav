@@ -97,14 +97,14 @@ const Features = () => {
                 </li>
               ))}
             </ul>
-            <p
+            {/* <p
               className={`flex items-center gap-5 pt-8 text-base lg:text-lg font-medium ${feature.buttonColor}`}
             >
               Learn More
               <span>
                 <img src={feature.buttonImg} alt="Button" />
               </span>
-            </p>
+            </p> */}
           </div>
         </div>
       ))}

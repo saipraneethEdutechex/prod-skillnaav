@@ -12,7 +12,7 @@ import { useSelector } from "react-redux";
 
 const Discover = () => {
   const { skillnaavData } = useSelector((state) => state.root);
-
+  const [isDisabled, setIsDisabled] = React.useState(true);
   if (
     !skillnaavData ||
     !skillnaavData.discover ||
@@ -56,11 +56,14 @@ const Discover = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <button className="bg-[#4328EB] text-[#FFFFFF] w-1/2 px-8 py-4 rounded-[4px] lg:w-fit">
+          <button
+            disabled={isDisabled}
+            className="bg-[#4328EB] text-[#FFFFFF] w-1/2 px-8 py-4 rounded-[4px] lg:w-fit"
+          >
             {tryforfreebtn || ""}
           </button>
           <button className="text-[#4328EB] font-medium flex items-center justify-center gap-x-2 w-1/2 px-8 py-4 rounded-[4px] lg:w-fit">
-            {viewpricebtn || ""}
+            <a href="#pricing">{viewpricebtn || ""}</a>
             <span>
               <img src={BlueArrow} alt="Learn More" />
             </span>
