@@ -16,64 +16,85 @@ const {
 
 const User = require("../models/userModel");
 
-// get all SkillNaav data
+// Error handler function
+const handleErrorResponse = (res, error) => {
+  console.error("Error:", error);
+  res.status(500).send({ success: false, message: "Internal server error" });
+};
+
+// GET: Get all SkillNaav data
 router.get("/get-skillnaav-data", async (req, res) => {
   try {
-    const discovers = await Discover.find();
-    const visionhead = await VisionHead.find();
-    const visionpoint = await VisionPoint.find();
-    const features = await Feature.find();
-    const team = await Team.find();
-    const teammember = await TeamMember.find();
-    const pricing = await Pricing.find();
-    const pricingcard = await PricingCard.find();
-    const faq = await FAQ.find();
-    const faqcard = await FAQCard.find();
-    const contact = await Contact.find();
-    const footer = await Footer.find();
+    const data = await Promise.all([
+      Discover.find(),
+      VisionHead.find(),
+      VisionPoint.find(),
+      Feature.find(),
+      Team.find(),
+      TeamMember.find(),
+      Pricing.find(),
+      PricingCard.find(),
+      FAQ.find(),
+      FAQCard.find(),
+      Contact.find(),
+      Footer.find(),
+    ]);
+
+    const [
+      discovers,
+      visionhead,
+      visionpoint,
+      features,
+      team,
+      teammember,
+      pricing,
+      pricingcard,
+      faq,
+      faqcard,
+      contact,
+      footer,
+    ] = data;
 
     res.status(200).send({
       discover: discovers,
-      visionhead: visionhead,
-      visionpoint: visionpoint,
-      features: features,
-      team: team,
-      teammember: teammember,
-      pricing: pricing,
-      pricingcard: pricingcard,
-      faq: faq,
-      faqcard: faqcard,
-      contact: contact,
-      footer: footer,
+      visionhead,
+      visionpoint,
+      features,
+      team,
+      teammember,
+      pricing,
+      pricingcard,
+      faq,
+      faqcard,
+      contact,
+      footer,
     });
   } catch (error) {
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Update discover
+// POST: Update discover
 router.post("/update-discover", async (req, res) => {
   try {
-    const discover = await Discover.findOneAndUpdate(
-      { _id: req.body._id },
-      req.body,
-      { new: true }
-    );
+    const discover = await Discover.findByIdAndUpdate(req.body._id, req.body, {
+      new: true,
+    });
     res.status(200).send({
       data: discover,
       success: true,
       message: "Discover updated successfully",
     });
   } catch (error) {
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Update Vision Heading
+// POST: Update Vision Heading
 router.post("/update-visionheading", async (req, res) => {
   try {
     const visionhead = await VisionHead.findByIdAndUpdate(
-      { _id: req.body._id },
+      req.body._id,
       req.body,
       { new: true }
     );
@@ -83,12 +104,11 @@ router.post("/update-visionheading", async (req, res) => {
       message: "Vision Heading updated successfully",
     });
   } catch (error) {
-    console.error("Error updating Vision Heading:", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Add Vision Point
+// POST: Add Vision Point
 router.post("/add-visionpoint", async (req, res) => {
   try {
     const visionpoint = new VisionPoint(req.body);
@@ -96,19 +116,18 @@ router.post("/add-visionpoint", async (req, res) => {
     res.status(200).send({
       data: visionpoint,
       success: true,
-      message: "Feature added successfully",
+      message: "Vision Point added successfully",
     });
   } catch (error) {
-    console.error("Error adding vision:", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Update Vision Point
+// POST: Update Vision Point
 router.post("/update-visionpoint", async (req, res) => {
   try {
-    const visionpoint = await VisionPoint.findOneAndUpdate(
-      { _id: req.body._id },
+    const visionpoint = await VisionPoint.findByIdAndUpdate(
+      req.body._id,
       req.body,
       { new: true }
     );
@@ -118,12 +137,11 @@ router.post("/update-visionpoint", async (req, res) => {
       message: "Vision Point updated successfully",
     });
   } catch (error) {
-    console.error("Error updating vision point:", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Delete Vision Point
+// DELETE: Delete Vision Point
 router.delete("/delete-visionpoint/:id", async (req, res) => {
   try {
     await VisionPoint.findByIdAndDelete(req.params.id);
@@ -132,85 +150,71 @@ router.delete("/delete-visionpoint/:id", async (req, res) => {
       message: "Vision Point deleted successfully",
     });
   } catch (error) {
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Update Feature
+// POST: Update Feature
 router.post("/update-feature", async (req, res) => {
   try {
-    console.log("Updating feature with data:", req.body);
-    const feature = await Feature.findOneAndUpdate(
-      { _id: req.body._id },
-      req.body,
-      { new: true }
-    );
-    console.log("Feature updated:", feature);
+    const feature = await Feature.findByIdAndUpdate(req.body._id, req.body, {
+      new: true,
+    });
     res.status(200).send({
       data: feature,
       success: true,
       message: "Feature updated successfully",
     });
   } catch (error) {
-    console.error("Error updating feature:", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Add Feature
+// POST: Add Feature
 router.post("/add-feature", async (req, res) => {
   try {
-    console.log("Adding feature with data:", req.body);
     const feature = new Feature(req.body);
     await feature.save();
-    console.log("Feature added:", feature);
     res.status(200).send({
       data: feature,
       success: true,
       message: "Feature added successfully",
     });
   } catch (error) {
-    console.error("Error adding feature:", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Delete Feature
+// DELETE: Delete Feature
 router.delete("/delete-feature/:id", async (req, res) => {
   try {
-    console.log("Deleting feature with ID:", req.params.id);
     await Feature.findByIdAndDelete(req.params.id);
-    console.log("Feature deleted");
     res.status(200).send({
       success: true,
       message: "Feature deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting feature:", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Update Team Heading
+// POST: Update Team Heading
 router.post("/update-teamheading", async (req, res) => {
   try {
-    const teamhead = await Team.findByIdAndUpdate(
-      { _id: req.body._id },
-      req.body,
-      { new: true }
-    );
+    const teamhead = await Team.findByIdAndUpdate(req.body._id, req.body, {
+      new: true,
+    });
     res.status(200).send({
       data: teamhead,
       success: true,
       message: "Team Heading updated successfully",
     });
   } catch (error) {
-    console.error("Error updating Team Heading:", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Add Team Member
+// POST: Add Team Member
 router.post("/add-teammember", async (req, res) => {
   try {
     const teammember = new TeamMember(req.body);
@@ -221,12 +225,11 @@ router.post("/add-teammember", async (req, res) => {
       message: "Team Member added successfully",
     });
   } catch (error) {
-    console.error("Error adding team member:", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Update Team Member
+// POST: Update Team Member
 router.post("/update-teammember", async (req, res) => {
   try {
     const teammember = await TeamMember.findByIdAndUpdate(
@@ -240,12 +243,11 @@ router.post("/update-teammember", async (req, res) => {
       message: "Team member updated successfully",
     });
   } catch (error) {
-    console.error("Error updating team member:", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Delete Team Member
+// DELETE: Delete Team Member
 router.delete("/delete-teammember/:id", async (req, res) => {
   try {
     await TeamMember.findByIdAndDelete(req.params.id);
@@ -254,30 +256,27 @@ router.delete("/delete-teammember/:id", async (req, res) => {
       message: "Team Member deleted successfully",
     });
   } catch (error) {
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Update Price Heading
+// POST: Update Price Heading
 router.post("/update-priceheading", async (req, res) => {
   try {
-    const pricing = await Pricing.findByIdAndUpdate(
-      { _id: req.body._id },
-      req.body,
-      { new: true }
-    );
+    const pricing = await Pricing.findByIdAndUpdate(req.body._id, req.body, {
+      new: true,
+    });
     res.status(200).send({
       data: pricing,
       success: true,
       message: "Price Heading updated successfully",
     });
   } catch (error) {
-    console.error("Error updating Price Heading:", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Add Price Card
+// POST: Add Pricing Card
 router.post("/add-pricingcard", async (req, res) => {
   try {
     const pricingcard = new PricingCard(req.body);
@@ -285,15 +284,14 @@ router.post("/add-pricingcard", async (req, res) => {
     res.status(200).send({
       data: pricingcard,
       success: true,
-      message: "Price Card added successfully",
+      message: "Pricing Card added successfully",
     });
   } catch (error) {
-    console.error("Error adding Price Card :", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Update Price Card
+// POST: Update Pricing Card
 router.post("/update-pricingcard", async (req, res) => {
   try {
     const pricingcard = await PricingCard.findByIdAndUpdate(
@@ -307,12 +305,11 @@ router.post("/update-pricingcard", async (req, res) => {
       message: "Pricing Card updated successfully",
     });
   } catch (error) {
-    console.error("Error updating Pricing Card:", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Delete Price Card
+// DELETE: Delete Pricing Card
 router.delete("/delete-pricingcard/:id", async (req, res) => {
   try {
     await PricingCard.findByIdAndDelete(req.params.id);
@@ -321,14 +318,14 @@ router.delete("/delete-pricingcard/:id", async (req, res) => {
       message: "Pricing Card deleted successfully",
     });
   } catch (error) {
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Update FAQ Heading
+// POST: Update FAQ Heading
 router.post("/update-faqheading", async (req, res) => {
   try {
-    const faq = await FAQ.findByIdAndUpdate({ _id: req.body._id }, req.body, {
+    const faq = await FAQ.findByIdAndUpdate(req.body._id, req.body, {
       new: true,
     });
     res.status(200).send({
@@ -337,12 +334,11 @@ router.post("/update-faqheading", async (req, res) => {
       message: "FAQ Heading updated successfully",
     });
   } catch (error) {
-    console.error("Error updating FAQ Heading:", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Add FAQ Card
+// POST: Add FAQ Card
 router.post("/add-faqcard", async (req, res) => {
   try {
     const faqcard = new FAQCard(req.body);
@@ -353,12 +349,11 @@ router.post("/add-faqcard", async (req, res) => {
       message: "FAQ Card added successfully",
     });
   } catch (error) {
-    console.error("Error adding FAQ Card :", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Update FAQ Card
+// POST: Update FAQ Card
 router.post("/update-faqcard", async (req, res) => {
   try {
     const faqcard = await FAQCard.findByIdAndUpdate(req.body._id, req.body, {
@@ -370,12 +365,11 @@ router.post("/update-faqcard", async (req, res) => {
       message: "FAQ Card updated successfully",
     });
   } catch (error) {
-    console.error("Error updating FAQ Card:", error);
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Delete FAQ Card
+// DELETE: Delete FAQ Card
 router.delete("/delete-faqcard/:id", async (req, res) => {
   try {
     await FAQCard.findByIdAndDelete(req.params.id);
@@ -384,48 +378,45 @@ router.delete("/delete-faqcard/:id", async (req, res) => {
       message: "FAQ Card deleted successfully",
     });
   } catch (error) {
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-//admin login
+// POST: Admin Login
 router.post("/admin-login", async (req, res) => {
   try {
-    const user = await User.findOne({
-      username: req.body.username,
-      password: req.body.password,
-    });
-    user.password = "";
-    if (user) {
-      res.status(200).send({
-        data: user,
-        success: true,
-        message: "Login Successfully",
-      });
-    } else {
-      res.status(200).send({
-        data: user,
+    const { username, password } = req.body;
+    const user = await User.findOne({ username, password });
+    if (!user) {
+      return res.status(401).send({
         success: false,
         message: "Invalid username or password",
       });
     }
+    // Omitting password field from response for security
+    const { password: omitPassword, ...userData } = user._doc;
+    res.status(200).send({
+      data: userData,
+      success: true,
+      message: "Login successful",
+    });
   } catch (error) {
-    res.status(500).send(error);
+    handleErrorResponse(res, error);
   }
 });
 
-// Save contact form data
+// POST: Save Contact Form Data
 router.post("/", async (req, res) => {
   try {
     const newContact = new Contact(req.body);
     await newContact.save();
-    res.status(201).send({ message: "Contact saved successfully!" });
+    res.status(201).send({ message: "Contact saved successfully" });
   } catch (error) {
-    res.status(500).send({ message: "Error saving contact data", error });
+    handleErrorResponse(res, error);
   }
 });
 
-// Get all contact form data
+// GET: Get All Contact Form Data with Pagination and Search
 router.get("/", async (req, res) => {
   const { page = 1, pageSize = 10, search = "" } = req.query;
   const skip = (page - 1) * pageSize;
@@ -444,16 +435,17 @@ router.get("/", async (req, res) => {
     const totalContacts = await Contact.countDocuments(query);
     res.status(200).send({ contacts, total: totalContacts });
   } catch (error) {
-    res.status(500).send({ message: "Error fetching contact data", error });
+    handleErrorResponse(res, error);
   }
 });
 
+// DELETE: Delete Contact Form Data
 router.delete("/:id", async (req, res) => {
   try {
     await Contact.findByIdAndDelete(req.params.id);
     res.status(200).send({ message: "Contact deleted successfully" });
   } catch (error) {
-    res.status(500).send({ message: "Error deleting contact", error });
+    handleErrorResponse(res, error);
   }
 });
 
