@@ -98,77 +98,76 @@ const AdminVision = () => {
   const { visionhead, visionpoint } = skillnaavData;
 
   return (
-    <div className="p-4 md:p-8 lg:p-12">
-      <div className="border p-4 rounded-lg mb-4 bg-white shadow-md">
-        <h1 className="text-xl font-semibold mb-2">Vision Head</h1>
-        <hr className="my-2" />
-        <p className="mb-4">
-          <span className="font-semibold">Heading: </span>
-          {visionhead[0]?.visionheading}
-        </p>
-        <p className="mb-4">
-          <span className="font-semibold">Sub Heading: </span>
-          {visionhead[0]?.visionsub}
-        </p>
-        <div className="mb-4">
-          <span className="font-semibold">Image: </span>
-          <img
-            src={visionhead[0]?.visionImg}
-            alt="Vision Image"
-            className="max-w-full h-auto rounded"
-            style={{ maxHeight: "400px", objectFit: "cover" }}
-          />
-        </div>
-        <div className="flex justify-end mt-4">
-          <Button
-            type="primary"
-            onClick={() => openModal("editHead", visionhead[0])}
-            className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded"
-          >
-            Edit
-          </Button>
+    <div className="container mx-auto py-8">
+      <div className="mb-8">
+        <div className="border p-4 rounded-lg bg-white shadow-md">
+          <h1 className="text-2xl font-semibold mb-4">Vision Head</h1>
+          <div className="mb-4">
+            <p className="text-lg mb-2 font-semibold">Heading:</p>
+            <p className="mb-2">{visionhead[0]?.visionheading}</p>
+          </div>
+          <div className="mb-4">
+            <p className="text-lg mb-2 font-semibold">Sub Heading:</p>
+            <p className="mb-2">{visionhead[0]?.visionsub}</p>
+          </div>
+          <div className="mb-4">
+            <p className="text-lg mb-2 font-semibold">Image:</p>
+            <img
+              src={visionhead[0]?.visionImg}
+              alt="Vision Image"
+              className="max-w-full h-auto rounded"
+              style={{ maxHeight: "400px", objectFit: "cover" }}
+            />
+          </div>
+          <div className="flex justify-end">
+            <Button
+              type="primary"
+              onClick={() => openModal("editHead", visionhead[0])}
+            >
+              Edit Vision Head
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="border p-4 rounded-lg mb-4 bg-white shadow-md">
-        <h1 className="text-xl font-semibold mb-2">Vision Points</h1>
-        <hr className="my-2" />
-        <List
-          itemLayout="horizontal"
-          dataSource={visionpoint}
-          renderItem={(item) => (
-            <List.Item
-              actions={[
-                <Button
-                  type="link"
-                  onClick={() => openModal("editPoint", item)}
-                  key="edit"
-                  className="text-blue-500"
-                >
-                  Edit
-                </Button>,
-                <Button
-                  type="link"
-                  onClick={() => handleDelete(item._id)}
-                  key="delete"
-                  className="text-red-500"
-                >
-                  Delete
-                </Button>,
-              ]}
+      <div className="mb-8">
+        <div className="border p-4 rounded-lg bg-white shadow-md">
+          <h1 className="text-2xl font-semibold mb-4">Vision Points</h1>
+          <List
+            itemLayout="horizontal"
+            dataSource={visionpoint}
+            renderItem={(item) => (
+              <List.Item
+                actions={[
+                  <Button
+                    type="link"
+                    onClick={() => openModal("editPoint", item)}
+                    className="text-blue-500"
+                  >
+                    Edit
+                  </Button>,
+                  <Button
+                    type="link"
+                    onClick={() => handleDelete(item._id)}
+                    className="text-red-500"
+                  >
+                    Delete
+                  </Button>,
+                ]}
+              >
+                <List.Item.Meta title={item.visionpoint} />
+              </List.Item>
+            )}
+          />
+          <div className="flex justify-end mt-4">
+            <Button
+              type="primary"
+              onClick={() => openModal("addPoint")}
+              className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded"
             >
-              <List.Item.Meta title={item.visionpoint} />
-            </List.Item>
-          )}
-        />
-        <div className="flex justify-end mt-4">
-          <Button
-            type="primary"
-            onClick={() => openModal("addPoint")}
-            className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded"
-          >
-            Add Point
-          </Button>
+              Add Vision Point
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -186,7 +185,6 @@ const AdminVision = () => {
           setModalData({ isVisible: false, type: "", data: null })
         }
         footer={null}
-        className="p-4 md:p-8 lg:p-12"
       >
         <Form layout="vertical" onFinish={handleFinish} form={form}>
           {modalData.type === "editHead" ? (
@@ -232,11 +230,7 @@ const AdminVision = () => {
             </Form.Item>
           )}
           <div className="flex justify-end">
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded"
-            >
+            <Button type="primary" htmlType="submit">
               {modalData.type === "addPoint" ? "Add" : "Save"}
             </Button>
           </div>

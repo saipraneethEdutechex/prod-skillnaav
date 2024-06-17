@@ -63,7 +63,7 @@ const Admin = () => {
             <img
               src={SkillnaavLogo}
               alt="Skillnaav Logo"
-              className="w-24 h-16 md:w-28 md:h-20 mr-3"
+              className="w-32 h-auto md:w-40 md:h-auto mr-3"
             />
             <span className="text-white text-lg md:text-xl font-medium">
               Admin Panel
@@ -74,7 +74,7 @@ const Admin = () => {
               localStorage.removeItem("token");
               window.location.href = "/admin-login";
             }}
-            className="text-white text-lg md:text-xl font-medium cursor-pointer"
+            className="text-white text-lg md:text-xl font-medium cursor-pointer hover:underline"
           >
             Logout
           </span>
@@ -120,7 +120,7 @@ const Admin = () => {
 
 export default React.memo(Admin);
 
-// CSS styles
+// CSS styles (you can include this in your global styles or CSS file)
 const styles = `
 .loader {
   display: inline-block;
