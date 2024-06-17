@@ -1,4 +1,6 @@
-const router = require("express").Router();
+const express = require("express");
+const NodeCache = require("node-cache");
+const router = express.Router();
 const {
   Discover,
   VisionHead,
@@ -15,6 +17,9 @@ const {
 } = require("../models/skillnaavModel");
 
 const User = require("../models/userModel");
+
+// Initialize cache
+const cache = new NodeCache({ stdTTL: 600, checkperiod: 120 }); // TTL of 10 minutes
 
 // Middleware for handling asynchronous route handlers
 const asyncHandler = (fn) => (req, res, next) => {
@@ -45,10 +50,17 @@ const deleteOneById = async (model, id) => {
   await model.findByIdAndDelete(id);
 };
 
-// Route to get all SkillNaav data
+// Route to get all SkillNaav data with caching
 router.get(
   "/get-skillnaav-data",
   asyncHandler(async (req, res) => {
+    const cacheKey = "skillnaav-data";
+    const cachedData = cache.get(cacheKey);
+
+    if (cachedData) {
+      return res.status(200).json(cachedData);
+    }
+
     const [
       discovers,
       visionhead,
@@ -77,7 +89,7 @@ router.get(
       Footer.find(),
     ]);
 
-    res.status(200).json({
+    const responseData = {
       discover: discovers,
       visionhead,
       visionpoint,
@@ -90,7 +102,10 @@ router.get(
       faqcard,
       contact,
       footer,
-    });
+    };
+
+    cache.set(cacheKey, responseData);
+    res.status(200).json(responseData);
   })
 );
 
@@ -100,6 +115,7 @@ const createRoute = (path, model) => {
     path,
     asyncHandler(async (req, res) => {
       const instance = await createOne(model, req.body);
+      cache.flushAll(); // Clear cache on data mutation
       res.status(200).json({
         data: instance,
         success: true,
@@ -114,6 +130,7 @@ const updateRoute = (path, model) => {
     path,
     asyncHandler(async (req, res) => {
       const instance = await updateOne(model, { _id: req.body._id }, req.body);
+      cache.flushAll(); // Clear cache on data mutation
       res.status(200).json({
         data: instance,
         success: true,
@@ -128,6 +145,7 @@ const deleteRoute = (path, model) => {
     path,
     asyncHandler(async (req, res) => {
       await deleteOneById(model, req.params.id);
+      cache.flushAll(); // Clear cache on data mutation
       res.status(200).json({
         success: true,
         message: `${model.modelName} deleted successfully`,
@@ -189,11 +207,12 @@ router.post(
   asyncHandler(async (req, res) => {
     const newContact = new Contact(req.body);
     await newContact.save();
+    cache.flushAll(); // Clear cache on data mutation
     res.status(201).json({ message: "Contact saved successfully!" });
   })
 );
 
-// Get all contact form data route
+// Get all contact form data route with pagination and search
 router.get(
   "/",
   asyncHandler(async (req, res) => {
@@ -220,6 +239,7 @@ router.delete(
   "/:id",
   asyncHandler(async (req, res) => {
     await Contact.findByIdAndDelete(req.params.id);
+    cache.flushAll(); // Clear cache on data mutation
     res.status(200).json({ message: "Contact deleted successfully" });
   })
 );
