@@ -4,7 +4,9 @@ import Modal from "react-modal";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import linkedin from "../../assets/linkedin_blue.png";
-import HemaRanjini from "../../assets/HemaRanjini.jpeg";
+import HemRanjiniCropped from "../../assets/HemRanjiniCropped.png";
+import KrishnaPillaiCropped from "../../assets/KrishnaPillaiCropped.png";
+import AkanshaCropped from "../../assets/Akansha.jpg";
 import "./Team.scss";
 import { useSelector } from "react-redux";
 
@@ -57,10 +59,22 @@ const Team = () => {
 
   const { teamheading, teamsubheading } = skillnaavData.team[0];
   const teammember = skillnaavData.teammember.map((item, index) => {
+    if (index === 3) {
+      return {
+        ...item,
+        image: KrishnaPillaiCropped,
+      };
+    }
+    if (index === 4) {
+      return {
+        ...item,
+        image: AkanshaCropped,
+      };
+    }
     if (index === 2) {
       return {
         ...item,
-        image: HemaRanjini,
+        image: HemRanjiniCropped,
       };
     }
     return item;
