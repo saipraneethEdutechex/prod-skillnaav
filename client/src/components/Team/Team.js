@@ -82,11 +82,11 @@ const Team = () => {
           {teammember.map((item) => (
             <div key={item._id} className="flex justify-center">
               <div className="team-card bg-white p-6 md:p-8 lg:p-10 rounded-lg shadow-lg max-w-xs flex flex-col items-center">
-                <div className="relative h-32 w-32 md:h-56 md:w-44 mb-6 flex items-center justify-center rounded-full overflow-hidden">
+                <div className="team-image-container relative mb-6 flex items-center justify-center rounded-full overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.teammemberName}
-                    className="object-cover w-full h-full transition-transform duration-300 hover:scale-110"
+                    className="team-image object-cover w-full h-full transition-transform duration-300 hover:scale-110"
                   />
                 </div>
                 <h1 className="text-xl md:text-2xl text-gray-900 font-bold mb-2 text-center">
@@ -119,11 +119,11 @@ const Team = () => {
         >
           <div className="bg-white p-6 md:p-8 lg:p-10 rounded-lg shadow-lg max-w-3xl w-full">
             <div className="flex flex-col items-center">
-              <div className="relative h-40 w-40 md:h-48 md:w-48 mb-6">
+              <div className="modal-image-container relative mb-6">
                 <img
                   src={selectedMember.image}
                   alt={selectedMember.teammemberName}
-                  className="object-cover w-full h-full rounded-full transition-transform duration-300 hover:scale-110"
+                  className="modal-image object-cover w-full h-full rounded-full transition-transform duration-300 hover:scale-110"
                 />
               </div>
               <h1 className="text-lg md:text-xl lg:text-2xl text-gray-900 font-bold mt-4">

@@ -31,10 +31,10 @@
 }
 
 .team-card .team-image-container {
-  width: 120px; /* Adjusted width for smaller image */
-  height: 120px; /* Adjusted height for smaller image */
+  width: 150px;
+  height: 200px;
   overflow: hidden;
-  border-radius: 50%;
+  //border-radius: 50%;
   margin-bottom: 1rem;
 }
 
@@ -78,8 +78,8 @@
 }
 
 .modal .modal-image-container {
-  width: 160px; /* Adjusted width for modal image */
-  height: 160px; /* Adjusted height for modal image */
+  width: 180px;
+  height: 180px;
   overflow: hidden;
   border-radius: 50%;
   margin-bottom: 1rem;
