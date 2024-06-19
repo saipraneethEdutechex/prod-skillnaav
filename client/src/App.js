@@ -4,14 +4,14 @@ import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 import Home from "./pages/Home";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { HideLoading, SetSkillNaavData } from "./redux/rootSlice";
 import Admin from "./pages/Admin";
 import Login from "./pages/Admin/Login";
 
 function App() {
-  const { loading, skillnaavData, reloadData, ReloadData } = useSelector(
+  const { skillnaavData, reloadData, ReloadData } = useSelector(
     (state) => state.root
   );
   const dispatch = useDispatch();
