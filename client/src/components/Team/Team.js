@@ -114,39 +114,52 @@ const Team = () => {
           isOpen={modalIsOpen}
           onRequestClose={closeModal}
           contentLabel="Team Member Details"
-          className="fixed inset-0 flex items-center justify-center p-4 modal-content"
-          overlayClassName="fixed inset-0 modal-overlay"
+          className="team-modal"
+          overlayClassName="modal-overlay"
         >
-          <div className="bg-white p-6 md:p-8 lg:p-10 rounded-lg shadow-lg max-w-3xl w-full">
-            <div className="flex flex-col items-center">
-              <div className="modal-image-container relative mb-6">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2 className="text-2xl font-bold text-gray-800">
+                {selectedMember.teammemberName}
+              </h2>
+              <button
+                onClick={closeModal}
+                className="modal-close-button"
+                aria-label="Close Modal"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="modal-image-container">
                 <img
                   src={selectedMember.image}
                   alt={selectedMember.teammemberName}
-                  className="modal-image object-cover w-full h-full rounded-full transition-transform duration-300 hover:scale-110"
+                  className="modal-image"
                 />
               </div>
-              <h1 className="text-lg md:text-xl lg:text-2xl text-gray-900 font-bold mt-4">
-                {selectedMember.teammemberName}
-              </h1>
-              <p className="text-sm md:text-base text-center text-gray-600">
+              <p className="text-base text-gray-700 mt-4 mb-2">
                 {selectedMember.teammemberDesgn}
               </p>
-              <p className="text-sm md:text-base text-center text-gray-700 mt-2">
+              <p className="text-base text-gray-700 mb-4">
                 {selectedMember.teammemberDesc}
               </p>
               <button
                 onClick={() =>
                   window.open(selectedMember.teammemberLinkedin, "_blank")
                 }
-                className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 mt-4"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 mr-4"
               >
-                <img src={linkedin} alt="LinkedIn" width={20} height={20} />
-                <span className="ml-2">Connect on LinkedIn</span>
+                <img
+                  src={linkedin}
+                  alt="LinkedIn"
+                  className="inline-block w-5 h-5 mr-2"
+                />
+                Connect on LinkedIn
               </button>
               <button
                 onClick={closeModal}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold mt-2 transition-colors duration-300 hover:bg-red-700"
+                className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700"
               >
                 Close
               </button>
