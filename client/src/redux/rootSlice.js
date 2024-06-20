@@ -20,10 +20,20 @@ const rootSlice = createSlice({
     ReloadData: (state, action) => {
       state.reloadData = action.payload;
     },
+    UpdateDiscoverImageUrl: (state, action) => {
+      if (state.skillnaavData && state.skillnaavData.discover) {
+        state.skillnaavData.discover[0].imageUrl = action.payload;
+      }
+    },
   },
 });
 
-export const { ShowLoading, HideLoading, SetSkillNaavData, ReloadData } =
-  rootSlice.actions;
+export const {
+  ShowLoading,
+  HideLoading,
+  SetSkillNaavData,
+  ReloadData,
+  UpdateDiscoverImageUrl,
+} = rootSlice.actions;
 
 export const rootReducer = rootSlice.reducer;
