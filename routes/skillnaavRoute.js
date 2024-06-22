@@ -17,6 +17,49 @@ const {
 } = require("../models/skillnaavModel");
 
 const User = require("../models/userModel");
+const multer = require("multer");
+const path = require("path");
+
+// Multer storage configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./client/uploads"); // Destination folder for uploads
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}${path.extname(file.originalname)}`); // File naming
+  },
+});
+
+// File filter (optional)
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only image files are allowed!"), false);
+  }
+};
+
+// Multer upload instance
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 1024 * 1024 * 5, // Limit file size to 5MB (adjust as needed)
+  },
+});
+
+// Route for image upload
+router.post("/upload-image", upload.single("image"), (req, res) => {
+  try {
+    const imageUrl = `/uploads/${req.file.filename}`; // Relative path to uploaded image
+    res.status(200).json({ success: true, imageUrl });
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    res.status(500).json({ success: false, message: "Failed to upload image" });
+  }
+});
+
+// Update existing CRUD routes and error handling as necessary
 
 // Initialize cache
 const cache = new NodeCache({ stdTTL: 600, checkperiod: 120 }); // TTL of 10 minutes

@@ -1,21 +1,23 @@
-import React from "react";
-import { Form, Input, Button, message, Skeleton } from "antd";
+import React, { useState } from "react";
+import { Form, Input, Button, message, Skeleton, Upload } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { ShowLoading, HideLoading } from "../../redux/rootSlice";
 import axios from "axios";
-import { LoadingOutlined } from "@ant-design/icons";
+import { LoadingOutlined, UploadOutlined } from "@ant-design/icons";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 function AdminDiscover() {
   const dispatch = useDispatch();
   const { skillnaavData, loading } = useSelector((state) => state.root);
+  const [imageUrl, setImageUrl] = useState(null); // State to store image URL
 
   const onFinish = async (values) => {
     try {
       dispatch(ShowLoading());
       const response = await axios.post("/api/skillnaav/update-discover", {
         ...values,
+        imageUrl, // Include imageUrl in the request
         _id: skillnaavData.discover[0]._id,
       });
       dispatch(HideLoading());
@@ -28,6 +30,12 @@ function AdminDiscover() {
       dispatch(HideLoading());
       message.error("Failed to save changes. Please try again later.");
       console.error("Error:", error);
+    }
+  };
+
+  const handleImageChange = (info) => {
+    if (info.file.status === "done") {
+      setImageUrl(info.file.response.imageUrl); // Store uploaded image URL
     }
   };
 
@@ -87,6 +95,22 @@ function AdminDiscover() {
             className="rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
           />
         </Form.Item>
+        {/* Upload Image */}
+        <Form.Item
+          name="imageUrl"
+          label="Upload Image"
+          className="font-semibold text-gray-700"
+        >
+          <Upload
+            name="image"
+            listType="picture"
+            action="/api/skillnaav/upload-image"
+            onChange={handleImageChange}
+          >
+            <Button icon={<UploadOutlined />}>Click to upload</Button>
+          </Upload>
+        </Form.Item>
+
         <div className="flex justify-end">
           <Button
             htmlType="submit"

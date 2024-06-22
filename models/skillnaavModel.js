@@ -17,6 +17,10 @@ const discoverSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  imageUrl: {
+    type: String,
+    required: true,
+  },
 });
 
 const visionheadingSchema = new mongoose.Schema({
