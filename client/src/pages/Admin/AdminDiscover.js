@@ -13,6 +13,9 @@ function AdminDiscover() {
   const [imageUrl, setImageUrl] = useState(null); // State to store image URL
 
   const onFinish = async (values) => {
+    console.log("Form Values:", values);
+    console.log("Image URL:", imageUrl);
+
     try {
       dispatch(ShowLoading());
       const response = await axios.post("/api/skillnaav/update-discover", {
