@@ -109,6 +109,8 @@ function AdminDiscover() {
             listType="picture"
             action="/api/skillnaav/upload-image"
             onChange={handleImageChange}
+            maxCount={1} // Allow only one image to be uploaded
+            defaultFileList={imageUrl ? [{ url: imageUrl }] : []} // Show the current image if available
           >
             <Button icon={<UploadOutlined />}>Click to upload</Button>
           </Upload>
