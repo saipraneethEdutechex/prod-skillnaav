@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 const Discover = () => {
   const { skillnaavData } = useSelector((state) => state.root);
   const [isDisabled, setIsDisabled] = React.useState(true);
+
   if (
     !skillnaavData ||
     !skillnaavData.discover ||
@@ -22,8 +23,13 @@ const Discover = () => {
   }
 
   const discover = skillnaavData.discover[0];
-  const { discoverheading, discoversubheading, tryforfreebtn, viewpricebtn } =
-    discover;
+  const {
+    discoverheading,
+    discoversubheading,
+    tryforfreebtn,
+    viewpricebtn,
+    imgUrl,
+  } = discover;
 
   return (
     <motion.div
@@ -83,7 +89,7 @@ const Discover = () => {
         />
         <div className="absolute bottom-5 flex w-full flex-col items-center">
           <img
-            src={HeroImage}
+            src={imgUrl || HeroImage}
             alt="hero image"
             className="mb-10 md:w-[60%] md:mt-20 sm:mb-20 px-3 sm:px-20 sm:mx-12 lg:w-[60%] xl:w-[65%]"
           />

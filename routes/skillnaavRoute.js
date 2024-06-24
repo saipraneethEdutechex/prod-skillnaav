@@ -248,3 +248,35 @@ router.delete(
 router.use(errorHandler);
 
 module.exports = router;
+
+// Update the /update-discover route
+router.post(
+  "/update-discover",
+  asyncHandler(async (req, res) => {
+    const {
+      _id,
+      discoverheading,
+      discoversubheading,
+      tryforfreebtn,
+      viewpricebtn,
+      imgUrl,
+    } = req.body;
+    const updatedDiscover = await Discover.findByIdAndUpdate(
+      _id,
+      {
+        discoverheading,
+        discoversubheading,
+        tryforfreebtn,
+        viewpricebtn,
+        imgUrl,
+      },
+      { new: true }
+    );
+    cache.flushAll(); // Clear cache on data mutation
+    res.status(200).json({
+      data: updatedDiscover,
+      success: true,
+      message: "Discover section updated successfully",
+    });
+  })
+);
