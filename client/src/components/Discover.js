@@ -83,7 +83,8 @@ const Discover = () => {
           <img
             src={imgUrl || HeroImage}
             alt="hero image"
-            className="mb-10 md:w-[60%] md:mt-20 sm:mb-20 px-3 sm:px-20 sm:mx-12 lg:w-[60%] xl:w-[65%]"
+            className="mb-10 md:w-[60%] md:mt-20 sm:mb-20 px-3 sm:px-20 sm:mx-12 lg:w-[60%] xl:w-[65%] max-w-full h-auto"
+            style={{ maxWidth: "100%", maxHeight: "auto" }}
           />
           <div className="flex w-full flex-col items-center lg:container lg:flex-row lg:justify-between lg:px-20">
             <p className="text-[white] text-center text-[16px] lg:text-[18px]">
@@ -98,6 +99,8 @@ const Discover = () => {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
+                  className="max-w-full h-auto"
+                  style={{ maxWidth: "100%", maxHeight: "auto" }}
                 />
               ))}
             </div>

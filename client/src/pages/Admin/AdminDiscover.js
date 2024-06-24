@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, message, Upload, Skeleton } from "antd";
+import { Form, Input, Button, message, Upload, Skeleton, Spin } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { ShowLoading, HideLoading } from "../../redux/rootSlice";
 import axios from "axios";
@@ -10,6 +10,7 @@ import {
   UploadOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
+import ImageLazyLoad from "react-lazyload";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -17,6 +18,8 @@ function AdminDiscover() {
   const [form] = Form.useForm();
   const [discoverImgUrl, setDiscoverImgUrl] = useState("");
   const [compImageUrls, setCompImageUrls] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [formData, setFormData] = useState(null); // State to store form data before saving
   const dispatch = useDispatch();
   const { skillnaavData, loading } = useSelector((state) => state.root);
 
@@ -29,6 +32,7 @@ function AdminDiscover() {
       const discover = skillnaavData.discover[0];
       setDiscoverImgUrl(discover.imgUrl || "");
       setCompImageUrls(discover.compImageUrls || []);
+      setFormData(discover); // Initialize form data with fetched data
     }
   }, [skillnaavData]);
 
@@ -43,6 +47,7 @@ function AdminDiscover() {
       });
       dispatch(HideLoading());
       if (response.data.success) {
+        setFormData(values); // Update form data state with saved values
         message.success(response.data.message);
       } else {
         message.error(response.data.message);
@@ -56,7 +61,9 @@ function AdminDiscover() {
 
   const handleDiscoverImageUpload = ({ file }) => {
     const storageRef = firebase.storage().ref();
-    const fileRef = storageRef.child(file.name);
+    const fileRef = storageRef.child(`discover/${Date.now()}_${file.name}`);
+
+    setUploading(true);
 
     fileRef
       .put(file)
@@ -67,6 +74,7 @@ function AdminDiscover() {
             type: "UPDATE_DISCOVER_IMG_URL",
             payload: downloadURL,
           });
+          message.success("Discover image uploaded successfully");
         });
       })
       .catch((error) => {
@@ -74,12 +82,15 @@ function AdminDiscover() {
         message.error(
           "Failed to upload discover image. Please try again later."
         );
-      });
+      })
+      .finally(() => setUploading(false));
   };
 
   const handleCompanyImageUpload = async ({ file }) => {
     const storageRef = firebase.storage().ref();
-    const fileRef = storageRef.child(file.name);
+    const fileRef = storageRef.child(`company/${Date.now()}_${file.name}`);
+
+    setUploading(true);
 
     try {
       const snapshot = await fileRef.put(file);
@@ -95,24 +106,29 @@ function AdminDiscover() {
         await axios.post("/api/skillnaav/add-discover-comp-img", {
           imageUrl: downloadURL,
         });
+        message.success("Company image uploaded successfully");
       } else {
         message.warning("You can upload a maximum of 5 images.");
       }
     } catch (error) {
       console.error("Company image upload error:", error);
       message.error("Failed to upload company image. Please try again later.");
+    } finally {
+      setUploading(false);
     }
   };
 
-  const handleImageRemove = async (idToRemove) => {
+  const handleImageRemove = async (urlToRemove) => {
     try {
       const response = await axios.delete(
-        `/api/skillnaav/delete-discover-comp-img/${idToRemove}`
+        `/api/skillnaav/delete-discover-comp-img/${encodeURIComponent(
+          urlToRemove
+        )}`
       );
       if (response.data.success) {
         message.success("Company image deleted successfully");
-        // Remove the deleted image from compImageUrls state
-        setCompImageUrls(compImageUrls.filter((url) => url !== idToRemove));
+        // Update state to reflect the deleted image
+        setCompImageUrls(compImageUrls.filter((url) => url !== urlToRemove));
       } else {
         message.error(
           response.data.message || "Failed to delete company image"
@@ -124,6 +140,15 @@ function AdminDiscover() {
     }
   };
 
+  const handleReset = () => {
+    // Reset form data to last saved state
+    if (formData) {
+      form.setFieldsValue(formData);
+      setDiscoverImgUrl(formData.imgUrl || "");
+      setCompImageUrls(formData.compImageUrls || []);
+    }
+  };
+
   if (
     !skillnaavData ||
     !skillnaavData.discover ||
@@ -132,7 +157,6 @@ function AdminDiscover() {
     return <Skeleton active />;
   }
 
-  const discover = skillnaavData.discover[0];
   const discovercompimg = skillnaavData.discovercompimg || [];
 
   return (
@@ -144,7 +168,7 @@ function AdminDiscover() {
         form={form}
         onFinish={onFinish}
         layout="vertical"
-        initialValues={discover}
+        initialValues={formData} // Initialize form with formData
         className="space-y-6"
       >
         <Form.Item
@@ -228,7 +252,7 @@ function AdminDiscover() {
           <Upload
             name="image"
             listType="picture-card"
-            showUploadList={true}
+            showUploadList={false}
             beforeUpload={() => false}
             onChange={handleCompanyImageUpload}
           >
@@ -256,6 +280,9 @@ function AdminDiscover() {
           <Button type="primary" htmlType="submit" loading={loading}>
             Save Changes
           </Button>
+          <Button className="ml-2" onClick={handleReset}>
+            Discard Changes
+          </Button>
         </Form.Item>
         {discovercompimg.length > 0 && (
           <div className="mt-8">
@@ -264,30 +291,33 @@ function AdminDiscover() {
             </h2>
             <div className="grid grid-cols-3 gap-4">
               {discovercompimg.map((image, index) => (
-                <div key={image._id}>
-                  <img
-                    src={image.imageUrl}
-                    alt={`Company ${index + 1}`}
-                    style={{
-                      width: "100%",
-                      maxHeight: "200px",
-                      objectFit: "cover",
-                    }}
-                    className="rounded-lg shadow-md"
-                  />
-                  <Button
-                    type="link"
-                    onClick={() => handleImageRemove(image._id)}
-                    icon={<DeleteOutlined />}
-                  >
-                    Delete
-                  </Button>
-                </div>
+                <ImageLazyLoad key={image._id} height={200} offset={100}>
+                  <div>
+                    <img
+                      src={image.imageUrl}
+                      alt={`Company ${index + 1}`}
+                      style={{
+                        width: "100%",
+                        maxHeight: "200px",
+                        objectFit: "cover",
+                      }}
+                      className="rounded-lg shadow-md"
+                    />
+                    <Button
+                      type="link"
+                      onClick={() => handleImageRemove(image._id)}
+                      icon={<DeleteOutlined />}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </ImageLazyLoad>
               ))}
             </div>
           </div>
         )}
       </Form>
+      <Spin spinning={uploading} indicator={antIcon} />
     </div>
   );
 }
