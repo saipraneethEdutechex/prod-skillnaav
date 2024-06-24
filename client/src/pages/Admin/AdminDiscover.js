@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, message, Skeleton } from "antd";
+import { Form, Input, Button, message, Skeleton, Upload } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { ShowLoading, HideLoading } from "../../redux/rootSlice";
 import axios from "axios";
 import firebase from "firebase/compat/app";
 import "firebase/compat/storage";
-import { LoadingOutlined } from "@ant-design/icons";
+import {
+  LoadingOutlined,
+  DeleteOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 function AdminDiscover() {
-  const [ImgUrl, setImgUrl] = useState("");
+  const [form] = Form.useForm();
+  const [imgUrl, setImgUrl] = useState("");
   const dispatch = useDispatch();
   const { skillnaavData, loading } = useSelector((state) => state.root);
 
@@ -26,7 +31,7 @@ function AdminDiscover() {
       const response = await axios.post("/api/skillnaav/update-discover", {
         ...values,
         _id: skillnaavData.discover[0]._id,
-        imgUrl: ImgUrl,
+        imgUrl: imgUrl,
       });
       dispatch(HideLoading());
       if (response.data.success) {
@@ -41,27 +46,22 @@ function AdminDiscover() {
     }
   };
 
-  const handleFileUpload = (event) => {
-    const selectedFile = event.target.files[0];
-    if (selectedFile) {
-      const storageRef = firebase.storage().ref();
-      const fileRef = storageRef.child(selectedFile.name);
+  const handleFileUpload = (options) => {
+    const { file } = options;
+    const storageRef = firebase.storage().ref();
+    const fileRef = storageRef.child(file.name);
 
-      fileRef
-        .put(selectedFile)
-        .then((snapshot) => {
-          snapshot.ref.getDownloadURL().then((downloadURL) => {
-            console.log(downloadURL);
-            setImgUrl(downloadURL);
-          });
-        })
-        .catch((error) => {
-          console.error("File upload error:", error);
-          message.error("Failed to upload file. Please try again later.");
+    fileRef
+      .put(file)
+      .then((snapshot) => {
+        snapshot.ref.getDownloadURL().then((downloadURL) => {
+          setImgUrl(downloadURL);
         });
-    } else {
-      console.log("No file selected");
-    }
+      })
+      .catch((error) => {
+        console.error("File upload error:", error);
+        message.error("Failed to upload file. Please try again later.");
+      });
   };
 
   const handleImageRemove = () => {
@@ -78,6 +78,7 @@ function AdminDiscover() {
         Edit Discover Section
       </h1>
       <Form
+        form={form}
         onFinish={onFinish}
         layout="vertical"
         initialValues={skillnaavData.discover[0]}
@@ -114,19 +115,46 @@ function AdminDiscover() {
             className="rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
           />
         </Form.Item>
-        <input type="file" onChange={handleFileUpload} />
-        {ImgUrl && (
-          <>
-            <img src={ImgUrl} alt="Uploaded" style={{ marginTop: 10 }} />
+        <Form.Item
+          name="image"
+          label="Upload Image"
+          valuePropName="fileList"
+          getValueFromEvent={(e) => {
+            if (Array.isArray(e)) {
+              return e;
+            }
+            return e && e.fileList;
+          }}
+          className="font-semibold text-gray-700"
+        >
+          <Upload
+            name="image"
+            listType="picture-card"
+            className="avatar-uploader"
+            showUploadList={false}
+            beforeUpload={() => false}
+            onChange={handleFileUpload}
+          >
+            {imgUrl ? (
+              <img src={imgUrl} alt="avatar" style={{ width: "100%" }} />
+            ) : (
+              <div>
+                <UploadOutlined style={{ fontSize: 24 }} />
+                <div style={{ marginTop: 8 }}>Upload</div>
+              </div>
+            )}
+          </Upload>
+          {imgUrl && (
             <Button
               type="danger"
+              icon={<DeleteOutlined />}
               onClick={handleImageRemove}
               style={{ marginTop: 10 }}
             >
               Remove Image
             </Button>
-          </>
-        )}
+          )}
+        </Form.Item>
         <Form.Item
           name="viewpricebtn"
           label="View Price Button"
