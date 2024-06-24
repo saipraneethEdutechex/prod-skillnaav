@@ -45,9 +45,9 @@ function AdminDiscover() {
       });
       dispatch(HideLoading());
       if (response.data.success) {
-        message.success(response.data.message);
+        message.success("Changes saved successfully");
       } else {
-        message.error(response.data.message);
+        message.error(response.data.message || "Failed to save changes");
       }
     } catch (error) {
       dispatch(HideLoading());
@@ -76,9 +76,7 @@ function AdminDiscover() {
       })
       .catch((error) => {
         console.error("Discover image upload error:", error);
-        message.error(
-          "Failed to upload discover image. Please try again later."
-        );
+        message.error("Failed to upload discover image");
       })
       .finally(() => setUploading(false));
   };
@@ -109,7 +107,7 @@ function AdminDiscover() {
       }
     } catch (error) {
       console.error("Company image upload error:", error);
-      message.error("Failed to upload company image. Please try again later.");
+      message.error("Failed to upload company image");
     } finally {
       setUploading(false);
     }
@@ -132,7 +130,7 @@ function AdminDiscover() {
       }
     } catch (error) {
       console.error("Company image delete error:", error);
-      message.error("Failed to delete company image. Please try again later.");
+      message.error("Failed to delete company image");
     }
   };
 
@@ -164,32 +162,27 @@ function AdminDiscover() {
           label="Discover Heading"
           className="font-semibold text-gray-700"
         >
-          <Input placeholder="Discover Heading" />
+          <Input placeholder="Enter Discover Heading" />
         </Form.Item>
         <Form.Item
           name="discoversubheading"
           label="Discover Sub Heading"
           className="font-semibold text-gray-700"
         >
-          <Input.TextArea rows={4} placeholder="Discover Sub Heading" />
+          <Input.TextArea rows={4} placeholder="Enter Discover Sub Heading" />
         </Form.Item>
         <Form.Item
           name="tryforfreebtn"
           label="Try for Free Button"
           className="font-semibold text-gray-700"
         >
-          <Input placeholder="Try for Free Button" />
+          <Input placeholder="Enter Try for Free Button" />
         </Form.Item>
         <Form.Item
           name="image"
           label="Upload Discover Image"
           valuePropName="fileList"
-          getValueFromEvent={(e) => {
-            if (Array.isArray(e)) {
-              return e;
-            }
-            return e && e.fileList;
-          }}
+          getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
           className="font-semibold text-gray-700"
         >
           <Upload
@@ -202,13 +195,13 @@ function AdminDiscover() {
             {discoverImgUrl ? (
               <img
                 src={discoverImgUrl}
-                alt="discover"
+                alt="Discover"
                 style={{ width: "100%" }}
               />
             ) : (
-              <div>
-                <UploadOutlined />
-                <div className="ant-upload-text">Upload</div>
+              <div className="flex items-center justify-center w-full h-full">
+                <UploadOutlined className="text-3xl text-gray-500" />
+                <div className="ml-2 text-gray-500">Upload</div>
               </div>
             )}
           </Upload>
@@ -223,51 +216,49 @@ function AdminDiscover() {
           label="View Price Button"
           className="font-semibold text-gray-700"
         >
-          <Input placeholder="View Price Button" />
+          <Input placeholder="Enter View Price Button" />
         </Form.Item>
         <Form.Item
           name="compImageUrls"
           label="Upload Company Images"
           valuePropName="fileList"
-          getValueFromEvent={(e) => {
-            if (Array.isArray(e)) {
-              return e;
-            }
-            return e && e.fileList;
-          }}
+          getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
           className="font-semibold text-gray-700"
         >
-          <Upload
-            name="image"
-            listType="picture-card"
-            showUploadList={false}
-            beforeUpload={() => false}
-            onChange={handleCompanyImageUpload}
-          >
-            {compImageUrls.map((url) => (
-              <div key={url} className="image-preview">
-                <img src={url} alt="company" style={{ width: "100%" }} />
+          <div className="grid grid-cols-3 gap-4">
+            {compImageUrls.map((url, index) => (
+              <div
+                key={url}
+                className="relative overflow-hidden rounded-lg shadow-md"
+              >
+                <img
+                  src={url}
+                  alt={`Company ${index + 1}`}
+                  className="w-full"
+                />
                 <Button
                   type="link"
                   onClick={() => handleImageRemove(url)}
                   icon={<DeleteOutlined />}
+                  className="absolute top-2 right-2 text-red-500"
                 >
                   Remove
                 </Button>
               </div>
             ))}
             {compImageUrls.length < 5 && (
-              <div>
-                <UploadOutlined />
-                <div className="ant-upload-text">Upload</div>
-              </div>
+              <label className="relative flex items-center justify-center w-full h-full bg-gray-100 rounded-lg cursor-pointer">
+                <UploadOutlined className="text-3xl text-gray-500" />
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) =>
+                    handleCompanyImageUpload({ file: e.target.files[0] })
+                  }
+                />
+              </label>
             )}
-          </Upload>
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading}>
-            Save Changes
-          </Button>
+          </div>
         </Form.Item>
         {discovercompimg.length > 0 && (
           <div className="mt-8">
@@ -292,6 +283,7 @@ function AdminDiscover() {
                       type="link"
                       onClick={() => handleImageRemove(image._id)}
                       icon={<DeleteOutlined />}
+                      className="text-red-500"
                     >
                       Delete
                     </Button>
@@ -301,6 +293,11 @@ function AdminDiscover() {
             </div>
           </div>
         )}
+        <Form.Item>
+          <Button type="primary" htmlType="submit" loading={loading}>
+            Save Changes
+          </Button>
+        </Form.Item>
       </Form>
       <Spin spinning={uploading} indicator={antIcon} />
     </div>
