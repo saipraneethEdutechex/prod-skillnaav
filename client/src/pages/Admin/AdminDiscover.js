@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Input, Button, message, Skeleton } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { ShowLoading, HideLoading } from "../../redux/rootSlice";
 import axios from "axios";
+import firebase from "firebase/compat/app";
+import "firebase/compat/storage";
 import { LoadingOutlined } from "@ant-design/icons";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 function AdminDiscover() {
+  const [ImgUrl, setImgUrl] = useState("");
   const dispatch = useDispatch();
   const { skillnaavData, loading } = useSelector((state) => state.root);
 
@@ -31,6 +34,22 @@ function AdminDiscover() {
     }
   };
 
+  const handleFileUpload = (event) => {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      const storageRef = firebase.storage().ref();
+      const fileRef = storageRef.child(selectedFile.name);
+
+      fileRef.put(selectedFile).then((snapshot) => {
+        snapshot.ref.getDownloadURL().then((downloadURL) => {
+          console.log(downloadURL);
+          setImgUrl(downloadURL);
+        });
+      });
+    } else {
+      console.log("No file Selected");
+    }
+  };
   if (!skillnaavData || !skillnaavData.discover || !skillnaavData.discover[0]) {
     return <Skeleton active avatar />;
   }
@@ -77,6 +96,14 @@ function AdminDiscover() {
             className="rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
           />
         </Form.Item>
+        <input type="file" onChange={handleFileUpload} />
+        <input
+          type="text"
+          placeholder="Add Image URL"
+          className="text-black"
+          value={ImgUrl}
+          onChange={(e) => setImgUrl(e.target.value)}
+        />
         <Form.Item
           name="viewpricebtn"
           label="View Price Button"
