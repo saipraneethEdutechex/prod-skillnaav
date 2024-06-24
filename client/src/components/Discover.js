@@ -2,17 +2,11 @@ import React from "react";
 import { motion } from "framer-motion";
 import Gradient from "../assets/Gradient.svg";
 import HeroImage from "../assets/app_mockup.png";
-import Google from "../assets/Google.svg";
-import Slack from "../assets/Slack.svg";
-import Trustpilot from "../assets/Trustpilot.svg";
-import Cnn from "../assets/CNN.svg";
-import Clutch from "../assets/Clutch.svg";
 import BlueArrow from "../assets/blue-button.svg";
 import { useSelector } from "react-redux";
 
 const Discover = () => {
   const { skillnaavData } = useSelector((state) => state.root);
-  const [isDisabled, setIsDisabled] = React.useState(true);
 
   if (
     !skillnaavData ||
@@ -23,12 +17,14 @@ const Discover = () => {
   }
 
   const discover = skillnaavData.discover[0];
+  const discovercompimg = skillnaavData.discovercompimg || []; // Ensure discovercompimg is initialized as an array
   const {
     discoverheading,
     discoversubheading,
     tryforfreebtn,
     viewpricebtn,
     imgUrl,
+    compImageUrls,
   } = discover;
 
   return (
@@ -62,10 +58,7 @@ const Discover = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <button
-            disabled={isDisabled}
-            className="bg-[#4328EB] text-[#FFFFFF] w-1/2 px-8 py-4 rounded-[4px] lg:w-fit"
-          >
+          <button className="bg-[#4328EB] text-[#FFFFFF] w-1/2 px-8 py-4 rounded-[4px] lg:w-fit">
             {tryforfreebtn || ""}
           </button>
           <button className="text-[#4328EB] font-medium flex items-center justify-center gap-x-2 w-1/2 px-8 py-4 rounded-[4px] lg:w-fit">
@@ -98,41 +91,16 @@ const Discover = () => {
               Trusted by these companies
             </p>
             <div className="grid grid-cols-3 items-center justify-center justify-items-center px-[20px] align-middle lg:grid-cols-5">
-              <motion.img
-                src={Google}
-                alt="Google"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.8 }}
-              />
-              <motion.img
-                src={Slack}
-                alt="Slack"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.8, delay: 1 }}
-              />
-              <motion.img
-                src={Trustpilot}
-                alt="Trustpilot"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.8, delay: 1.2 }}
-              />
-              <motion.img
-                src={Cnn}
-                alt="Cnn"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.8, delay: 1.4 }}
-              />
-              <motion.img
-                src={Clutch}
-                alt="Clutch"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.8, delay: 1.6 }}
-              />
+              {discovercompimg.map((image, index) => (
+                <motion.img
+                  key={image._id}
+                  src={image.imageUrl}
+                  alt={`company ${index + 1}`}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
+                />
+              ))}
             </div>
           </div>
         </div>

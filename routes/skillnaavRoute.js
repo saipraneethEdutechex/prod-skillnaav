@@ -3,6 +3,7 @@ const NodeCache = require("node-cache");
 const router = express.Router();
 const {
   Discover,
+  DiscoverCompImg,
   VisionHead,
   VisionPoint,
   Feature,
@@ -63,6 +64,7 @@ router.get(
 
     const [
       discovers,
+      discovercompimg,
       visionhead,
       visionpoint,
       features,
@@ -76,6 +78,7 @@ router.get(
       footer,
     ] = await Promise.all([
       Discover.find(),
+      DiscoverCompImg.find(),
       VisionHead.find(),
       VisionPoint.find(),
       Feature.find(),
@@ -91,6 +94,7 @@ router.get(
 
     const responseData = {
       discover: discovers,
+      discovercompimg,
       visionhead,
       visionpoint,
       features,
@@ -277,6 +281,50 @@ router.post(
       data: updatedDiscover,
       success: true,
       message: "Discover section updated successfully",
+    });
+  })
+);
+
+router.post(
+  "/add-discover-comp-img",
+  asyncHandler(async (req, res) => {
+    const { imageUrl } = req.body;
+    const newImage = await DiscoverCompImg.create({ imageUrl });
+    cache.flushAll(); // Clear cache on data mutation
+    res.status(200).json({
+      data: newImage,
+      success: true,
+      message: "Company image added successfully",
+    });
+  })
+);
+
+router.post(
+  "/update-discover-comp-img/:id",
+  asyncHandler(async (req, res) => {
+    const { imageUrl } = req.body;
+    const updatedImage = await DiscoverCompImg.findByIdAndUpdate(
+      req.params.id,
+      { imageUrl },
+      { new: true }
+    );
+    cache.flushAll(); // Clear cache on data mutation
+    res.status(200).json({
+      data: updatedImage,
+      success: true,
+      message: "Company image updated successfully",
+    });
+  })
+);
+
+router.delete(
+  "/delete-discover-comp-img/:id",
+  asyncHandler(async (req, res) => {
+    await DiscoverCompImg.findByIdAndDelete(req.params.id);
+    cache.flushAll(); // Clear cache on data mutation
+    res.status(200).json({
+      success: true,
+      message: "Company image deleted successfully",
     });
   })
 );
