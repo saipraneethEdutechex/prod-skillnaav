@@ -117,7 +117,7 @@ function AdminDiscover() {
         </Form.Item>
         <Form.Item
           name="image"
-          label="Upload Image"
+          label="Upload Discover Image"
           valuePropName="fileList"
           getValueFromEvent={(e) => {
             if (Array.isArray(e)) {
