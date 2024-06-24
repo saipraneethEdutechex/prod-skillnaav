@@ -23,9 +23,8 @@ const User = require("../models/userModel");
 const cache = new NodeCache({ stdTTL: 600, checkperiod: 120 }); // TTL of 10 minutes
 
 // Middleware for handling asynchronous route handlers
-const asyncHandler = (fn) => (req, res, next) => {
+const asyncHandler = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
-};
 
 // Error handling middleware
 const errorHandler = (err, req, res, next) => {
@@ -144,11 +143,13 @@ const updateRoute = (path, model) => {
   );
 };
 
+// Update deleteRoute function to handle DELETE requests with ID
 const deleteRoute = (path, model) => {
   router.delete(
     path,
     asyncHandler(async (req, res) => {
-      await deleteOneById(model, req.params.id);
+      const { id } = req.params; // Extract ID from request parameters
+      await deleteOneById(model, id);
       cache.flushAll(); // Clear cache on data mutation
       res.status(200).json({
         success: true,
@@ -207,7 +208,7 @@ router.post(
 
 // Save contact form data route
 router.post(
-  "/",
+  "/contacts",
   asyncHandler(async (req, res) => {
     const newContact = new Contact(req.body);
     await newContact.save();
@@ -218,7 +219,7 @@ router.post(
 
 // Get all contact form data route with pagination and search
 router.get(
-  "/",
+  "/contacts",
   asyncHandler(async (req, res) => {
     const { page = 1, pageSize = 10, search = "" } = req.query;
     const skip = (page - 1) * pageSize;
@@ -240,7 +241,7 @@ router.get(
 
 // Delete contact form data route
 router.delete(
-  "/:id",
+  "/contacts/:id",
   asyncHandler(async (req, res) => {
     await Contact.findByIdAndDelete(req.params.id);
     cache.flushAll(); // Clear cache on data mutation
@@ -248,83 +249,11 @@ router.delete(
   })
 );
 
+// CRUD routes for DiscoverCompImg
+createRoute("/add-discover-comp-img", DiscoverCompImg);
+deleteRoute("/delete-discover-comp-img/:id", DiscoverCompImg);
+
 // Apply error handling middleware
 router.use(errorHandler);
 
 module.exports = router;
-
-// Update the /update-discover route
-router.post(
-  "/update-discover",
-  asyncHandler(async (req, res) => {
-    const {
-      _id,
-      discoverheading,
-      discoversubheading,
-      tryforfreebtn,
-      viewpricebtn,
-      imgUrl,
-    } = req.body;
-    const updatedDiscover = await Discover.findByIdAndUpdate(
-      _id,
-      {
-        discoverheading,
-        discoversubheading,
-        tryforfreebtn,
-        viewpricebtn,
-        imgUrl,
-      },
-      { new: true }
-    );
-    cache.flushAll(); // Clear cache on data mutation
-    res.status(200).json({
-      data: updatedDiscover,
-      success: true,
-      message: "Discover section updated successfully",
-    });
-  })
-);
-
-router.post(
-  "/add-discover-comp-img",
-  asyncHandler(async (req, res) => {
-    const { imageUrl } = req.body;
-    const newImage = await DiscoverCompImg.create({ imageUrl });
-    cache.flushAll(); // Clear cache on data mutation
-    res.status(200).json({
-      data: newImage,
-      success: true,
-      message: "Company image added successfully",
-    });
-  })
-);
-
-router.post(
-  "/update-discover-comp-img/:id",
-  asyncHandler(async (req, res) => {
-    const { imageUrl } = req.body;
-    const updatedImage = await DiscoverCompImg.findByIdAndUpdate(
-      req.params.id,
-      { imageUrl },
-      { new: true }
-    );
-    cache.flushAll(); // Clear cache on data mutation
-    res.status(200).json({
-      data: updatedImage,
-      success: true,
-      message: "Company image updated successfully",
-    });
-  })
-);
-
-router.delete(
-  "/delete-discover-comp-img/:id",
-  asyncHandler(async (req, res) => {
-    await DiscoverCompImg.findByIdAndDelete(req.params.id);
-    cache.flushAll(); // Clear cache on data mutation
-    res.status(200).json({
-      success: true,
-      message: "Company image deleted successfully",
-    });
-  })
-);

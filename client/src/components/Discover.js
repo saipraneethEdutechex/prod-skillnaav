@@ -17,14 +17,13 @@ const Discover = () => {
   }
 
   const discover = skillnaavData.discover[0];
-  const discovercompimg = skillnaavData.discovercompimg || []; // Ensure discovercompimg is initialized as an array
+  const discovercompimg = skillnaavData.discovercompimg || [];
   const {
     discoverheading,
     discoversubheading,
     tryforfreebtn,
     viewpricebtn,
     imgUrl,
-    compImageUrls,
   } = discover;
 
   return (

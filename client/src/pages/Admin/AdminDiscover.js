@@ -7,8 +7,8 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/storage";
 import {
   LoadingOutlined,
-  DeleteOutlined,
   UploadOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
@@ -16,7 +16,7 @@ const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 function AdminDiscover() {
   const [form] = Form.useForm();
   const [discoverImgUrl, setDiscoverImgUrl] = useState("");
-  const [compImageUrls, setCompImageUrls] = useState([]); // State to hold company image URLs
+  const [compImageUrls, setCompImageUrls] = useState([]);
   const dispatch = useDispatch();
   const { skillnaavData, loading } = useSelector((state) => state.root);
 
@@ -39,7 +39,7 @@ function AdminDiscover() {
         ...values,
         _id: skillnaavData.discover[0]._id,
         imgUrl: discoverImgUrl,
-        compImageUrls: compImageUrls, // Pass updated compImageUrls to backend
+        compImageUrls: compImageUrls,
       });
       dispatch(HideLoading());
       if (response.data.success) {
@@ -63,7 +63,6 @@ function AdminDiscover() {
       .then((snapshot) => {
         snapshot.ref.getDownloadURL().then((downloadURL) => {
           setDiscoverImgUrl(downloadURL);
-          // Update Redux state with the new imgUrl
           dispatch({
             type: "UPDATE_DISCOVER_IMG_URL",
             payload: downloadURL,
@@ -85,9 +84,9 @@ function AdminDiscover() {
     try {
       const snapshot = await fileRef.put(file);
       const downloadURL = await snapshot.ref.getDownloadURL();
+
       if (compImageUrls.length < 5) {
         setCompImageUrls([...compImageUrls, downloadURL]);
-        // Update Redux state with the new compImageUrls
         dispatch({
           type: "UPDATE_COMP_IMAGE_URLS",
           payload: [...compImageUrls, downloadURL],
@@ -105,29 +104,26 @@ function AdminDiscover() {
     }
   };
 
-  const handleImageRemove = async (urlToRemove) => {
-    const filteredUrls = compImageUrls.filter((url) => url !== urlToRemove);
-    setCompImageUrls(filteredUrls);
-    // Update Redux state with the filtered compImageUrls
-    dispatch({
-      type: "UPDATE_COMP_IMAGE_URLS",
-      payload: filteredUrls,
-    });
-
+  const handleImageRemove = async (idToRemove) => {
     try {
-      await axios.delete(
-        `/api/skillnaav/delete-discover-comp-img/${encodeURIComponent(
-          urlToRemove
-        )}`
+      const response = await axios.delete(
+        `/api/skillnaav/delete-discover-comp-img/${idToRemove}`
       );
-      message.success("Company image deleted successfully");
+      if (response.data.success) {
+        message.success("Company image deleted successfully");
+        // Remove the deleted image from compImageUrls state
+        setCompImageUrls(compImageUrls.filter((url) => url !== idToRemove));
+      } else {
+        message.error(
+          response.data.message || "Failed to delete company image"
+        );
+      }
     } catch (error) {
       console.error("Company image delete error:", error);
       message.error("Failed to delete company image. Please try again later.");
     }
   };
 
-  // Return loading indicator or form based on whether data is available
   if (
     !skillnaavData ||
     !skillnaavData.discover ||
@@ -137,8 +133,7 @@ function AdminDiscover() {
   }
 
   const discover = skillnaavData.discover[0];
-  const { discoverheading, discoversubheading, tryforfreebtn, viewpricebtn } =
-    discover;
+  const discovercompimg = skillnaavData.discovercompimg || [];
 
   return (
     <div className="p-8 bg-white rounded-lg shadow-lg max-w-4xl mx-auto mt-10">
@@ -157,31 +152,21 @@ function AdminDiscover() {
           label="Discover Heading"
           className="font-semibold text-gray-700"
         >
-          <Input
-            placeholder="Discover"
-            className="rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-          />
+          <Input placeholder="Discover Heading" />
         </Form.Item>
         <Form.Item
           name="discoversubheading"
           label="Discover Sub Heading"
           className="font-semibold text-gray-700"
         >
-          <Input.TextArea
-            rows={4}
-            placeholder="Discover Sub Heading"
-            className="rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-          />
+          <Input.TextArea rows={4} placeholder="Discover Sub Heading" />
         </Form.Item>
         <Form.Item
           name="tryforfreebtn"
           label="Try for Free Button"
           className="font-semibold text-gray-700"
         >
-          <Input
-            placeholder="Try for Free Button"
-            className="rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-          />
+          <Input placeholder="Try for Free Button" />
         </Form.Item>
         <Form.Item
           name="image"
@@ -198,7 +183,6 @@ function AdminDiscover() {
           <Upload
             name="image"
             listType="picture-card"
-            className="avatar-uploader"
             showUploadList={false}
             beforeUpload={() => false}
             onChange={handleDiscoverImageUpload}
@@ -206,24 +190,19 @@ function AdminDiscover() {
             {discoverImgUrl ? (
               <img
                 src={discoverImgUrl}
-                alt="discover image"
-                style={{ width: "100%", height: "auto" }}
+                alt="discover"
+                style={{ width: "100%" }}
               />
             ) : (
               <div>
-                <UploadOutlined style={{ fontSize: 24 }} />
-                <div style={{ marginTop: 8 }}>Upload</div>
+                <UploadOutlined />
+                <div className="ant-upload-text">Upload</div>
               </div>
             )}
           </Upload>
           {discoverImgUrl && (
-            <Button
-              type="danger"
-              icon={<DeleteOutlined />}
-              onClick={() => setDiscoverImgUrl("")}
-              style={{ marginTop: 10 }}
-            >
-              Remove Image
+            <Button type="link" onClick={() => setDiscoverImgUrl("")}>
+              Remove
             </Button>
           )}
         </Form.Item>
@@ -232,10 +211,7 @@ function AdminDiscover() {
           label="View Price Button"
           className="font-semibold text-gray-700"
         >
-          <Input
-            placeholder="View Price Button"
-            className="rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-          />
+          <Input placeholder="View Price Button" />
         </Form.Item>
         <Form.Item
           name="compImageUrls"
@@ -252,19 +228,17 @@ function AdminDiscover() {
           <Upload
             name="image"
             listType="picture-card"
-            className="avatar-uploader"
-            showUploadList={true} // Show upload list for multiple images
-            beforeUpload={() => false} // Disable automatic upload
+            showUploadList={true}
+            beforeUpload={() => false}
             onChange={handleCompanyImageUpload}
           >
             {compImageUrls.map((url) => (
               <div key={url} className="image-preview">
-                <img src={url} alt="company image" style={{ width: "100%" }} />
+                <img src={url} alt="company" style={{ width: "100%" }} />
                 <Button
-                  type="danger"
-                  icon={<DeleteOutlined />}
+                  type="link"
                   onClick={() => handleImageRemove(url)}
-                  style={{ marginTop: 10 }}
+                  icon={<DeleteOutlined />}
                 >
                   Remove
                 </Button>
@@ -272,8 +246,8 @@ function AdminDiscover() {
             ))}
             {compImageUrls.length < 5 && (
               <div>
-                <UploadOutlined style={{ fontSize: 24 }} />
-                <div style={{ marginTop: 8 }}>Upload</div>
+                <UploadOutlined />
+                <div className="ant-upload-text">Upload</div>
               </div>
             )}
           </Upload>
@@ -283,47 +257,37 @@ function AdminDiscover() {
             Save Changes
           </Button>
         </Form.Item>
-      </Form>
-
-      {/* Preview Section */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
-          Preview Section
-        </h2>
-        <div className="flex justify-center items-center space-x-4">
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Discover Image:</h3>
-            {discoverImgUrl ? (
-              <img
-                src={discoverImgUrl}
-                alt="discover image"
-                style={{ width: "300px", height: "auto" }}
-              />
-            ) : (
-              <p>No discover image uploaded</p>
-            )}
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Company Images:</h3>
-            <div className="flex flex-wrap">
-              {compImageUrls.map((url) => (
-                <div key={url} className="company-image-preview">
+        {discovercompimg.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-semibold mb-4">
+              Preview Company Images
+            </h2>
+            <div className="grid grid-cols-3 gap-4">
+              {discovercompimg.map((image, index) => (
+                <div key={image._id}>
                   <img
-                    src={url}
-                    alt="company image"
+                    src={image.imageUrl}
+                    alt={`Company ${index + 1}`}
                     style={{
-                      width: "100px",
-                      height: "auto",
-                      marginBottom: "8px",
+                      width: "100%",
+                      maxHeight: "200px",
+                      objectFit: "cover",
                     }}
+                    className="rounded-lg shadow-md"
                   />
+                  <Button
+                    type="link"
+                    onClick={() => handleImageRemove(image._id)}
+                    icon={<DeleteOutlined />}
+                  >
+                    Delete
+                  </Button>
                 </div>
               ))}
-              {compImageUrls.length === 0 && <p>No company images uploaded</p>}
             </div>
           </div>
-        </div>
-      </div>
+        )}
+      </Form>
     </div>
   );
 }
