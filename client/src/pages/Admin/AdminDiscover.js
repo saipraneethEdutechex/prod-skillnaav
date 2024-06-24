@@ -19,7 +19,6 @@ function AdminDiscover() {
   const [discoverImgUrl, setDiscoverImgUrl] = useState("");
   const [compImageUrls, setCompImageUrls] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [formData, setFormData] = useState(null); // State to store form data before saving
   const dispatch = useDispatch();
   const { skillnaavData, loading } = useSelector((state) => state.root);
 
@@ -32,7 +31,6 @@ function AdminDiscover() {
       const discover = skillnaavData.discover[0];
       setDiscoverImgUrl(discover.imgUrl || "");
       setCompImageUrls(discover.compImageUrls || []);
-      setFormData(discover); // Initialize form data with fetched data
     }
   }, [skillnaavData]);
 
@@ -47,7 +45,6 @@ function AdminDiscover() {
       });
       dispatch(HideLoading());
       if (response.data.success) {
-        setFormData(values); // Update form data state with saved values
         message.success(response.data.message);
       } else {
         message.error(response.data.message);
@@ -127,7 +124,6 @@ function AdminDiscover() {
       );
       if (response.data.success) {
         message.success("Company image deleted successfully");
-        // Update state to reflect the deleted image
         setCompImageUrls(compImageUrls.filter((url) => url !== urlToRemove));
       } else {
         message.error(
@@ -140,15 +136,6 @@ function AdminDiscover() {
     }
   };
 
-  const handleReset = () => {
-    // Reset form data to last saved state
-    if (formData) {
-      form.setFieldsValue(formData);
-      setDiscoverImgUrl(formData.imgUrl || "");
-      setCompImageUrls(formData.compImageUrls || []);
-    }
-  };
-
   if (
     !skillnaavData ||
     !skillnaavData.discover ||
@@ -157,6 +144,7 @@ function AdminDiscover() {
     return <Skeleton active />;
   }
 
+  const discover = skillnaavData.discover[0];
   const discovercompimg = skillnaavData.discovercompimg || [];
 
   return (
@@ -168,7 +156,7 @@ function AdminDiscover() {
         form={form}
         onFinish={onFinish}
         layout="vertical"
-        initialValues={formData} // Initialize form with formData
+        initialValues={discover}
         className="space-y-6"
       >
         <Form.Item
@@ -279,9 +267,6 @@ function AdminDiscover() {
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={loading}>
             Save Changes
-          </Button>
-          <Button className="ml-2" onClick={handleReset}>
-            Discard Changes
           </Button>
         </Form.Item>
         {discovercompimg.length > 0 && (
