@@ -3,6 +3,7 @@ import { Modal, Form, Input, Button, message, List, Skeleton } from "antd";
 import axios from "axios";
 import firebase from "firebase/compat/app";
 import "firebase/compat/storage";
+
 const { TextArea } = Input;
 
 const AdminVision = () => {
@@ -14,6 +15,7 @@ const AdminVision = () => {
   });
   const [form] = Form.useForm();
   const [imgUrl, setImgUrl] = useState("");
+  const [previewUrl, setPreviewUrl] = useState("");
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -23,6 +25,14 @@ const AdminVision = () => {
   const handleFileUpload = (event) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
+      // Set the preview URL for instant feedback
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(selectedFile);
+
+      // Upload to Firebase
       const storageRef = firebase.storage().ref();
       const fileRef = storageRef.child(selectedFile.name);
       fileRef.put(selectedFile).then((snapshot) => {
@@ -40,6 +50,10 @@ const AdminVision = () => {
     try {
       const response = await axios.get("/api/skillnaav/get-skillnaav-data");
       setSkillnaavData(response.data);
+      if (response.data.visionhead && response.data.visionhead.length > 0) {
+        setImgUrl(response.data.visionhead[0].visionImg || "");
+        setPreviewUrl(response.data.visionhead[0].visionImg || "");
+      }
     } catch (error) {
       console.error("Error fetching skillnaav data:", error);
     }
@@ -77,6 +91,7 @@ const AdminVision = () => {
           setModalData({ isVisible: false, type: "", data: null });
           fetchSkillnaavData();
           form.resetFields();
+          setPreviewUrl("");
         } else {
           message.error(response.data.message);
         }
@@ -112,6 +127,7 @@ const AdminVision = () => {
       if (data) {
         form.setFieldsValue(data);
         setImgUrl(data.visionImg || "");
+        setPreviewUrl(data.visionImg || "");
       }
     },
     [form]
@@ -250,9 +266,9 @@ const AdminVision = () => {
                 ]}
               >
                 <input type="file" onChange={handleFileUpload} />
-                {imgUrl && (
+                {previewUrl && (
                   <img
-                    src={imgUrl}
+                    src={previewUrl}
                     alt="Vision Image"
                     className="max-w-full h-auto rounded mt-2"
                     style={{ maxHeight: "200px", objectFit: "cover" }}
