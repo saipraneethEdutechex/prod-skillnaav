@@ -90,17 +90,21 @@ const Discover = () => {
             <p className="text-[white] text-center text-[16px] lg:text-[18px]">
               Trusted by these companies
             </p>
-            <div className="grid grid-cols-3 items-center justify-center justify-items-center px-[20px] align-middle lg:grid-cols-5">
-              {discovercompimg.map((image, index) => (
+            <div className="flex flex-wrap justify-center px-4 sm:px-0">
+              {discovercompimg.slice(0, 5).map((image, index) => (
                 <motion.img
                   key={image._id}
                   src={image.imageUrl}
                   alt={`company ${index + 1}`}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
-                  className="max-w-full h-auto"
-                  style={{ maxWidth: "100%", maxHeight: "auto" }}
+                  className="w-[150px] h-[150px] lg:w-[180px] lg:h-[180px] rounded-lg shadow-lg mx-4 my-2"
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    objectFit: "cover",
+                  }}
                 />
               ))}
             </div>

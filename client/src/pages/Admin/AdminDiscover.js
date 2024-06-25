@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, message, Upload, Skeleton, Spin } from "antd";
+import { Form, Input, Button, message, Upload, Spin } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { ShowLoading, HideLoading } from "../../redux/rootSlice";
 import axios from "axios";
@@ -14,7 +14,7 @@ import ImageLazyLoad from "react-lazyload";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
-function AdminDiscover() {
+const AdminDiscover = () => {
   const [form] = Form.useForm();
   const [discoverImgUrl, setDiscoverImgUrl] = useState("");
   const [compImageUrls, setCompImageUrls] = useState([]);
@@ -82,6 +82,11 @@ function AdminDiscover() {
   };
 
   const handleCompanyImageUpload = async ({ file }) => {
+    if (compImageUrls.length >= 5) {
+      message.warning("You can upload a maximum of 5 images.");
+      return;
+    }
+
     const storageRef = firebase.storage().ref();
     const fileRef = storageRef.child(`company/${Date.now()}_${file.name}`);
 
@@ -91,20 +96,16 @@ function AdminDiscover() {
       const snapshot = await fileRef.put(file);
       const downloadURL = await snapshot.ref.getDownloadURL();
 
-      if (compImageUrls.length < 5) {
-        setCompImageUrls([...compImageUrls, downloadURL]);
-        dispatch({
-          type: "UPDATE_COMP_IMAGE_URLS",
-          payload: [...compImageUrls, downloadURL],
-        });
+      setCompImageUrls([...compImageUrls, downloadURL]);
+      dispatch({
+        type: "UPDATE_COMP_IMAGE_URLS",
+        payload: [...compImageUrls, downloadURL],
+      });
 
-        await axios.post("/api/skillnaav/add-discover-comp-img", {
-          imageUrl: downloadURL,
-        });
-        message.success("Company image uploaded successfully");
-      } else {
-        message.warning("You can upload a maximum of 5 images.");
-      }
+      await axios.post("/api/skillnaav/add-discover-comp-img", {
+        imageUrl: downloadURL,
+      });
+      message.success("Company image uploaded successfully");
     } catch (error) {
       console.error("Company image upload error:", error);
       message.error("Failed to upload company image");
@@ -139,7 +140,7 @@ function AdminDiscover() {
     !skillnaavData.discover ||
     skillnaavData.discover.length === 0
   ) {
-    return <Skeleton active />;
+    return <Spin spinning={true} indicator={antIcon} />;
   }
 
   const discover = skillnaavData.discover[0];
@@ -258,7 +259,25 @@ function AdminDiscover() {
                 />
               </label>
             )}
+            {compImageUrls.length === 5 && (
+              <div className="relative flex items-center justify-center w-full h-full bg-gray-100 rounded-lg cursor-pointer opacity-50">
+                <UploadOutlined className="text-3xl text-gray-500" />
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) =>
+                    handleCompanyImageUpload({ file: e.target.files[0] })
+                  }
+                  disabled
+                />
+              </div>
+            )}
           </div>
+          {compImageUrls.length === 5 && (
+            <p className="text-gray-500 text-sm mt-2">
+              Maximum of 5 images uploaded.
+            </p>
+          )}
         </Form.Item>
         {discovercompimg.length > 0 && (
           <div className="mt-8">
@@ -302,6 +321,6 @@ function AdminDiscover() {
       <Spin spinning={uploading} indicator={antIcon} />
     </div>
   );
-}
+};
 
 export default AdminDiscover;
