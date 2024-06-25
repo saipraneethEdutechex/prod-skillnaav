@@ -159,6 +159,12 @@ const deleteRoute = (path, model) => {
   );
 };
 
+// Define specific CRUD routes for Vision Head and Vision Point
+updateRoute("/update-visionhead/:id", VisionHead);
+updateRoute("/update-visionpoint/:id", VisionPoint);
+createRoute("/add-visionpoint", VisionPoint);
+deleteRoute("/delete-visionpoint/:id", VisionPoint);
+
 // Define specific CRUD routes for Discover
 updateRoute("/update-discover/:id", Discover);
 
