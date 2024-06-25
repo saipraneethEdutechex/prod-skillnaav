@@ -52,7 +52,7 @@ const Discover = () => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
-              className="w-20 h-20 lg:w-24 lg:h-24 rounded-lg"
+              className="w-16 sm:w-20 lg:w-24 h-16 sm:h-20 lg:h-24 rounded-lg"
             />
           ))}
         </div>
@@ -70,7 +70,7 @@ const Discover = () => {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
-            className="w-20 h-20 lg:w-24 lg:h-24 rounded-lg mx-2 my-2"
+            className="w-16 sm:w-20 lg:w-24 h-16 sm:h-20 lg:h-24 rounded-lg mx-2 my-2"
           />
         ))}
       </div>
@@ -87,7 +87,7 @@ const Discover = () => {
     >
       <div>
         <motion.h1
-          className="text-center text-3xl sm:text-4xl leading-[40px] font-medium text-[#172026] lg:text-5xl lg:leading-[56px]"
+          className="text-center text-3xl sm:text-4xl leading-[32px] font-medium text-[#172026] lg:text-5xl lg:leading-[48px]"
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8 }}
@@ -129,7 +129,7 @@ const Discover = () => {
           <img
             src={Gradient}
             alt="Gradient"
-            className="w-full object-cover min-h-[200px] sm:min-h-[300px] lg:min-h-[500px] mt-6 sm:mt-8"
+            className="w-full object-cover min-h-[200px] sm:min-h-[300px] lg:min-h-[400px] mt-6 sm:mt-8"
           />
         </div>
         <div className="absolute bottom-5 w-full flex flex-col items-center">

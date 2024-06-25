@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Modal, Form, Input, Button, message, List, Skeleton } from "antd";
 import axios from "axios";
-
+import firebase from "firebase/compat/app";
+import "firebase/compat/storage";
 const { TextArea } = Input;
 
 const AdminVision = () => {
@@ -12,10 +13,28 @@ const AdminVision = () => {
     data: null,
   });
   const [form] = Form.useForm();
+  const [imgUrl, setImgUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     fetchSkillnaavData();
   }, []);
+
+  const handleFileUpload = (event) => {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      const storageRef = firebase.storage().ref();
+      const fileRef = storageRef.child(selectedFile.name);
+      fileRef.put(selectedFile).then((snapshot) => {
+        snapshot.ref.getDownloadURL().then((downloadURL) => {
+          console.log(downloadURL);
+          setImgUrl(downloadURL);
+        });
+      });
+    } else {
+      console.log("No file selected, so select one");
+    }
+  };
 
   const fetchSkillnaavData = useCallback(async () => {
     try {
@@ -31,18 +50,26 @@ const AdminVision = () => {
       try {
         let response;
         if (modalData.type === "editHead") {
-          response = await axios.post("/api/skillnaav/update-visionheading", {
-            ...values,
-            _id: modalData.data._id,
-          });
+          const { _id } = modalData.data;
+          response = await axios.put(
+            `/api/skillnaav/update-visionhead/${_id}`,
+            {
+              ...values,
+              visionImg: imgUrl, // Include uploaded image URL in update
+            }
+          );
         } else if (modalData.type === "editPoint") {
-          values._id = modalData.data._id;
-          response = await axios.post(
-            "/api/skillnaav/update-visionpoint",
+          const { _id } = modalData.data;
+          values._id = _id;
+          response = await axios.put(
+            `/api/skillnaav/update-visionpoint/${_id}`,
             values
           );
         } else if (modalData.type === "addPoint") {
-          response = await axios.post("/api/skillnaav/add-visionpoint", values);
+          response = await axios.post("/api/skillnaav/add-visionpoint", {
+            ...values,
+            visionImg: imgUrl, // Include uploaded image URL in creation
+          });
         }
 
         if (response.data.success) {
@@ -57,7 +84,7 @@ const AdminVision = () => {
         message.error(`Error ${modalData.type} vision data: ${error.message}`);
       }
     },
-    [modalData, form, fetchSkillnaavData]
+    [modalData, form, fetchSkillnaavData, imgUrl]
   );
 
   const handleDelete = useCallback(
@@ -82,7 +109,10 @@ const AdminVision = () => {
   const openModal = useCallback(
     (type, data = null) => {
       setModalData({ isVisible: true, type, data });
-      if (data) form.setFieldsValue(data);
+      if (data) {
+        form.setFieldsValue(data);
+        setImgUrl(data.visionImg || "");
+      }
     },
     [form]
   );
@@ -110,15 +140,17 @@ const AdminVision = () => {
             <p className="text-lg mb-2 font-semibold">Sub Heading:</p>
             <p className="mb-2">{visionhead[0]?.visionsub}</p>
           </div>
-          <div className="mb-4">
-            <p className="text-lg mb-2 font-semibold">Image:</p>
-            <img
-              src={visionhead[0]?.visionImg}
-              alt="Vision Image"
-              className="max-w-full h-auto rounded"
-              style={{ maxHeight: "400px", objectFit: "cover" }}
-            />
-          </div>
+          {imgUrl && (
+            <div className="mb-4">
+              <p className="text-lg mb-2 font-semibold">Image:</p>
+              <img
+                src={imgUrl}
+                alt="Vision Image"
+                className="max-w-full h-auto rounded"
+                style={{ maxHeight: "400px", objectFit: "cover" }}
+              />
+            </div>
+          )}
           <div className="flex justify-end">
             <Button
               type="primary"
@@ -214,10 +246,18 @@ const AdminVision = () => {
                 name="visionImg"
                 label="Vision Image"
                 rules={[
-                  { required: true, message: "Please enter vision image URL" },
+                  { required: true, message: "Please upload vision image" },
                 ]}
               >
-                <TextArea rows={4} />
+                <input type="file" onChange={handleFileUpload} />
+                {imgUrl && (
+                  <img
+                    src={imgUrl}
+                    alt="Vision Image"
+                    className="max-w-full h-auto rounded mt-2"
+                    style={{ maxHeight: "200px", objectFit: "cover" }}
+                  />
+                )}
               </Form.Item>
             </>
           ) : (

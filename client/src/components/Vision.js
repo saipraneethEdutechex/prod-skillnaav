@@ -1,5 +1,4 @@
 import React from "react";
-import VisionImg from "../assets/canada_vis.jpg";
 import { useSelector } from "react-redux";
 
 const Vision = () => {
@@ -32,8 +31,6 @@ const Vision = () => {
 
           <div className="text-center md:text-left">
             <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-8 text-center">
-              {" "}
-              {/* Added text-center */}
               {visionhead[0].visionheading}
             </h2>
             <p className="text-base lg:text-lg mb-6 max-w-3xl mx-auto lg:mx-0">

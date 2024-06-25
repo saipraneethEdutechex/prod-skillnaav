@@ -129,10 +129,11 @@ const createRoute = (path, model) => {
 };
 
 const updateRoute = (path, model) => {
-  router.post(
+  router.put(
     path,
     asyncHandler(async (req, res) => {
-      const instance = await updateOne(model, { _id: req.body._id }, req.body);
+      const { id } = req.params;
+      const instance = await updateOne(model, { _id: id }, req.body);
       cache.flushAll(); // Clear cache on data mutation
       res.status(200).json({
         data: instance,
@@ -143,12 +144,11 @@ const updateRoute = (path, model) => {
   );
 };
 
-// Update deleteRoute function to handle DELETE requests with ID
 const deleteRoute = (path, model) => {
   router.delete(
     path,
     asyncHandler(async (req, res) => {
-      const { id } = req.params; // Extract ID from request parameters
+      const { id } = req.params;
       await deleteOneById(model, id);
       cache.flushAll(); // Clear cache on data mutation
       res.status(200).json({
@@ -161,31 +161,13 @@ const deleteRoute = (path, model) => {
 
 // Define specific CRUD routes
 createRoute("/add-visionpoint", VisionPoint);
-updateRoute("/update-visionpoint", VisionPoint);
+updateRoute("/update-visionpoint/:id", VisionPoint);
 deleteRoute("/delete-visionpoint/:id", VisionPoint);
 
-createRoute("/add-feature", Feature);
-updateRoute("/update-feature", Feature);
-deleteRoute("/delete-feature/:id", Feature);
+createRoute("/add-visionhead", VisionHead);
+updateRoute("/update-visionhead/:id", VisionHead);
 
-createRoute("/add-teammember", TeamMember);
-updateRoute("/update-teammember", TeamMember);
-deleteRoute("/delete-teammember/:id", TeamMember);
-
-createRoute("/add-pricingcard", PricingCard);
-updateRoute("/update-pricingcard", PricingCard);
-deleteRoute("/delete-pricingcard/:id", PricingCard);
-
-createRoute("/add-faqcard", FAQCard);
-updateRoute("/update-faqcard", FAQCard);
-deleteRoute("/delete-faqcard/:id", FAQCard);
-
-// Additional routes
-updateRoute("/update-discover", Discover);
-updateRoute("/update-visionheading", VisionHead);
-updateRoute("/update-teamheading", Team);
-updateRoute("/update-priceheading", Pricing);
-updateRoute("/update-faqheading", FAQ);
+// Add other CRUD routes as needed
 
 // Admin login route
 router.post(

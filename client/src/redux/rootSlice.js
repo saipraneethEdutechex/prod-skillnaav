@@ -6,12 +6,13 @@ const rootSlice = createSlice({
     loading: false,
     skillnaavData: null,
     reloadData: false,
+    compImageUrls: [],
   },
   reducers: {
-    ShowLoading: (state, action) => {
+    ShowLoading: (state) => {
       state.loading = true;
     },
-    HideLoading: (state, action) => {
+    HideLoading: (state) => {
       state.loading = false;
     },
     SetSkillNaavData: (state, action) => {
@@ -20,10 +21,18 @@ const rootSlice = createSlice({
     ReloadData: (state, action) => {
       state.reloadData = action.payload;
     },
+    UpdateCompImageUrls: (state, action) => {
+      state.compImageUrls = action.payload;
+    },
   },
 });
 
-export const { ShowLoading, HideLoading, SetSkillNaavData, ReloadData } =
-  rootSlice.actions;
+export const {
+  ShowLoading,
+  HideLoading,
+  SetSkillNaavData,
+  ReloadData,
+  UpdateCompImageUrls,
+} = rootSlice.actions;
 
 export const rootReducer = rootSlice.reducer;
