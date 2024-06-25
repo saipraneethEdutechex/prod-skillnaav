@@ -112,7 +112,7 @@ router.get(
   })
 );
 
-// Generalized CRUD routes
+// Define specific CRUD routes
 const createRoute = (path, model) => {
   router.post(
     path,
@@ -159,15 +159,8 @@ const deleteRoute = (path, model) => {
   );
 };
 
-// Define specific CRUD routes
-createRoute("/add-visionpoint", VisionPoint);
-updateRoute("/update-visionpoint/:id", VisionPoint);
-deleteRoute("/delete-visionpoint/:id", VisionPoint);
-
-createRoute("/add-visionhead", VisionHead);
-updateRoute("/update-visionhead/:id", VisionHead);
-
-// Add other CRUD routes as needed
+// Define specific CRUD routes for Discover
+updateRoute("/update-discover/:id", Discover);
 
 // Admin login route
 router.post(

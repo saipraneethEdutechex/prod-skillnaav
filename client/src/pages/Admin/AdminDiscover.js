@@ -120,12 +120,14 @@ const AdminDiscover = () => {
   const onFinish = async (values) => {
     try {
       dispatch(ShowLoading());
-      const response = await axios.post("/api/skillnaav/update-discover", {
-        ...values,
-        _id: skillnaavData.discover[0]._id,
-        imgUrl: discoverImgUrl,
-        compImageUrls: compImageUrls,
-      });
+      const response = await axios.put(
+        `/api/skillnaav/update-discover/${skillnaavData.discover[0]._id}`,
+        {
+          ...values,
+          imgUrl: discoverImgUrl,
+          compImageUrls: compImageUrls,
+        }
+      );
       dispatch(HideLoading());
       if (response.data.success) {
         message.success("Changes saved successfully");
