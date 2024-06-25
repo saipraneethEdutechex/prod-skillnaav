@@ -3,6 +3,11 @@ import { motion } from "framer-motion";
 import Gradient from "../assets/Gradient.svg";
 import HeroImage from "../assets/app_mockup.png";
 import BlueArrow from "../assets/blue-button.svg";
+import Google from "../assets/Google.svg";
+import Slack from "../assets/Slack.svg";
+import Trustpilot from "../assets/Trustpilot.svg";
+import Cnn from "../assets/CNN.svg";
+import Clutch from "../assets/Clutch.svg";
 import { useSelector } from "react-redux";
 
 const Discover = () => {
@@ -26,42 +31,88 @@ const Discover = () => {
     imgUrl,
   } = discover;
 
+  const renderCompanyImages = () => {
+    if (discovercompimg.length === 0) {
+      // Render default images if discovercompimg is empty
+      const defaultCompanies = [
+        { src: Google, alt: "Google" },
+        { src: Slack, alt: "Slack" },
+        { src: Trustpilot, alt: "Trustpilot" },
+        { src: Cnn, alt: "CNN" },
+        { src: Clutch, alt: "Clutch" },
+      ];
+
+      return (
+        <div className="grid grid-cols-3 gap-4 sm:gap-6 lg:grid-cols-5">
+          {defaultCompanies.map((company, index) => (
+            <motion.img
+              key={index}
+              src={company.src}
+              alt={company.alt}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
+              className="w-20 h-20 lg:w-24 lg:h-24 rounded-lg"
+            />
+          ))}
+        </div>
+      );
+    }
+
+    // Render uploaded images from discovercompimg
+    return (
+      <div className="flex flex-wrap justify-center gap-4 sm:gap-6 px-4 sm:px-0">
+        {discovercompimg.slice(0, 5).map((image, index) => (
+          <motion.img
+            key={image._id}
+            src={image.imageUrl}
+            alt={`company ${index + 1}`}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
+            className="w-20 h-20 lg:w-24 lg:h-24 rounded-lg mx-2 my-2"
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <motion.div
       id="discover"
-      className="pt-4 lg:pt-10"
+      className="pt-6 lg:pt-10"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
     >
-      <div className="px-[20px] lg:px-[280px]">
+      <div>
         <motion.h1
-          className="text-center text-[32px] leading-[40px] font-medium text-[#172026] lg:text-[64px] lg:leading-[72px]"
+          className="text-center text-3xl sm:text-4xl leading-[40px] font-medium text-[#172026] lg:text-5xl lg:leading-[56px]"
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          {discoverheading || ""}
+          {discoverheading}
         </motion.h1>
         <motion.p
-          className="text-center pt-6 text-[18px] font-normal text-[#36485C] lg:text-[18px] lg:leading-7"
+          className="text-center pt-4 sm:pt-6 text-base sm:text-lg font-normal text-[#36485C] lg:text-lg lg:leading-7"
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          {discoversubheading || ""}
+          {discoversubheading}
         </motion.p>
         <motion.div
-          className="align-center flex w-full py-8 justify-center gap-x-6"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-x-6 pt-6 sm:pt-8"
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <button className="bg-[#4328EB] text-[#FFFFFF] w-1/2 px-8 py-4 rounded-[4px] lg:w-fit">
-            {tryforfreebtn || ""}
+          <button className="bg-[#4328EB] text-white w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-md">
+            {tryforfreebtn}
           </button>
-          <button className="text-[#4328EB] font-medium flex items-center justify-center gap-x-2 w-1/2 px-8 py-4 rounded-[4px] lg:w-fit">
-            <a href="#pricing">{viewpricebtn || ""}</a>
+          <button className="text-[#4328EB] font-medium flex items-center justify-center gap-2 w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-md">
+            <a href="#pricing">{viewpricebtn}</a>
             <span>
               <img src={BlueArrow} alt="Learn More" />
             </span>
@@ -69,45 +120,29 @@ const Discover = () => {
         </motion.div>
       </div>
       <motion.div
-        className="relative flex h-full w-full justify-center"
+        className="relative flex flex-col items-center w-full"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 0.6 }}
       >
-        <img
-          src={Gradient}
-          alt="Gradient"
-          className="min-h-[500px] w-full object-cover lg:h-auto"
-        />
-        <div className="absolute bottom-5 flex w-full flex-col items-center">
+        <div className="w-full">
+          <img
+            src={Gradient}
+            alt="Gradient"
+            className="w-full object-cover min-h-[200px] sm:min-h-[300px] lg:min-h-[500px] mt-6 sm:mt-8"
+          />
+        </div>
+        <div className="absolute bottom-5 w-full flex flex-col items-center">
           <img
             src={imgUrl || HeroImage}
             alt="hero image"
-            className="mb-10 md:w-[60%] md:mt-20 sm:mb-20 px-3 sm:px-20 sm:mx-12 lg:w-[60%] xl:w-[65%] max-w-full h-auto"
-            style={{ maxWidth: "100%", maxHeight: "auto" }}
+            className="mb-10 w-full max-w-[85%] sm:mb-20 px-3 sm:px-10 sm:mx-12 lg:max-w-[65%]"
           />
-          <div className="flex w-full flex-col items-center lg:container lg:flex-row lg:justify-between lg:px-20">
-            <p className="text-[white] text-center text-[16px] lg:text-[18px]">
+          <div className="flex flex-col items-center w-full px-4 sm:px-0 lg:flex-row lg:justify-between lg:px-20">
+            <p className="text-white text-center text-base sm:text-lg lg:text-lg">
               Trusted by these companies
             </p>
-            <div className="flex flex-wrap justify-center px-4 sm:px-0">
-              {discovercompimg.slice(0, 5).map((image, index) => (
-                <motion.img
-                  key={image._id}
-                  src={image.imageUrl}
-                  alt={`company ${index + 1}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
-                  className="w-[150px] h-[150px] lg:w-[180px] lg:h-[180px] rounded-lg shadow-lg mx-4 my-2"
-                  style={{
-                    maxWidth: "100%",
-                    maxHeight: "100%",
-                    objectFit: "cover",
-                  }}
-                />
-              ))}
-            </div>
+            {renderCompanyImages()}
           </div>
         </div>
       </motion.div>
