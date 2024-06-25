@@ -11,8 +11,91 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons";
 import ImageLazyLoad from "react-lazyload";
+import styled from "styled-components";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+
+const Container = styled.div`
+  padding: 2rem;
+  background: #f9f9f9;
+  border-radius: 1rem;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  margin: 3rem auto;
+  font-family: "Roboto", sans-serif;
+`;
+
+const Title = styled.h1`
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+`;
+
+const StyledForm = styled(Form)`
+  .ant-form-item {
+    margin-bottom: 1.5rem;
+  }
+
+  .ant-input,
+  .ant-input-textarea {
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .ant-input-textarea {
+    resize: none;
+  }
+
+  .ant-form-item-label > label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .ant-btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+  }
+
+  .ant-btn-link {
+    color: #007bff;
+    padding: 0;
+    height: auto;
+    font-size: 0.875rem;
+  }
+`;
+
+const UploadWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+`;
+
+const ImagePreview = styled.div`
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ant-btn-link {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+`;
 
 const AdminDiscover = () => {
   const [form] = Form.useForm();
@@ -147,36 +230,21 @@ const AdminDiscover = () => {
   const discovercompimg = skillnaavData.discovercompimg || [];
 
   return (
-    <div className="p-8 bg-white rounded-lg shadow-lg max-w-4xl mx-auto mt-10">
-      <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">
-        Edit Discover Section
-      </h1>
-      <Form
+    <Container>
+      <Title>Edit Discover Section</Title>
+      <StyledForm
         form={form}
         onFinish={onFinish}
         layout="vertical"
         initialValues={discover}
-        className="space-y-6"
       >
-        <Form.Item
-          name="discoverheading"
-          label="Discover Heading"
-          className="font-semibold text-gray-700"
-        >
+        <Form.Item name="discoverheading" label="Discover Heading">
           <Input placeholder="Enter Discover Heading" />
         </Form.Item>
-        <Form.Item
-          name="discoversubheading"
-          label="Discover Sub Heading"
-          className="font-semibold text-gray-700"
-        >
+        <Form.Item name="discoversubheading" label="Discover Sub Heading">
           <Input.TextArea rows={4} placeholder="Enter Discover Sub Heading" />
         </Form.Item>
-        <Form.Item
-          name="tryforfreebtn"
-          label="Try for Free Button"
-          className="font-semibold text-gray-700"
-        >
+        <Form.Item name="tryforfreebtn" label="Try for Free Button">
           <Input placeholder="Enter Try for Free Button" />
         </Form.Item>
         <Form.Item
@@ -184,7 +252,6 @@ const AdminDiscover = () => {
           label="Upload Discover Image"
           valuePropName="fileList"
           getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
-          className="font-semibold text-gray-700"
         >
           <Upload
             name="image"
@@ -212,11 +279,7 @@ const AdminDiscover = () => {
             </Button>
           )}
         </Form.Item>
-        <Form.Item
-          name="viewpricebtn"
-          label="View Price Button"
-          className="font-semibold text-gray-700"
-        >
+        <Form.Item name="viewpricebtn" label="View Price Button">
           <Input placeholder="Enter View Price Button" />
         </Form.Item>
         <Form.Item
@@ -224,31 +287,22 @@ const AdminDiscover = () => {
           label="Upload Company Images"
           valuePropName="fileList"
           getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
-          className="font-semibold text-gray-700"
         >
-          <div className="grid grid-cols-3 gap-4">
+          <UploadWrapper>
             {compImageUrls.map((url, index) => (
-              <div
-                key={url}
-                className="relative overflow-hidden rounded-lg shadow-md"
-              >
-                <img
-                  src={url}
-                  alt={`Company ${index + 1}`}
-                  className="w-full"
-                />
+              <ImagePreview key={url}>
+                <img src={url} alt={`Company ${index + 1}`} />
                 <Button
                   type="link"
                   onClick={() => handleImageRemove(url)}
                   icon={<DeleteOutlined />}
-                  className="absolute top-2 right-2 text-red-500"
                 >
                   Remove
                 </Button>
-              </div>
+              </ImagePreview>
             ))}
             {compImageUrls.length < 5 && (
-              <label className="relative flex items-center justify-center w-full h-full bg-gray-100 rounded-lg cursor-pointer">
+              <UploadWrapper className="relative flex items-center justify-center w-full h-full bg-gray-100 rounded-lg cursor-pointer">
                 <UploadOutlined className="text-3xl text-gray-500" />
                 <input
                   type="file"
@@ -257,22 +311,9 @@ const AdminDiscover = () => {
                     handleCompanyImageUpload({ file: e.target.files[0] })
                   }
                 />
-              </label>
+              </UploadWrapper>
             )}
-            {compImageUrls.length === 5 && (
-              <div className="relative flex items-center justify-center w-full h-full bg-gray-100 rounded-lg cursor-pointer opacity-50">
-                <UploadOutlined className="text-3xl text-gray-500" />
-                <input
-                  type="file"
-                  className="hidden"
-                  onChange={(e) =>
-                    handleCompanyImageUpload({ file: e.target.files[0] })
-                  }
-                  disabled
-                />
-              </div>
-            )}
-          </div>
+          </UploadWrapper>
           {compImageUrls.length === 5 && (
             <p className="text-gray-500 text-sm mt-2">
               Maximum of 5 images uploaded.
@@ -317,9 +358,9 @@ const AdminDiscover = () => {
             Save Changes
           </Button>
         </Form.Item>
-      </Form>
+      </StyledForm>
       <Spin spinning={uploading} indicator={antIcon} />
-    </div>
+    </Container>
   );
 };
 
