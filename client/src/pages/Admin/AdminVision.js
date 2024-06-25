@@ -1,3 +1,4 @@
+// src/components/AdminVision.js
 import React, { useState, useEffect, useCallback } from "react";
 import { Modal, Form, Input, Button, message, List, Skeleton } from "antd";
 import axios from "axios";
@@ -25,6 +26,9 @@ const AdminVision = () => {
   const handleFileUpload = (event) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
+      // Set uploading state to true to show loader
+      setUploading(true);
+
       // Set the preview URL for instant feedback
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -35,12 +39,21 @@ const AdminVision = () => {
       // Upload to Firebase
       const storageRef = firebase.storage().ref();
       const fileRef = storageRef.child(selectedFile.name);
-      fileRef.put(selectedFile).then((snapshot) => {
-        snapshot.ref.getDownloadURL().then((downloadURL) => {
+      fileRef
+        .put(selectedFile)
+        .then((snapshot) => {
+          return snapshot.ref.getDownloadURL();
+        })
+        .then((downloadURL) => {
           console.log(downloadURL);
           setImgUrl(downloadURL);
+          setUploading(false); // Set uploading state to false after successful upload
+        })
+        .catch((error) => {
+          console.error("Error uploading file:", error);
+          setUploading(false); // Set uploading state to false on error
+          // Handle error as needed (e.g., show error message)
         });
-      });
     } else {
       console.log("No file selected, so select one");
     }
@@ -266,14 +279,22 @@ const AdminVision = () => {
                 ]}
               >
                 <input type="file" onChange={handleFileUpload} />
-                {previewUrl && (
+                {uploading ? (
+                  <div className="mt-2 flex items-center">
+                    <Skeleton.Avatar active size="small" />
+                    <Skeleton.Button
+                      active
+                      style={{ marginLeft: 10, width: 150 }}
+                    />
+                  </div>
+                ) : previewUrl ? (
                   <img
                     src={previewUrl}
                     alt="Vision Image"
                     className="max-w-full h-auto rounded mt-2"
                     style={{ maxHeight: "200px", objectFit: "cover" }}
                   />
-                )}
+                ) : null}
               </Form.Item>
             </>
           ) : (
