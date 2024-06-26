@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Modal, Form, Input, Button, message, Skeleton } from "antd";
 import axios from "axios";
+import firebase from "firebase/compat/app";
+import "firebase/compat/storage";
 
 const { TextArea } = Input;
 
@@ -11,13 +13,28 @@ function AdminFeatures() {
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(true);
-  const [imageUrl, setImageUrl] = useState(""); // State for image URL
-  const [previewImageUrl, setPreviewImageUrl] = useState(""); // State for image preview URL
-
+  const [imageUrl, setImageUrl] = useState("");
+  const [previewImageUrl, setPreviewImageUrl] = useState("");
   useEffect(() => {
     fetchSkillnaavData();
   }, []);
 
+  const handleFileUpload = (event) => {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      const storageRef = firebase.storage().ref();
+      const fileRef = storageRef.child(selectedFile.name);
+
+      fileRef.put(selectedFile).then((snapshot) => {
+        snapshot.ref.getDownloadURL().then((downloadURL) => {
+          console.log(downloadURL);
+          setImageUrl(downloadURL);
+        });
+      });
+    } else {
+      console.log("Error occured check");
+    }
+  };
   const fetchSkillnaavData = useCallback(async () => {
     try {
       setLoading(true);
@@ -186,7 +203,7 @@ function AdminFeatures() {
               <span className="font-semibold">Point 4: </span>
               {feat.point4}
             </p>
-            {feat.featureImg && (
+            {/* {feat.featureImg && (
               <div className="mb-4">
                 <img
                   src={feat.featureImg}
@@ -194,7 +211,8 @@ function AdminFeatures() {
                   style={{ maxWidth: "100%", maxHeight: "200px" }}
                 />
               </div>
-            )}
+            )} */}
+            <input type="file" onChange={handleFileUpload} />
             <div className="flex justify-end mt-4">
               <Button
                 type="primary"
@@ -283,7 +301,7 @@ function AdminFeatures() {
           >
             <TextArea rows={2} />
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="featureImg"
             label="Image URL"
             rules={[{ required: true, message: "Please enter image URL" }]}
@@ -302,7 +320,8 @@ function AdminFeatures() {
                 style={{ maxWidth: "100%", maxHeight: "200px" }}
               />
             </div>
-          )}
+          )} */}
+          <input type="file" onChange={handleFileUpload} />
           <div className="flex justify-end">
             <Button
               type="primary"
@@ -377,7 +396,7 @@ function AdminFeatures() {
           >
             <TextArea rows={2} />
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="featureImg"
             label="Image URL"
             rules={[{ required: true, message: "Please enter image URL" }]}
@@ -396,7 +415,8 @@ function AdminFeatures() {
                 style={{ maxWidth: "100%", maxHeight: "200px" }}
               />
             </div>
-          )}
+          )} */}
+          <input type="file" onChange={handleFileUpload} />
           <div className="flex justify-end">
             <Button
               type="primary"
