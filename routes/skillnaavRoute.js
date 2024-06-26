@@ -1,3 +1,5 @@
+// routes/skillnaavRoutes.js
+
 const express = require("express");
 const NodeCache = require("node-cache");
 const router = express.Router();
@@ -168,6 +170,11 @@ deleteRoute("/delete-visionpoint/:id", VisionPoint);
 // Define specific CRUD routes for Discover
 updateRoute("/update-discover/:id", Discover);
 
+// Define CRUD routes for Feature
+updateRoute("/update-feature/:id", Feature);
+createRoute("/add-feature", Feature);
+deleteRoute("/delete-feature/:id", Feature);
+
 // Admin login route
 router.post(
   "/admin-login",
@@ -227,6 +234,19 @@ router.delete(
     await Contact.findByIdAndDelete(req.params.id);
     cache.flushAll(); // Clear cache on data mutation
     res.status(200).json({ message: "Contact deleted successfully" });
+  })
+);
+router.put(
+  "/update-feature/:id",
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const instance = await updateOne(Feature, { _id: id }, req.body);
+    cache.flushAll(); // Clear cache on data mutation
+    res.status(200).json({
+      data: instance,
+      success: true,
+      message: `${Feature.modelName} updated successfully`,
+    });
   })
 );
 
