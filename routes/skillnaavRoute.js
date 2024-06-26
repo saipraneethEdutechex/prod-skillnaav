@@ -134,42 +134,26 @@ const updateRoute = (path, model) => {
     `${path}/:id`,
     asyncHandler(async (req, res) => {
       const { id } = req.params;
-      const {
-        teammemberName,
-        teammemberDesgn,
-        teammemberDesc,
-        teammemberLinkedin,
-      } = req.body;
 
       try {
-        const updatedMember = await model.findOneAndUpdate(
-          { _id: id },
-          {
-            teammemberName,
-            teammemberDesgn,
-            teammemberDesc,
-            teammemberLinkedin,
-          },
-          { new: true }
-        );
+        const updatedInstance = await updateOne(model, { _id: id }, req.body);
 
-        if (!updatedMember) {
+        if (!updatedInstance) {
           return res.status(404).json({
             success: false,
-            message: "Team member not found",
+            message: `${model.modelName} not found`,
           });
         }
 
-        // Optionally, you can clear specific cache entries related to team members here
         cache.flushAll(); // Clear cache on data mutation
 
         res.status(200).json({
           success: true,
-          message: "Team member updated successfully",
-          data: updatedMember,
+          message: `${model.modelName} updated successfully`,
+          data: updatedInstance,
         });
       } catch (error) {
-        console.error("Error updating team member:", error);
+        console.error(`Error updating ${model.modelName}:`, error);
         res.status(500).json({
           success: false,
           message: "Server Error",
@@ -182,7 +166,7 @@ const updateRoute = (path, model) => {
 
 const deleteRoute = (path, model) => {
   router.delete(
-    path,
+    `${path}/:id`,
     asyncHandler(async (req, res) => {
       const { id } = req.params;
       await deleteOneById(model, id);
@@ -196,20 +180,19 @@ const deleteRoute = (path, model) => {
 };
 
 // Define specific CRUD routes for Vision Head and Vision Point
-updateRoute("/update-visionhead/:id", VisionHead);
-updateRoute("/update-visionpoint/:id", VisionPoint);
-createRoute("/add-visionpoint", VisionPoint);
-deleteRoute("/delete-visionpoint/:id", VisionPoint);
+updateRoute("/update-visionhead", VisionHead);
+createRoute("/add-visionhead", VisionHead);
+deleteRoute("/delete-visionhead", VisionHead);
 
 // Define CRUD routes for Feature
-updateRoute("/update-feature/:id", Feature);
+updateRoute("/update-feature", Feature);
 createRoute("/add-feature", Feature);
-deleteRoute("/delete-feature/:id", Feature);
+deleteRoute("/delete-feature", Feature);
 
 // Define specific CRUD routes for TeamMember
 createRoute("/add-teammember", TeamMember);
-updateRoute("/update-teammember/:id", TeamMember);
-deleteRoute("/delete-teammember/:id", TeamMember);
+updateRoute("/update-teammember", TeamMember);
+deleteRoute("/delete-teammember", TeamMember);
 
 // Admin login route
 router.post(

@@ -6,17 +6,20 @@ import "firebase/compat/storage";
 
 const { TextArea } = Input;
 
-function AdminTeam() {
-  const [skillnaavData, setSkillnaavData] = useState(null);
+const AdminTeam = () => {
+  const [skillnaavData, setSkillnaavData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isEditTeamModalVisible, setIsEditTeamModalVisible] = useState(false);
   const [isAddTeamModalVisible, setIsAddTeamModalVisible] = useState(false);
-  const [isEditHeadingModalVisible, setIsEditHeadingModalVisible] =
-    useState(false);
   const [selectedTeamMember, setSelectedTeamMember] = useState(null);
   const [form] = Form.useForm();
-  const [headingForm] = Form.useForm();
   const [imgUrl, setImgUrl] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState("");
+
+  useEffect(() => {
+    fetchSkillnaavData();
+  }, []);
 
   const fetchSkillnaavData = useCallback(async () => {
     try {
@@ -31,261 +34,133 @@ function AdminTeam() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchSkillnaavData();
-  }, [fetchSkillnaavData]);
-
   const handleFileUpload = (event) => {
     const selectedFile = event.target.files[0];
 
     if (selectedFile) {
+      setUploading(true);
+
       const storageRef = firebase.storage().ref();
       const fileRef = storageRef.child(selectedFile.name);
       fileRef
         .put(selectedFile)
         .then((snapshot) => snapshot.ref.getDownloadURL())
-        .then((downloadURL) => {
-          setImgUrl(downloadURL);
+        .then((url) => {
+          setImgUrl(url);
+          setPreviewUrl(url);
+          setUploading(false);
         })
         .catch((error) => {
           console.error("Error uploading file:", error);
-          message.error("Failed to upload file");
+          setUploading(false);
+          message.error("Failed to upload image");
         });
-    } else {
-      console.log("No file selected");
     }
   };
 
-  const onFinishEdit = useCallback(
-    async (values) => {
-      try {
-        values._id = selectedTeamMember._id;
-        const response = await axios.put(
-          `/api/skillnaav/update-teammember/${values._id}`,
-          values
-        );
-        if (response.data.success) {
-          message.success(response.data.message);
-          setIsEditTeamModalVisible(false);
-          fetchSkillnaavData();
-        } else {
-          message.error(response.data.message);
-        }
-      } catch (error) {
-        message.error("Error updating team member:", error.message);
-      }
-    },
-    [selectedTeamMember, fetchSkillnaavData]
-  );
-
-  const onFinishAdd = useCallback(
-    async (values) => {
-      try {
-        values.image = imgUrl;
-        const response = await axios.post(
-          "/api/skillnaav/add-teammember",
-          values
-        );
-        if (response.data.success) {
-          message.success(response.data.message);
-          setIsAddTeamModalVisible(false);
-          fetchSkillnaavData();
-          form.resetFields();
-          setImgUrl(null);
-        } else {
-          message.error(response.data.message);
-        }
-      } catch (error) {
-        message.error("Error adding team member:", error.message);
-      }
-    },
-    [fetchSkillnaavData, form, imgUrl]
-  );
-
-  const onFinishEditHeading = useCallback(
-    async (values) => {
-      try {
-        const teamId =
-          skillnaavData && skillnaavData.length > 0
-            ? skillnaavData[0]._id
-            : null;
-        if (!teamId) {
-          message.error("Team data not available");
-          return;
-        }
-        values._id = teamId;
-        const response = await axios.put(
-          `/api/skillnaav/update-teamheading/${values._id}`,
-          values
-        );
-        if (response.data.success) {
-          message.success(response.data.message);
-          setIsEditHeadingModalVisible(false);
-          fetchSkillnaavData();
-        } else {
-          message.error(response.data.message);
-        }
-      } catch (error) {
-        message.error("Error updating team heading:", error.message);
-      }
-    },
-    [skillnaavData, fetchSkillnaavData]
-  );
-
-  const onDelete = useCallback(
-    async (teammemberId) => {
-      try {
-        const response = await axios.delete(
-          `/api/skillnaav/delete-teammember/${teammemberId}`
-        );
-        if (response.data.success) {
-          message.success(response.data.message);
-          fetchSkillnaavData();
-        } else {
-          message.error(response.data.message);
-        }
-      } catch (error) {
-        message.error("Error deleting team member:", error.message);
-      }
-    },
-    [fetchSkillnaavData]
-  );
-
-  const handleEditTeamMember = useCallback(
-    (teammember) => {
-      setSelectedTeamMember(teammember);
-      form.setFieldsValue(teammember);
-      setIsEditTeamModalVisible(true);
-    },
-    [form]
-  );
-
-  const handleEditHeading = useCallback(() => {
-    if (skillnaavData && skillnaavData.length > 0) {
-      headingForm.setFieldsValue({
-        teamheading: skillnaavData[0].teamheading,
-        teamsubheading: skillnaavData[0].teamsubheading,
-      });
-      setIsEditHeadingModalVisible(true);
+  const handleFormSubmit = async (values) => {
+    const teamData = { ...values, image: imgUrl };
+    try {
+      const response = await axios.post(
+        "/api/skillnaav/add-teammember",
+        teamData
+      );
+      message.success(response.data.message);
+      fetchSkillnaavData();
+      setIsAddTeamModalVisible(false);
+      form.resetFields();
+      setImgUrl(null);
+      setPreviewUrl("");
+    } catch (error) {
+      console.error("Error adding team member:", error);
+      message.error("Failed to add team member");
     }
-  }, [skillnaavData, headingForm]);
+  };
 
-  if (loading || skillnaavData === null) {
-    return <Skeleton active />;
-  }
+  const handleEditFormSubmit = async (values) => {
+    const teamData = { ...values, image: imgUrl || selectedTeamMember.image };
+    try {
+      const response = await axios.put(
+        `/api/skillnaav/update-teammember/${selectedTeamMember._id}`,
+        teamData
+      );
+      message.success(response.data.message);
+      fetchSkillnaavData();
+      setIsEditTeamModalVisible(false);
+      form.resetFields();
+      setImgUrl(null);
+      setPreviewUrl("");
+    } catch (error) {
+      console.error("Error updating team member:", error);
+      message.error("Failed to update team member");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`/api/skillnaav/delete-teammember/${id}`);
+      message.success("Team member deleted successfully");
+      fetchSkillnaavData();
+    } catch (error) {
+      console.error("Error deleting team member:", error);
+      message.error("Failed to delete team member");
+    }
+  };
+
+  const openEditTeamModal = (teamMember) => {
+    setSelectedTeamMember(teamMember);
+    setPreviewUrl(teamMember.image);
+    form.setFieldsValue({
+      teammemberName: teamMember.teammemberName,
+      teammemberDesgn: teamMember.teammemberDesgn,
+      teammemberDesc: teamMember.teammemberDesc,
+      teammemberLinkedin: teamMember.teammemberLinkedin,
+    });
+    setIsEditTeamModalVisible(true);
+  };
 
   return (
     <div>
-      <div className="border p-4 rounded-lg mb-4">
-        <h1 className="text-xl font-semibold">Team</h1>
-        <hr className="my-2" />
-        {skillnaavData.length > 0 && (
-          <>
-            <p className="mb-4">
-              <span className="font-semibold">Heading: </span>
-              {skillnaavData[0].teamheading}
-            </p>
-            <p className="mb-4">
-              <span className="font-semibold">Sub Heading: </span>
-              {skillnaavData[0].teamsubheading}
-            </p>
-            <div className="flex justify-end mt-4">
-              <Button type="primary" onClick={handleEditHeading}>
-                Edit Heading
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
-
-      <div className="border p-4 rounded-lg mb-4">
-        <h1 className="text-xl font-semibold">Team Members</h1>
-        <hr className="my-2" />
+      <h1>Manage Team Members</h1>
+      <Button
+        type="primary"
+        onClick={() => setIsAddTeamModalVisible(true)}
+        style={{ marginBottom: "20px" }}
+      >
+        Add Team Member
+      </Button>
+      {loading ? (
+        <Skeleton active />
+      ) : (
         <List
           itemLayout="horizontal"
           dataSource={skillnaavData}
-          renderItem={(member) => (
+          renderItem={(item) => (
             <List.Item
               actions={[
-                <Button
-                  type="link"
-                  onClick={() => handleEditTeamMember(member)}
-                  key="edit"
-                >
+                <Button type="link" onClick={() => openEditTeamModal(item)}>
                   Edit
                 </Button>,
                 <Button
                   type="link"
                   danger
-                  onClick={() => onDelete(member._id)}
-                  key="delete"
+                  onClick={() => handleDelete(item._id)}
                 >
                   Delete
                 </Button>,
               ]}
             >
               <List.Item.Meta
-                title={member.teammemberName}
-                description={member.teammemberDesgn}
+                avatar={
+                  <img src={item.image} alt={item.teammemberName} width={50} />
+                }
+                title={item.teammemberName}
+                description={item.teammemberDesgn}
               />
-              {member.image && (
-                <img
-                  src={member.image}
-                  alt={member.teammemberName}
-                  style={{ maxWidth: "100px", maxHeight: "100px" }}
-                />
-              )}
             </List.Item>
           )}
         />
-        <Button
-          type="primary"
-          className="mt-4"
-          onClick={() => setIsAddTeamModalVisible(true)}
-        >
-          Add Team Member
-        </Button>
-      </div>
-
-      <Modal
-        title="Edit Team Member"
-        visible={isEditTeamModalVisible}
-        onCancel={() => setIsEditTeamModalVisible(false)}
-        footer={null}
-      >
-        <Form form={form} onFinish={onFinishEdit}>
-          <Form.Item name="_id" hidden>
-            <Input />
-          </Form.Item>
-          <Form.Item name="teammemberName" label="Name">
-            <TextArea rows={2} />
-          </Form.Item>
-          <Form.Item name="teammemberDesgn" label="Position">
-            <TextArea rows={2} />
-          </Form.Item>
-          <Form.Item name="teammemberDesc" label="Description">
-            <TextArea rows={4} />
-          </Form.Item>
-          <Form.Item name="teammemberLinkedin" label="LinkedIn">
-            <TextArea rows={2} />
-          </Form.Item>
-          <input type="file" onChange={handleFileUpload} />
-          {imgUrl && (
-            <div style={{ marginTop: 10 }}>
-              <img
-                src={imgUrl}
-                alt="Uploaded Preview"
-                style={{ maxWidth: "100%" }}
-              />
-            </div>
-          )}
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Update
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
+      )}
 
       <Modal
         title="Add Team Member"
@@ -293,29 +168,40 @@ function AdminTeam() {
         onCancel={() => setIsAddTeamModalVisible(false)}
         footer={null}
       >
-        <Form form={form} onFinish={onFinishAdd}>
-          <Form.Item name="teammemberName" label="Name">
-            <TextArea rows={2} />
+        <Form form={form} onFinish={handleFormSubmit}>
+          <Form.Item
+            name="teammemberName"
+            label="Name"
+            rules={[{ required: true }]}
+          >
+            <Input />
           </Form.Item>
-          <Form.Item name="teammemberDesgn" label="Position">
-            <TextArea rows={2} />
+          <Form.Item
+            name="teammemberDesgn"
+            label="Designation"
+            rules={[{ required: true }]}
+          >
+            <Input />
           </Form.Item>
-          <Form.Item name="teammemberDesc" label="Description">
+          <Form.Item
+            name="teammemberDesc"
+            label="Description"
+            rules={[{ required: true }]}
+          >
             <TextArea rows={4} />
           </Form.Item>
-          <Form.Item name="teammemberLinkedin" label="LinkedIn">
-            <TextArea rows={2} />
+          <Form.Item
+            name="teammemberLinkedin"
+            label="LinkedIn"
+            rules={[{ required: true }]}
+          >
+            <Input />
           </Form.Item>
-          <input type="file" onChange={handleFileUpload} />
-          {imgUrl && (
-            <div style={{ marginTop: 10 }}>
-              <img
-                src={imgUrl}
-                alt="Uploaded Preview"
-                style={{ maxWidth: "100%" }}
-              />
-            </div>
-          )}
+          <Form.Item label="Image">
+            <input type="file" onChange={handleFileUpload} />
+            {uploading && <p>Uploading...</p>}
+            {previewUrl && <img src={previewUrl} alt="Preview" width={100} />}
+          </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Add
@@ -325,17 +211,44 @@ function AdminTeam() {
       </Modal>
 
       <Modal
-        title="Edit Team Heading"
-        visible={isEditHeadingModalVisible}
-        onCancel={() => setIsEditHeadingModalVisible(false)}
+        title="Edit Team Member"
+        visible={isEditTeamModalVisible}
+        onCancel={() => setIsEditTeamModalVisible(false)}
         footer={null}
       >
-        <Form form={headingForm} onFinish={onFinishEditHeading}>
-          <Form.Item name="teamheading" label="Heading">
+        <Form form={form} onFinish={handleEditFormSubmit}>
+          <Form.Item
+            name="teammemberName"
+            label="Name"
+            rules={[{ required: true }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="teamsubheading" label="Sub Heading">
+          <Form.Item
+            name="teammemberDesgn"
+            label="Designation"
+            rules={[{ required: true }]}
+          >
             <Input />
+          </Form.Item>
+          <Form.Item
+            name="teammemberDesc"
+            label="Description"
+            rules={[{ required: true }]}
+          >
+            <TextArea rows={4} />
+          </Form.Item>
+          <Form.Item
+            name="teammemberLinkedin"
+            label="LinkedIn"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item label="Image">
+            <input type="file" onChange={handleFileUpload} />
+            {uploading && <p>Uploading...</p>}
+            {previewUrl && <img src={previewUrl} alt="Preview" width={100} />}
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
@@ -346,6 +259,6 @@ function AdminTeam() {
       </Modal>
     </div>
   );
-}
+};
 
 export default AdminTeam;

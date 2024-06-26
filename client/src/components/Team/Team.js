@@ -59,24 +59,6 @@ const Team = () => {
 
   const { teamheading, teamsubheading } = skillnaavData.team[0];
   const teammember = skillnaavData.teammember.map((item, index) => {
-    if (index === 3) {
-      return {
-        ...item,
-        image: KrishnaPillaiCropped,
-      };
-    }
-    if (index === 4) {
-      return {
-        ...item,
-        image: AkanshaCropped,
-      };
-    }
-    if (index === 2) {
-      return {
-        ...item,
-        image: HemRanjiniCropped,
-      };
-    }
     return item;
   });
 
