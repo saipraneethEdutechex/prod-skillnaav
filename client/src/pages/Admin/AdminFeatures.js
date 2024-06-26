@@ -15,6 +15,7 @@ function AdminFeatures() {
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState("");
   const [previewImageUrl, setPreviewImageUrl] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false); // State to manage image upload loading
 
   useEffect(() => {
     fetchSkillnaavData();
@@ -35,6 +36,7 @@ function AdminFeatures() {
   const handleFileUpload = (event) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
+      setUploadingImage(true); // Set uploading image state to true
       const storageRef = firebase.storage().ref();
       const fileRef = storageRef.child(selectedFile.name);
 
@@ -42,6 +44,7 @@ function AdminFeatures() {
         snapshot.ref.getDownloadURL().then((downloadURL) => {
           setImageUrl(downloadURL);
           setPreviewImageUrl(downloadURL);
+          setUploadingImage(false); // Set uploading image state to false after upload completes
         });
       });
     }
@@ -64,6 +67,7 @@ function AdminFeatures() {
         fetchSkillnaavData();
         form.resetFields();
         setImageUrl("");
+        setPreviewImageUrl(""); // Clear preview image after successful update
       } else {
         message.error(response.data.message || "Failed to update feature.");
       }
@@ -88,6 +92,7 @@ function AdminFeatures() {
         fetchSkillnaavData();
         form.resetFields();
         setImageUrl("");
+        setPreviewImageUrl(""); // Clear preview image after successful addition
       } else {
         message.error(response.data.message || "Failed to add feature.");
       }
@@ -279,22 +284,27 @@ function AdminFeatures() {
             <TextArea rows={2} />
           </Form.Item>
           <input type="file" onChange={handleFileUpload} />
-          {previewImageUrl && (
-            <div className="mb-4">
-              <img
-                src={previewImageUrl}
-                alt="Preview Image"
-                style={{ maxWidth: "100%", maxHeight: "200px" }}
-              />
+          {uploadingImage ? (
+            <div className="mt-2 flex items-center">
+              <Skeleton.Avatar active size="small" />
+              <Skeleton.Button active style={{ marginLeft: 10, width: 150 }} />
             </div>
-          )}
-          <Form.Item>
+          ) : previewImageUrl ? (
+            <img
+              src={previewImageUrl}
+              alt="Preview"
+              className="max-w-full h-auto rounded mt-2"
+              style={{ maxHeight: "200px", objectFit: "cover" }}
+            />
+          ) : null}
+          <Form.Item style={{ marginTop: "16px" }}>
             <Button
               type="primary"
               htmlType="submit"
+              loading={loading}
               style={{ backgroundColor: "#1890ff", color: "#FFFFFF" }}
             >
-              Update Feature
+              Save Changes
             </Button>
           </Form.Item>
         </Form>
@@ -302,7 +312,7 @@ function AdminFeatures() {
 
       <Modal
         visible={showAddModal}
-        title="Add Feature"
+        title="Add New Feature"
         onCancel={() => {
           setShowAddModal(false);
           form.resetFields();
@@ -364,19 +374,19 @@ function AdminFeatures() {
             <TextArea rows={2} />
           </Form.Item>
           <input type="file" onChange={handleFileUpload} />
-          {previewImageUrl && (
-            <div className="mb-4">
-              <img
-                src={previewImageUrl}
-                alt="Preview Image"
-                style={{ maxWidth: "100%", maxHeight: "200px" }}
-              />
-            </div>
+          {uploadingImage && <Skeleton.Image style={{ width: "100%" }} />}
+          {previewImageUrl && !uploadingImage && (
+            <img
+              src={previewImageUrl}
+              alt="Preview"
+              style={{ maxWidth: "100%", maxHeight: "200px" }}
+            />
           )}
-          <Form.Item>
+          <Form.Item style={{ marginTop: "16px" }}>
             <Button
               type="primary"
               htmlType="submit"
+              loading={loading}
               style={{ backgroundColor: "#1890ff", color: "#FFFFFF" }}
             >
               Add Feature
