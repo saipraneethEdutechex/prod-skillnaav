@@ -15,8 +15,21 @@ function AdminFeatures() {
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState("");
   const [previewImageUrl, setPreviewImageUrl] = useState("");
+
   useEffect(() => {
     fetchSkillnaavData();
+  }, []);
+
+  const fetchSkillnaavData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("/api/skillnaav/get-skillnaav-data");
+      setSkillnaavData(response.data);
+    } catch (error) {
+      message.error("Failed to fetch data. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const handleFileUpload = (event) => {
@@ -27,53 +40,34 @@ function AdminFeatures() {
 
       fileRef.put(selectedFile).then((snapshot) => {
         snapshot.ref.getDownloadURL().then((downloadURL) => {
-          console.log(downloadURL);
           setImageUrl(downloadURL);
+          setPreviewImageUrl(downloadURL);
         });
       });
-    } else {
-      console.log("Error occured check");
     }
   };
-  const fetchSkillnaavData = useCallback(async () => {
-    try {
-      setLoading(true);
-      console.log("Fetching skillnaav data...");
-      const response = await axios.get("/api/skillnaav/get-skillnaav-data");
-      console.log("Skillnaav data fetched:", response.data);
-      setSkillnaavData(response.data);
-    } catch (error) {
-      console.error("Error fetching skillnaav data:", error);
-      message.error("Failed to fetch data. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   const onFinishEdit = async (values) => {
     try {
       setLoading(true);
-      if (!values._id) {
-        values._id = selectedFeature._id;
-      }
-      const payload = { ...values, featureImg: imageUrl };
-      console.log("Updating feature with payload:", payload);
-      const response = await axios.post(
-        "/api/skillnaav/update-feature",
+      const payload = {
+        ...values,
+        featureImg: imageUrl,
+      };
+      const response = await axios.put(
+        `/api/skillnaav/update-feature/${selectedFeature._id}`,
         payload
       );
-      console.log("Feature update response:", response.data);
       if (response.data.success) {
         message.success(response.data.message);
         setShowEditModal(false);
         fetchSkillnaavData();
-        setImageUrl("");
         form.resetFields();
+        setImageUrl("");
       } else {
         message.error(response.data.message || "Failed to update feature.");
       }
     } catch (error) {
-      console.error("Error updating feature:", error);
       message.error(
         "Error updating feature: " +
           (error.message || "Unknown error occurred.")
@@ -87,9 +81,7 @@ function AdminFeatures() {
     try {
       setLoading(true);
       const payload = { ...values, featureImg: imageUrl };
-      console.log("Adding feature with payload:", payload);
       const response = await axios.post("/api/skillnaav/add-feature", payload);
-      console.log("Feature add response:", response.data);
       if (response.data.success) {
         message.success(response.data.message);
         setShowAddModal(false);
@@ -100,7 +92,6 @@ function AdminFeatures() {
         message.error(response.data.message || "Failed to add feature.");
       }
     } catch (error) {
-      console.error("Error adding feature:", error);
       message.error(
         "Error adding feature: " + (error.message || "Unknown error occurred.")
       );
@@ -112,11 +103,9 @@ function AdminFeatures() {
   const onDelete = async (featureId) => {
     try {
       setLoading(true);
-      console.log("Deleting feature with ID:", featureId);
       const response = await axios.delete(
         `/api/skillnaav/delete-feature/${featureId}`
       );
-      console.log("Feature delete response:", response.data);
       if (response.data.success) {
         message.success(response.data.message);
         fetchSkillnaavData();
@@ -124,7 +113,6 @@ function AdminFeatures() {
         message.error(response.data.message || "Failed to delete feature.");
       }
     } catch (error) {
-      console.error("Error deleting feature:", error);
       message.error(
         "Error deleting feature: " +
           (error.message || "Unknown error occurred.")
@@ -136,24 +124,18 @@ function AdminFeatures() {
 
   const handleEdit = (feature) => {
     setSelectedFeature(feature);
-    setImageUrl(feature.featureImg); // Set initial value of imageUrl for edit modal
-    setPreviewImageUrl(feature.featureImg); // Set preview image URL for edit modal
-    form.setFieldsValue(feature); // Set form fields value for editing
+    setImageUrl(feature.featureImg);
+    setPreviewImageUrl(feature.featureImg);
+    form.setFieldsValue(feature);
     setShowEditModal(true);
   };
 
   const handleAdd = () => {
-    form.resetFields(); // Reset form fields
-    setSelectedFeature(null); // Clear selected feature
-    setImageUrl(""); // Clear imageUrl state
-    setPreviewImageUrl(""); // Clear previewImageUrl state
-    setShowAddModal(true); // Show the Add Feature modal
-  };
-
-  const handleImageUrlChange = (e) => {
-    const url = e.target.value;
-    setPreviewImageUrl(url);
-    setImageUrl(url);
+    form.resetFields();
+    setSelectedFeature(null);
+    setImageUrl("");
+    setPreviewImageUrl("");
+    setShowAddModal(true);
   };
 
   if (loading || !skillnaavData || !skillnaavData.features) {
@@ -203,7 +185,7 @@ function AdminFeatures() {
               <span className="font-semibold">Point 4: </span>
               {feat.point4}
             </p>
-            {/* {feat.featureImg && (
+            {feat.featureImg && (
               <div className="mb-4">
                 <img
                   src={feat.featureImg}
@@ -211,8 +193,7 @@ function AdminFeatures() {
                   style={{ maxWidth: "100%", maxHeight: "200px" }}
                 />
               </div>
-            )} */}
-            <input type="file" onChange={handleFileUpload} />
+            )}
             <div className="flex justify-end mt-4">
               <Button
                 type="primary"
@@ -233,6 +214,7 @@ function AdminFeatures() {
           </div>
         ))}
       </div>
+
       <Modal
         visible={showEditModal}
         title="Edit Feature"
@@ -244,12 +226,7 @@ function AdminFeatures() {
         }}
         footer={null}
       >
-        <Form
-          layout="vertical"
-          onFinish={onFinishEdit}
-          initialValues={selectedFeature}
-          form={form}
-        >
+        <Form layout="vertical" onFinish={onFinishEdit} form={form}>
           <Form.Item
             name="feature"
             label="Feature"
@@ -301,17 +278,7 @@ function AdminFeatures() {
           >
             <TextArea rows={2} />
           </Form.Item>
-          {/* <Form.Item
-            name="featureImg"
-            label="Image URL"
-            rules={[{ required: true, message: "Please enter image URL" }]}
-          >
-            <TextArea
-              rows={2}
-              onChange={handleImageUrlChange}
-              value={imageUrl}
-            />
-          </Form.Item>
+          <input type="file" onChange={handleFileUpload} />
           {previewImageUrl && (
             <div className="mb-4">
               <img
@@ -320,19 +287,19 @@ function AdminFeatures() {
                 style={{ maxWidth: "100%", maxHeight: "200px" }}
               />
             </div>
-          )} */}
-          <input type="file" onChange={handleFileUpload} />
-          <div className="flex justify-end">
+          )}
+          <Form.Item>
             <Button
               type="primary"
               htmlType="submit"
               style={{ backgroundColor: "#1890ff", color: "#FFFFFF" }}
             >
-              Save
+              Update Feature
             </Button>
-          </div>
+          </Form.Item>
         </Form>
       </Modal>
+
       <Modal
         visible={showAddModal}
         title="Add Feature"
@@ -396,17 +363,7 @@ function AdminFeatures() {
           >
             <TextArea rows={2} />
           </Form.Item>
-          {/* <Form.Item
-            name="featureImg"
-            label="Image URL"
-            rules={[{ required: true, message: "Please enter image URL" }]}
-          >
-            <TextArea
-              rows={2}
-              onChange={handleImageUrlChange}
-              value={imageUrl}
-            />
-          </Form.Item>
+          <input type="file" onChange={handleFileUpload} />
           {previewImageUrl && (
             <div className="mb-4">
               <img
@@ -415,21 +372,20 @@ function AdminFeatures() {
                 style={{ maxWidth: "100%", maxHeight: "200px" }}
               />
             </div>
-          )} */}
-          <input type="file" onChange={handleFileUpload} />
-          <div className="flex justify-end">
+          )}
+          <Form.Item>
             <Button
               type="primary"
               htmlType="submit"
               style={{ backgroundColor: "#1890ff", color: "#FFFFFF" }}
             >
-              Add
+              Add Feature
             </Button>
-          </div>
+          </Form.Item>
         </Form>
       </Modal>
     </div>
   );
 }
 
-export default React.memo(AdminFeatures);
+export default AdminFeatures;
