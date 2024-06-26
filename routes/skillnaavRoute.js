@@ -1,5 +1,4 @@
-// routes/skillnaavRoutes.js
-
+// routes/skillnaav.js
 const express = require("express");
 const NodeCache = require("node-cache");
 const router = express.Router();
@@ -132,16 +131,51 @@ const createRoute = (path, model) => {
 
 const updateRoute = (path, model) => {
   router.put(
-    path,
+    `${path}/:id`,
     asyncHandler(async (req, res) => {
       const { id } = req.params;
-      const instance = await updateOne(model, { _id: id }, req.body);
-      cache.flushAll(); // Clear cache on data mutation
-      res.status(200).json({
-        data: instance,
-        success: true,
-        message: `${model.modelName} updated successfully`,
-      });
+      const {
+        teammemberName,
+        teammemberDesgn,
+        teammemberDesc,
+        teammemberLinkedin,
+      } = req.body;
+
+      try {
+        const updatedMember = await model.findOneAndUpdate(
+          { _id: id },
+          {
+            teammemberName,
+            teammemberDesgn,
+            teammemberDesc,
+            teammemberLinkedin,
+          },
+          { new: true }
+        );
+
+        if (!updatedMember) {
+          return res.status(404).json({
+            success: false,
+            message: "Team member not found",
+          });
+        }
+
+        // Optionally, you can clear specific cache entries related to team members here
+        cache.flushAll(); // Clear cache on data mutation
+
+        res.status(200).json({
+          success: true,
+          message: "Team member updated successfully",
+          data: updatedMember,
+        });
+      } catch (error) {
+        console.error("Error updating team member:", error);
+        res.status(500).json({
+          success: false,
+          message: "Server Error",
+          error: error.message,
+        });
+      }
     })
   );
 };
@@ -167,13 +201,15 @@ updateRoute("/update-visionpoint/:id", VisionPoint);
 createRoute("/add-visionpoint", VisionPoint);
 deleteRoute("/delete-visionpoint/:id", VisionPoint);
 
-// Define specific CRUD routes for Discover
-updateRoute("/update-discover/:id", Discover);
-
 // Define CRUD routes for Feature
 updateRoute("/update-feature/:id", Feature);
 createRoute("/add-feature", Feature);
 deleteRoute("/delete-feature/:id", Feature);
+
+// Define specific CRUD routes for TeamMember
+createRoute("/add-teammember", TeamMember);
+updateRoute("/update-teammember/:id", TeamMember);
+deleteRoute("/delete-teammember/:id", TeamMember);
 
 // Admin login route
 router.post(
@@ -236,23 +272,6 @@ router.delete(
     res.status(200).json({ message: "Contact deleted successfully" });
   })
 );
-router.put(
-  "/update-feature/:id",
-  asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const instance = await updateOne(Feature, { _id: id }, req.body);
-    cache.flushAll(); // Clear cache on data mutation
-    res.status(200).json({
-      data: instance,
-      success: true,
-      message: `${Feature.modelName} updated successfully`,
-    });
-  })
-);
-
-// CRUD routes for DiscoverCompImg
-createRoute("/add-discover-comp-img", DiscoverCompImg);
-deleteRoute("/delete-discover-comp-img/:id", DiscoverCompImg);
 
 // Apply error handling middleware
 router.use(errorHandler);

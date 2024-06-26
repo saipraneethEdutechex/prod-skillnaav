@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Modal, Form, Input, Button, message, List, Skeleton } from "antd";
 import axios from "axios";
-
+import firebase from "firebase/compat/app";
+import "firebase/compat/storage";
 
 const { TextArea } = Input;
 
 function AdminTeam() {
   const [skillnaavData, setSkillnaavData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isEditTeamModalVisible, setIsEditTeamModalVisible] = useState(false);
   const [isAddTeamModalVisible, setIsAddTeamModalVisible] = useState(false);
   const [isEditHeadingModalVisible, setIsEditHeadingModalVisible] =
@@ -14,16 +16,18 @@ function AdminTeam() {
   const [selectedTeamMember, setSelectedTeamMember] = useState(null);
   const [form] = Form.useForm();
   const [headingForm] = Form.useForm();
-  const [loading, setLoading] = useState(true); // State for loading indicator
+  const [imgUrl, setImgUrl] = useState(null);
 
   const fetchSkillnaavData = useCallback(async () => {
     try {
+      setLoading(true);
       const response = await axios.get("/api/skillnaav/get-skillnaav-data");
-      setSkillnaavData(response.data);
-      setLoading(false); // Set loading to false after data is fetched
+      setSkillnaavData(response.data.teammember);
+      setLoading(false);
     } catch (error) {
-      console.error("Error fetching skillnaav data:", error);
-      setLoading(false); // Set loading to false even if there's an error
+      console.error("Error fetching SkillNaav data:", error);
+      setLoading(false);
+      message.error("Failed to fetch team members");
     }
   }, []);
 
@@ -31,12 +35,33 @@ function AdminTeam() {
     fetchSkillnaavData();
   }, [fetchSkillnaavData]);
 
+  const handleFileUpload = (event) => {
+    const selectedFile = event.target.files[0];
+
+    if (selectedFile) {
+      const storageRef = firebase.storage().ref();
+      const fileRef = storageRef.child(selectedFile.name);
+      fileRef
+        .put(selectedFile)
+        .then((snapshot) => snapshot.ref.getDownloadURL())
+        .then((downloadURL) => {
+          setImgUrl(downloadURL);
+        })
+        .catch((error) => {
+          console.error("Error uploading file:", error);
+          message.error("Failed to upload file");
+        });
+    } else {
+      console.log("No file selected");
+    }
+  };
+
   const onFinishEdit = useCallback(
     async (values) => {
       try {
-        values._id = values._id || selectedTeamMember._id;
-        const response = await axios.post(
-          "/api/skillnaav/update-teammember",
+        values._id = selectedTeamMember._id;
+        const response = await axios.put(
+          `/api/skillnaav/update-teammember/${values._id}`,
           values
         );
         if (response.data.success) {
@@ -56,6 +81,7 @@ function AdminTeam() {
   const onFinishAdd = useCallback(
     async (values) => {
       try {
+        values.image = imgUrl;
         const response = await axios.post(
           "/api/skillnaav/add-teammember",
           values
@@ -65,6 +91,7 @@ function AdminTeam() {
           setIsAddTeamModalVisible(false);
           fetchSkillnaavData();
           form.resetFields();
+          setImgUrl(null);
         } else {
           message.error(response.data.message);
         }
@@ -72,15 +99,23 @@ function AdminTeam() {
         message.error("Error adding team member:", error.message);
       }
     },
-    [fetchSkillnaavData, form]
+    [fetchSkillnaavData, form, imgUrl]
   );
 
   const onFinishEditHeading = useCallback(
     async (values) => {
       try {
-        values._id = skillnaavData.team[0]._id;
-        const response = await axios.post(
-          "/api/skillnaav/update-teamheading",
+        const teamId =
+          skillnaavData && skillnaavData.length > 0
+            ? skillnaavData[0]._id
+            : null;
+        if (!teamId) {
+          message.error("Team data not available");
+          return;
+        }
+        values._id = teamId;
+        const response = await axios.put(
+          `/api/skillnaav/update-teamheading/${values._id}`,
           values
         );
         if (response.data.success) {
@@ -126,32 +161,33 @@ function AdminTeam() {
   );
 
   const handleEditHeading = useCallback(() => {
-    if (skillnaavData && skillnaavData.team && skillnaavData.team.length > 0) {
-      headingForm.setFieldsValue(skillnaavData.team[0]);
+    if (skillnaavData && skillnaavData.length > 0) {
+      headingForm.setFieldsValue({
+        teamheading: skillnaavData[0].teamheading,
+        teamsubheading: skillnaavData[0].teamsubheading,
+      });
       setIsEditHeadingModalVisible(true);
     }
   }, [skillnaavData, headingForm]);
 
-  if (loading || !skillnaavData) {
+  if (loading || skillnaavData === null) {
     return <Skeleton active />;
   }
-
-  const { team, teammember } = skillnaavData;
 
   return (
     <div>
       <div className="border p-4 rounded-lg mb-4">
         <h1 className="text-xl font-semibold">Team</h1>
         <hr className="my-2" />
-        {team && team.length > 0 && (
+        {skillnaavData.length > 0 && (
           <>
             <p className="mb-4">
               <span className="font-semibold">Heading: </span>
-              {team[0].teamheading}
+              {skillnaavData[0].teamheading}
             </p>
             <p className="mb-4">
               <span className="font-semibold">Sub Heading: </span>
-              {team[0].teamsubheading}
+              {skillnaavData[0].teamsubheading}
             </p>
             <div className="flex justify-end mt-4">
               <Button type="primary" onClick={handleEditHeading}>
@@ -167,7 +203,7 @@ function AdminTeam() {
         <hr className="my-2" />
         <List
           itemLayout="horizontal"
-          dataSource={teammember}
+          dataSource={skillnaavData}
           renderItem={(member) => (
             <List.Item
               actions={[
@@ -180,6 +216,7 @@ function AdminTeam() {
                 </Button>,
                 <Button
                   type="link"
+                  danger
                   onClick={() => onDelete(member._id)}
                   key="delete"
                 >
@@ -210,7 +247,6 @@ function AdminTeam() {
         </Button>
       </div>
 
-      {/* Edit Team Member Modal */}
       <Modal
         title="Edit Team Member"
         visible={isEditTeamModalVisible}
@@ -218,7 +254,7 @@ function AdminTeam() {
         footer={null}
       >
         <Form form={form} onFinish={onFinishEdit}>
-          <Form.Item name="_id" hidden={true}>
+          <Form.Item name="_id" hidden>
             <Input />
           </Form.Item>
           <Form.Item name="teammemberName" label="Name">
@@ -233,9 +269,16 @@ function AdminTeam() {
           <Form.Item name="teammemberLinkedin" label="LinkedIn">
             <TextArea rows={2} />
           </Form.Item>
-          <Form.Item name="image" label="Image URL">
-            <TextArea rows={2} />
-          </Form.Item>
+          <input type="file" onChange={handleFileUpload} />
+          {imgUrl && (
+            <div style={{ marginTop: 10 }}>
+              <img
+                src={imgUrl}
+                alt="Uploaded Preview"
+                style={{ maxWidth: "100%" }}
+              />
+            </div>
+          )}
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Update
@@ -244,7 +287,6 @@ function AdminTeam() {
         </Form>
       </Modal>
 
-      {/* Add Team Member Modal */}
       <Modal
         title="Add Team Member"
         visible={isAddTeamModalVisible}
@@ -264,9 +306,16 @@ function AdminTeam() {
           <Form.Item name="teammemberLinkedin" label="LinkedIn">
             <TextArea rows={2} />
           </Form.Item>
-          <Form.Item name="image" label="Image URL">
-            <TextArea rows={2} />
-          </Form.Item>
+          <input type="file" onChange={handleFileUpload} />
+          {imgUrl && (
+            <div style={{ marginTop: 10 }}>
+              <img
+                src={imgUrl}
+                alt="Uploaded Preview"
+                style={{ maxWidth: "100%" }}
+              />
+            </div>
+          )}
           <Form.Item>
             <Button type="primary" htmlType="submit">
               Add
@@ -275,7 +324,6 @@ function AdminTeam() {
         </Form>
       </Modal>
 
-      {/* Edit Team Heading Modal */}
       <Modal
         title="Edit Team Heading"
         visible={isEditHeadingModalVisible}
@@ -284,10 +332,10 @@ function AdminTeam() {
       >
         <Form form={headingForm} onFinish={onFinishEditHeading}>
           <Form.Item name="teamheading" label="Heading">
-            <TextArea rows={2} />
+            <Input />
           </Form.Item>
           <Form.Item name="teamsubheading" label="Sub Heading">
-            <TextArea rows={2} />
+            <Input />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
