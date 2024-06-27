@@ -531,50 +531,60 @@ router.post(
     }
   })
 );
-
-// Save contact form data route
-router.post(
-  "/contacts",
-  asyncHandler(async (req, res) => {
-    const newContact = new Contact(req.body);
+// POST /api/contact - Create a new contact submission
+router.post("/", async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+    const newContact = new Contact({ name, email, subject, message });
     await newContact.save();
-    cache.flushAll(); // Clear cache on data mutation
-    res.status(201).json({ message: "Contact saved successfully!" });
-  })
-);
+    res.status(201).json(newContact);
+  } catch (error) {
+    console.error("Error creating contact submission:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
-// Get all contact form data route with pagination and search
-router.get(
-  "/contacts",
-  asyncHandler(async (req, res) => {
-    const { page = 1, pageSize = 10, search = "" } = req.query;
-    const skip = (page - 1) * pageSize;
+// GET /api/contact - Get all contact submissions with pagination and search
+router.get("/", async (req, res) => {
+  try {
+    const {
+      page = 1,
+      pageSize = 10,
+      search = "",
+      sort = "-createdAt",
+    } = req.query;
     const query = {
       $or: [
-        { name: new RegExp(search, "i") },
-        { email: new RegExp(search, "i") },
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
       ],
     };
-
+    const total = await Contact.countDocuments(query);
     const contacts = await Contact.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
+      .sort(sort)
+      .skip((page - 1) * pageSize)
       .limit(parseInt(pageSize));
-    const totalContacts = await Contact.countDocuments(query);
-    res.status(200).json({ contacts, total: totalContacts });
-  })
-);
+    res.json({ total, contacts });
+  } catch (error) {
+    console.error("Error fetching contact submissions:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
-// Delete contact form data route
-router.delete(
-  "/contacts/:id",
-  asyncHandler(async (req, res) => {
-    await Contact.findByIdAndDelete(req.params.id);
-    cache.flushAll(); // Clear cache on data mutation
-    res.status(200).json({ message: "Contact deleted successfully" });
-  })
-);
-
+// DELETE /api/contact/:id - Delete a contact submission
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedContact = await Contact.findByIdAndDelete(id);
+    if (!deletedContact) {
+      return res.status(404).json({ error: "Contact not found" });
+    }
+    res.json({ message: "Contact deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting contact submission:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 // Apply error handling middleware
 router.use(errorHandler);
 

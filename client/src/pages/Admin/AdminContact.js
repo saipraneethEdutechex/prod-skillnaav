@@ -104,23 +104,22 @@ function AdminContact() {
   ];
 
   return (
-    <div className="container mx-auto py-8">
-      <h2 className="text-3xl font-bold mb-4 text-gray-800">
-        Contact Submissions
-      </h2>
-      <div className="flex mb-4">
-        <Search
-          placeholder="Search by name or email"
-          onSearch={handleSearch}
-          enterButton
-          className="mr-2"
-        />
-        <Button onClick={handleReset}>Reset</Button>
-      </div>
+    <div className="admin-contact">
+      <h1 className="text-2xl font-bold mb-4">Contact Submissions</h1>
+      <Search
+        placeholder="Search by name or email"
+        enterButton
+        allowClear
+        onSearch={handleSearch}
+        style={{ marginBottom: 16 }}
+      />
+      <Button onClick={handleReset} style={{ marginBottom: 16 }}>
+        Reset
+      </Button>
       <Table
         columns={columns}
         dataSource={contacts}
-        loading={loading}
+        rowKey="_id"
         pagination={{
           current: currentPage,
           pageSize: pageSize,
@@ -130,7 +129,7 @@ function AdminContact() {
             setPageSize(pageSize);
           },
         }}
-        rowKey="_id"
+        loading={loading}
       />
     </div>
   );
