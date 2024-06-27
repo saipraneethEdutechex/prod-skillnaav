@@ -1,4 +1,3 @@
-// routes/skillnaav.js
 const express = require("express");
 const NodeCache = require("node-cache");
 const router = express.Router();
@@ -113,35 +112,39 @@ router.get(
   })
 );
 
-// Define specific CRUD routes
-const createRoute = (path, model) => {
+// Define specific CRUD routes for Discover
+const createDiscoverRoute = (path) => {
   router.post(
     path,
     asyncHandler(async (req, res) => {
-      const instance = await createOne(model, req.body);
+      const instance = await createOne(Discover, req.body);
       cache.flushAll(); // Clear cache on data mutation
       res.status(200).json({
         data: instance,
         success: true,
-        message: `${model.modelName} added successfully`,
+        message: `Discover added successfully`,
       });
     })
   );
 };
 
-const updateRoute = (path, model) => {
+const updateDiscoverRoute = (path) => {
   router.put(
     `${path}/:id`,
     asyncHandler(async (req, res) => {
       const { id } = req.params;
 
       try {
-        const updatedInstance = await updateOne(model, { _id: id }, req.body);
+        const updatedInstance = await updateOne(
+          Discover,
+          { _id: id },
+          req.body
+        );
 
         if (!updatedInstance) {
           return res.status(404).json({
             success: false,
-            message: `${model.modelName} not found`,
+            message: `Discover not found`,
           });
         }
 
@@ -149,11 +152,11 @@ const updateRoute = (path, model) => {
 
         res.status(200).json({
           success: true,
-          message: `${model.modelName} updated successfully`,
+          message: `Discover updated successfully`,
           data: updatedInstance,
         });
       } catch (error) {
-        console.error(`Error updating ${model.modelName}:`, error);
+        console.error(`Error updating Discover:`, error);
         res.status(500).json({
           success: false,
           message: "Server Error",
@@ -164,35 +167,351 @@ const updateRoute = (path, model) => {
   );
 };
 
-const deleteRoute = (path, model) => {
+const deleteDiscoverRoute = (path) => {
   router.delete(
     `${path}/:id`,
     asyncHandler(async (req, res) => {
       const { id } = req.params;
-      await deleteOneById(model, id);
+      await deleteOneById(Discover, id);
       cache.flushAll(); // Clear cache on data mutation
       res.status(200).json({
         success: true,
-        message: `${model.modelName} deleted successfully`,
+        message: `Discover deleted successfully`,
       });
     })
   );
 };
 
+// Define specific CRUD routes for Discover
+createDiscoverRoute("/add-discover");
+updateDiscoverRoute("/update-discover");
+deleteDiscoverRoute("/delete-discover");
+
+// Define specific CRUD routes for DiscoverCompImg
+const createDiscoverCompImgRoute = (path) => {
+  router.post(
+    path,
+    asyncHandler(async (req, res) => {
+      const instance = await createOne(DiscoverCompImg, req.body);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        data: instance,
+        success: true,
+        message: `DiscoverCompImg added successfully`,
+      });
+    })
+  );
+};
+
+const deleteDiscoverCompImgRoute = (path) => {
+  router.delete(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+      await deleteOneById(DiscoverCompImg, id);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        success: true,
+        message: `DiscoverCompImg deleted successfully`,
+      });
+    })
+  );
+};
+
+// Define specific CRUD routes for DiscoverCompImg
+createDiscoverCompImgRoute("/add-discover-comp-img");
+deleteDiscoverCompImgRoute("/delete-discover-comp-img");
+
 // Define specific CRUD routes for Vision Head and Vision Point
-updateRoute("/update-visionhead", VisionHead);
-createRoute("/add-visionhead", VisionHead);
-deleteRoute("/delete-visionhead", VisionHead);
+const updateVisionHeadRoute = (path) => {
+  router.put(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+
+      try {
+        const updatedInstance = await updateOne(
+          VisionHead,
+          { _id: id },
+          req.body
+        );
+
+        if (!updatedInstance) {
+          return res.status(404).json({
+            success: false,
+            message: `VisionHead not found`,
+          });
+        }
+
+        cache.flushAll(); // Clear cache on data mutation
+
+        res.status(200).json({
+          success: true,
+          message: `VisionHead updated successfully`,
+          data: updatedInstance,
+        });
+      } catch (error) {
+        console.error(`Error updating VisionHead:`, error);
+        res.status(500).json({
+          success: false,
+          message: "Server Error",
+          error: error.message,
+        });
+      }
+    })
+  );
+};
+
+const createVisionHeadRoute = (path) => {
+  router.post(
+    path,
+    asyncHandler(async (req, res) => {
+      const instance = await createOne(VisionHead, req.body);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        data: instance,
+        success: true,
+        message: `VisionHead added successfully`,
+      });
+    })
+  );
+};
+
+const deleteVisionHeadRoute = (path) => {
+  router.delete(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+      await deleteOneById(VisionHead, id);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        success: true,
+        message: `VisionHead deleted successfully`,
+      });
+    })
+  );
+};
+
+createVisionHeadRoute("/add-visionhead");
+updateVisionHeadRoute("/update-visionhead");
+deleteVisionHeadRoute("/delete-visionhead");
+
+const updateVisionPointRoute = (path) => {
+  router.put(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+
+      try {
+        const updatedInstance = await updateOne(
+          VisionPoint,
+          { _id: id },
+          req.body
+        );
+
+        if (!updatedInstance) {
+          return res.status(404).json({
+            success: false,
+            message: `VisionPoint not found`,
+          });
+        }
+
+        cache.flushAll(); // Clear cache on data mutation
+
+        res.status(200).json({
+          success: true,
+          message: `VisionPoint updated successfully`,
+          data: updatedInstance,
+        });
+      } catch (error) {
+        console.error(`Error updating VisionPoint:`, error);
+        res.status(500).json({
+          success: false,
+          message: "Server Error",
+          error: error.message,
+        });
+      }
+    })
+  );
+};
+
+const createVisionPointRoute = (path) => {
+  router.post(
+    path,
+    asyncHandler(async (req, res) => {
+      const instance = await createOne(VisionPoint, req.body);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        data: instance,
+        success: true,
+        message: `VisionPoint added successfully`,
+      });
+    })
+  );
+};
+
+const deleteVisionPointRoute = (path) => {
+  router.delete(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+      await deleteOneById(VisionPoint, id);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        success: true,
+        message: `VisionPoint deleted successfully`,
+      });
+    })
+  );
+};
+
+createVisionPointRoute("/add-visionpoint");
+updateVisionPointRoute("/update-visionpoint");
+deleteVisionPointRoute("/delete-visionpoint");
 
 // Define CRUD routes for Feature
-updateRoute("/update-feature", Feature);
-createRoute("/add-feature", Feature);
-deleteRoute("/delete-feature", Feature);
+const createFeatureRoute = (path) => {
+  router.post(
+    path,
+    asyncHandler(async (req, res) => {
+      const instance = await createOne(Feature, req.body);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        data: instance,
+        success: true,
+        message: `Feature added successfully`,
+      });
+    })
+  );
+};
+
+const updateFeatureRoute = (path) => {
+  router.put(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+
+      try {
+        const updatedInstance = await updateOne(Feature, { _id: id }, req.body);
+
+        if (!updatedInstance) {
+          return res.status(404).json({
+            success: false,
+            message: `Feature not found`,
+          });
+        }
+
+        cache.flushAll(); // Clear cache on data mutation
+
+        res.status(200).json({
+          success: true,
+          message: `Feature updated successfully`,
+          data: updatedInstance,
+        });
+      } catch (error) {
+        console.error(`Error updating Feature:`, error);
+        res.status(500).json({
+          success: false,
+          message: "Server Error",
+          error: error.message,
+        });
+      }
+    })
+  );
+};
+
+const deleteFeatureRoute = (path) => {
+  router.delete(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+      await deleteOneById(Feature, id);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        success: true,
+        message: `Feature deleted successfully`,
+      });
+    })
+  );
+};
+
+createFeatureRoute("/add-feature");
+updateFeatureRoute("/update-feature");
+deleteFeatureRoute("/delete-feature");
 
 // Define specific CRUD routes for TeamMember
-createRoute("/add-teammember", TeamMember);
-updateRoute("/update-teammember", TeamMember);
-deleteRoute("/delete-teammember", TeamMember);
+const createTeamMemberRoute = (path) => {
+  router.post(
+    path,
+    asyncHandler(async (req, res) => {
+      const instance = await createOne(TeamMember, req.body);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        data: instance,
+        success: true,
+        message: `TeamMember added successfully`,
+      });
+    })
+  );
+};
+
+const updateTeamMemberRoute = (path) => {
+  router.put(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+
+      try {
+        const updatedInstance = await updateOne(
+          TeamMember,
+          { _id: id },
+          req.body
+        );
+
+        if (!updatedInstance) {
+          return res.status(404).json({
+            success: false,
+            message: `TeamMember not found`,
+          });
+        }
+
+        cache.flushAll(); // Clear cache on data mutation
+
+        res.status(200).json({
+          success: true,
+          message: `TeamMember updated successfully`,
+          data: updatedInstance,
+        });
+      } catch (error) {
+        console.error(`Error updating TeamMember:`, error);
+        res.status(500).json({
+          success: false,
+          message: "Server Error",
+          error: error.message,
+        });
+      }
+    })
+  );
+};
+
+const deleteTeamMemberRoute = (path) => {
+  router.delete(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+      await deleteOneById(TeamMember, id);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        success: true,
+        message: `TeamMember deleted successfully`,
+      });
+    })
+  );
+};
+
+createTeamMemberRoute("/add-teammember");
+updateTeamMemberRoute("/update-teammember");
+deleteTeamMemberRoute("/delete-teammember");
 
 // Admin login route
 router.post(
