@@ -87,7 +87,7 @@ const ImagePreview = styled.div`
   img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover; /* Ensure the image covers the div */
   }
 
   .ant-btn-link {
@@ -335,7 +335,6 @@ const AdminDiscover = () => {
                       src={image.imageUrl}
                       alt={`Company ${index + 1}`}
                       style={{
-                        width: "100%",
                         maxHeight: "200px",
                         objectFit: "cover",
                       }}
