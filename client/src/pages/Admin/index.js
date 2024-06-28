@@ -8,6 +8,7 @@ import {
   FaDollarSign,
   FaQuestionCircle,
   FaEnvelope,
+  FaSpinner,
 } from "react-icons/fa";
 import SkillnaavLogo from "../../assets/skillnaav_logo-250w.png";
 
@@ -23,7 +24,7 @@ const AdminContact = lazy(() => import("./AdminContact"));
 // Loader component for suspense fallback
 const Loader = () => (
   <div className="flex justify-center items-center h-full">
-    <div className="loader"></div>
+    <FaSpinner className="animate-spin text-4xl text-blue-500" />
   </div>
 );
 
@@ -119,39 +120,3 @@ const Admin = () => {
 };
 
 export default React.memo(Admin);
-
-// CSS styles (you can include this in your global styles or CSS file)
-const styles = `
-.loader {
-  display: inline-block;
-  width: 80px;
-  height: 80px;
-}
-
-.loader:after {
-  content: " ";
-  display: block;
-  width: 64px;
-  height: 64px;
-  margin: 8px;
-  border-radius: 50%;
-  border: 6px dotted #3498db;
-  border-color: #3498db transparent #3498db transparent;
-  animation: loader-spin 1.2s linear infinite;
-}
-
-@keyframes loader-spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-`;
-
-// Inject CSS into the document head
-const styleSheet = document.createElement("style");
-styleSheet.type = "text/css";
-styleSheet.innerText = styles;
-document.head.appendChild(styleSheet);
