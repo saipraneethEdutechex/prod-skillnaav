@@ -513,6 +513,189 @@ createTeamMemberRoute("/add-teammember");
 updateTeamMemberRoute("/update-teammember");
 deleteTeamMemberRoute("/delete-teammember");
 
+// Define specific CRUD routes for Pricing
+
+// Define the route to update the price heading
+router.post(
+  "/update-priceheading",
+  asyncHandler(async (req, res) => {
+    const { _id, priceheading } = req.body;
+
+    try {
+      const updatedPricing = await Pricing.findByIdAndUpdate(
+        _id,
+        { priceheading },
+        { new: true }
+      );
+
+      if (!updatedPricing) {
+        return res.status(404).json({
+          success: false,
+          message: "Pricing not found",
+        });
+      }
+
+      cache.flushAll(); // Clear cache on data mutation
+
+      res.status(200).json({
+        success: true,
+        message: "Price heading updated successfully",
+        data: updatedPricing,
+      });
+    } catch (error) {
+      console.error("Error updating price heading:", error);
+      res.status(500).json({
+        success: false,
+        message: "Server Error",
+        error: error.message,
+      });
+    }
+  })
+);
+
+const createPricingRoute = (path) => {
+  router.post(
+    path,
+    asyncHandler(async (req, res) => {
+      const instance = await createOne(Pricing, req.body);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        data: instance,
+        success: true,
+        message: `Pricing added successfully`,
+      });
+    })
+  );
+};
+
+const updatePricingRoute = (path) => {
+  router.put(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+
+      try {
+        const updatedInstance = await updateOne(Pricing, { _id: id }, req.body);
+
+        if (!updatedInstance) {
+          return res.status(404).json({
+            success: false,
+            message: `Pricing not found`,
+          });
+        }
+
+        cache.flushAll(); // Clear cache on data mutation
+
+        res.status(200).json({
+          success: true,
+          message: `Pricing updated successfully`,
+          data: updatedInstance,
+        });
+      } catch (error) {
+        console.error(`Error updating Pricing:`, error);
+        res.status(500).json({
+          success: false,
+          message: "Server Error",
+          error: error.message,
+        });
+      }
+    })
+  );
+};
+
+const deletePricingRoute = (path) => {
+  router.delete(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+      await deleteOneById(Pricing, id);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        success: true,
+        message: `Pricing deleted successfully`,
+      });
+    })
+  );
+};
+
+createPricingRoute("/add-pricing");
+updatePricingRoute("/update-pricing");
+deletePricingRoute("/delete-pricing");
+
+// Define specific CRUD routes for PricingCard
+const createPricingCardRoute = (path) => {
+  router.post(
+    path,
+    asyncHandler(async (req, res) => {
+      const instance = await createOne(PricingCard, req.body);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        data: instance,
+        success: true,
+        message: `PricingCard added successfully`,
+      });
+    })
+  );
+};
+
+const updatePricingCardRoute = (path) => {
+  router.put(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+
+      try {
+        const updatedInstance = await updateOne(
+          PricingCard,
+          { _id: id },
+          req.body
+        );
+
+        if (!updatedInstance) {
+          return res.status(404).json({
+            success: false,
+            message: `PricingCard not found`,
+          });
+        }
+
+        cache.flushAll(); // Clear cache on data mutation
+
+        res.status(200).json({
+          success: true,
+          message: `PricingCard updated successfully`,
+          data: updatedInstance,
+        });
+      } catch (error) {
+        console.error(`Error updating PricingCard:`, error);
+        res.status(500).json({
+          success: false,
+          message: "Server Error",
+          error: error.message,
+        });
+      }
+    })
+  );
+};
+
+const deletePricingCardRoute = (path) => {
+  router.delete(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+      await deleteOneById(PricingCard, id);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        success: true,
+        message: `PricingCard deleted successfully`,
+      });
+    })
+  );
+};
+
+createPricingCardRoute("/add-pricingcard");
+updatePricingCardRoute("/update-pricingcard");
+deletePricingCardRoute("/delete-pricingcard");
+
 // Admin login route
 router.post(
   "/admin-login",
