@@ -695,6 +695,7 @@ const deletePricingCardRoute = (path) => {
 createPricingCardRoute("/add-pricingcard");
 updatePricingCardRoute("/update-pricingcard");
 deletePricingCardRoute("/delete-pricingcard");
+
 // Define route to update FAQ heading
 router.post(
   "/update-faqheading",
@@ -790,7 +791,7 @@ const deleteFAQRoute = (path) => {
     asyncHandler(async (req, res) => {
       const { id } = req.params;
       await deleteOneById(FAQ, id);
-      cache.flushAll(); // Clear cache on data mutation
+      cache.flushAll();
       res.status(200).json({
         success: true,
         message: `FAQ deleted successfully`,
@@ -802,6 +803,114 @@ const deleteFAQRoute = (path) => {
 createFAQRoute("/add-faq");
 updateFAQRoute("/update-faq");
 deleteFAQRoute("/delete-faq");
+
+// Define route to update FAQ heading
+router.put(
+  "/update-faqheading",
+  asyncHandler(async (req, res) => {
+    const { _id, faqheading } = req.body;
+
+    try {
+      const updatedFAQ = await FAQ.findByIdAndUpdate(
+        _id,
+        { faqheading },
+        { new: true }
+      );
+
+      if (!updatedFAQ) {
+        return res.status(404).json({
+          success: false,
+          message: "FAQ not found",
+        });
+      }
+
+      cache.flushAll(); // Clear cache on data mutation
+
+      res.status(200).json({
+        success: true,
+        message: "FAQ heading updated successfully",
+        data: updatedFAQ,
+      });
+    } catch (error) {
+      console.error("Error updating FAQ heading:", error);
+      res.status(500).json({
+        success: false,
+        message: "Server Error",
+        error: error.message,
+      });
+    }
+  })
+);
+
+// Define CRUD routes for FAQ Cards
+const createFAQCardRoute = (path) => {
+  router.post(
+    path,
+    asyncHandler(async (req, res) => {
+      const instance = await createOne(FAQCard, req.body);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        data: instance,
+        success: true,
+        message: `FAQ card added successfully`,
+      });
+    })
+  );
+};
+
+const updateFAQCardRoute = (path) => {
+  router.put(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+
+      try {
+        const updatedInstance = await updateOne(FAQCard, { _id: id }, req.body);
+
+        if (!updatedInstance) {
+          return res.status(404).json({
+            success: false,
+            message: `FAQ card not found`,
+          });
+        }
+
+        cache.flushAll(); // Clear cache on data mutation
+
+        res.status(200).json({
+          success: true,
+          message: `FAQ card updated successfully`,
+          data: updatedInstance,
+        });
+      } catch (error) {
+        console.error(`Error updating FAQ card:`, error);
+        res.status(500).json({
+          success: false,
+          message: "Server Error",
+          error: error.message,
+        });
+      }
+    })
+  );
+};
+
+const deleteFAQCardRoute = (path) => {
+  router.delete(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+      await deleteOneById(FAQCard, id);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        success: true,
+        message: `FAQ card deleted successfully`,
+      });
+    })
+  );
+};
+
+createFAQCardRoute("/add-faqcard");
+updateFAQCardRoute("/update-faqcard");
+deleteFAQCardRoute("/delete-faqcard");
 
 // Admin login route
 router.post(

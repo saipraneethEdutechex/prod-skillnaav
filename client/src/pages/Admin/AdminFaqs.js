@@ -1,14 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  Modal,
-  Form,
-  Input,
-  Button,
-  message,
-  List,
-  Spin,
-  Skeleton,
-} from "antd";
+import { Modal, Form, Input, Button, message, List, Skeleton } from "antd";
 import axios from "axios";
 
 function AdminFaqs() {
@@ -71,8 +62,8 @@ function AdminFaqs() {
   const onFinishEdit = useCallback(
     async (values) => {
       try {
-        const response = await axios.post(
-          "/api/skillnaav/update-faqcard",
+        const response = await axios.put(
+          `/api/skillnaav/update-faqcard/${values._id}`,
           values
         );
         if (response.data.success) {
@@ -118,7 +109,7 @@ function AdminFaqs() {
     async (values) => {
       try {
         const { _id } = faqData.faq[0];
-        const response = await axios.post("/api/skillnaav/update-faqheading", {
+        const response = await axios.put("/api/skillnaav/update-faqheading", {
           _id,
           faqheading: values.faqheading,
         });
