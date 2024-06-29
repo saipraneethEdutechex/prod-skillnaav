@@ -695,6 +695,113 @@ const deletePricingCardRoute = (path) => {
 createPricingCardRoute("/add-pricingcard");
 updatePricingCardRoute("/update-pricingcard");
 deletePricingCardRoute("/delete-pricingcard");
+// Define route to update FAQ heading
+router.post(
+  "/update-faqheading",
+  asyncHandler(async (req, res) => {
+    const { _id, faqheading } = req.body;
+
+    try {
+      const updatedFAQ = await FAQ.findByIdAndUpdate(
+        _id,
+        { faqheading },
+        { new: true }
+      );
+
+      if (!updatedFAQ) {
+        return res.status(404).json({
+          success: false,
+          message: "FAQ not found",
+        });
+      }
+
+      cache.flushAll(); // Clear cache on data mutation
+
+      res.status(200).json({
+        success: true,
+        message: "FAQ heading updated successfully",
+        data: updatedFAQ,
+      });
+    } catch (error) {
+      console.error("Error updating FAQ heading:", error);
+      res.status(500).json({
+        success: false,
+        message: "Server Error",
+        error: error.message,
+      });
+    }
+  })
+);
+
+// Define CRUD routes for FAQs
+const createFAQRoute = (path) => {
+  router.post(
+    path,
+    asyncHandler(async (req, res) => {
+      const instance = await createOne(FAQ, req.body);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        data: instance,
+        success: true,
+        message: `FAQ added successfully`,
+      });
+    })
+  );
+};
+
+const updateFAQRoute = (path) => {
+  router.put(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+
+      try {
+        const updatedInstance = await updateOne(FAQ, { _id: id }, req.body);
+
+        if (!updatedInstance) {
+          return res.status(404).json({
+            success: false,
+            message: `FAQ not found`,
+          });
+        }
+
+        cache.flushAll(); // Clear cache on data mutation
+
+        res.status(200).json({
+          success: true,
+          message: `FAQ updated successfully`,
+          data: updatedInstance,
+        });
+      } catch (error) {
+        console.error(`Error updating FAQ:`, error);
+        res.status(500).json({
+          success: false,
+          message: "Server Error",
+          error: error.message,
+        });
+      }
+    })
+  );
+};
+
+const deleteFAQRoute = (path) => {
+  router.delete(
+    `${path}/:id`,
+    asyncHandler(async (req, res) => {
+      const { id } = req.params;
+      await deleteOneById(FAQ, id);
+      cache.flushAll(); // Clear cache on data mutation
+      res.status(200).json({
+        success: true,
+        message: `FAQ deleted successfully`,
+      });
+    })
+  );
+};
+
+createFAQRoute("/add-faq");
+updateFAQRoute("/update-faq");
+deleteFAQRoute("/delete-faq");
 
 // Admin login route
 router.post(
