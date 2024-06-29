@@ -109,9 +109,10 @@ function AdminFaqs() {
     async (values) => {
       try {
         const { _id } = faqData.faq[0];
-        const response = await axios.put("/api/skillnaav/update-faqheading", {
+        const response = await axios.post("/api/skillnaav/update-faqheading", {
           _id,
           faqheading: values.faqheading,
+          faqsubheading: values.faqsubheading,
         });
         if (response.data.success) {
           message.success(response.data.message);
@@ -135,7 +136,7 @@ function AdminFaqs() {
   }
 
   const { faq, faqcard } = faqData;
-  const { faqheading } = faq[0];
+  const { faqheading, faqsubheading } = faq[0];
 
   return (
     <div>
@@ -164,7 +165,6 @@ function AdminFaqs() {
           </>
         )}
       </div>
-
       <div className="border p-4 rounded-lg mb-4">
         <h1 className="text-xl font-semibold">FAQ Cards</h1>
         <hr className="my-2" />
@@ -207,7 +207,6 @@ function AdminFaqs() {
           Add FAQ Card
         </Button>
       </div>
-
       <Modal
         title="Edit FAQ Card"
         visible={modalVisible.editFaqCard}
@@ -236,7 +235,6 @@ function AdminFaqs() {
           </Form.Item>
         </Form>
       </Modal>
-
       <Modal
         title="Add FAQ Card"
         visible={modalVisible.addFaqCard}
@@ -262,7 +260,6 @@ function AdminFaqs() {
           </Form.Item>
         </Form>
       </Modal>
-
       <Modal
         title="Edit FAQ Heading"
         visible={modalVisible.editHeading}
@@ -279,6 +276,13 @@ function AdminFaqs() {
             name="faqheading"
             initialValue={faqheading}
             label="FAQ Heading"
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="faqsubheading"
+            initialValue={faqsubheading}
+            label="FAQ Subheading"
           >
             <Input />
           </Form.Item>

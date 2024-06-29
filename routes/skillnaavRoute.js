@@ -696,16 +696,16 @@ createPricingCardRoute("/add-pricingcard");
 updatePricingCardRoute("/update-pricingcard");
 deletePricingCardRoute("/delete-pricingcard");
 
-// Define route to update FAQ heading
+// Update FAQ heading and subheading
 router.post(
   "/update-faqheading",
   asyncHandler(async (req, res) => {
-    const { _id, faqheading } = req.body;
+    const { _id, faqheading, faqsubheading } = req.body;
 
     try {
       const updatedFAQ = await FAQ.findByIdAndUpdate(
         _id,
-        { faqheading },
+        { faqheading, faqsubheading },
         { new: true }
       );
 
@@ -720,7 +720,7 @@ router.post(
 
       res.status(200).json({
         success: true,
-        message: "FAQ heading updated successfully",
+        message: "FAQ heading and subheading updated successfully",
         data: updatedFAQ,
       });
     } catch (error) {
