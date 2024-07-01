@@ -59,11 +59,11 @@ function AdminPricing() {
 
   const onFinishEdit = async (values) => {
     try {
-      values._id = values._id || selectedPricingCard._id;
-      const response = await axios.post(
-        "/api/skillnaav/update-pricingcard",
+      const response = await axios.put(
+        `/api/skillnaav/update-pricingcard/${values._id}`,
         values
       );
+
       if (response.data.success) {
         message.success(response.data.message);
         setModalVisible({ ...modalVisible, editPricingCard: false });
