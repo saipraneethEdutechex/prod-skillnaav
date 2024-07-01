@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
-
-mongoose.connect(process.env.mongo_url);
+const mongo_url =
+  "mongodb+srv://adi:1ACiRJq7FsQgFOtV@cluster0.bt8ym8l.mongodb.net/skillnaav-land";
+mongoose.connect(process.env.mongo_url || mongo_url);
 
 const connection = mongoose.connection;
 
