@@ -322,24 +322,23 @@ router.get(
   })
 );
 
-router.post("/contact", async (req, res) => {
-  try {
+// Route to add a new contact
+router.post(
+  "/",
+  asyncHandler(async (req, res) => {
     const { name, email, subject, message } = req.body;
     const newContact = new Contact({ name, email, subject, message });
     await newContact.save();
     res.status(201).json(newContact);
-  } catch (error) {
-    console.error("Error saving contact:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+  })
+);
 
 // Route to delete a contact by ID
 router.delete(
   "/:id",
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    await deleteOneById(id);
+    await Contact.findByIdAndDelete(id);
     res.status(200).json({
       success: true,
       message: "Contact deleted successfully",
