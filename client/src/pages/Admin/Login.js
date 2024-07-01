@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import SkillnaavLogo from "../../assets/skillnaav_logo-250w.png";
 import axios from "axios";
 import { message } from "antd";
-import { HideLoading, ShowLoading } from "../../redux/rootSlice";
+import { ShowLoading, HideLoading } from "../../redux/rootSlice";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function Login() {
@@ -13,11 +13,11 @@ function Login() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-
   const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    await login();
   };
 
   const login = async () => {
@@ -25,15 +25,16 @@ function Login() {
       dispatch(ShowLoading());
       const response = await axios.post("/api/skillnaav/admin-login", user);
       dispatch(HideLoading());
+
       if (response.data.success) {
         message.success(response.data.message);
         localStorage.setItem("token", JSON.stringify(response.data));
-        window.location.href = "/admin";
+        window.location.href = "/admin"; // Redirect to admin page on successful login
       } else {
         message.error(response.data.message);
       }
-    } catch (e) {
-      message.error(e.message);
+    } catch (error) {
+      message.error(error.response.data.message || error.message);
       dispatch(HideLoading());
     }
   };
@@ -59,7 +60,9 @@ function Login() {
               id="username"
               type="text"
               value={user.username}
-              onChange={(e) => setUser({ ...user, username: e.target.value })}
+              onChange={(e) =>
+                setUser({ ...user, username: e.target.value.trim() })
+              }
               placeholder="Enter your username"
               className="px-4 py-3 rounded-lg border border-gray-300 w-full focus:outline-none focus:border-blue-500"
             />
@@ -91,7 +94,6 @@ function Login() {
           </div>
           <button
             type="submit"
-            onClick={login}
             className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
           >
             Login

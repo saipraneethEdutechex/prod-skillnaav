@@ -345,5 +345,22 @@ router.delete(
     });
   })
 );
-
+// Admin login route
+router.post(
+  "/admin-login",
+  asyncHandler(async (req, res) => {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username, password });
+    if (user) {
+      user.password = ""; // Remove password from response
+      res
+        .status(200)
+        .json({ data: user, success: true, message: "Login Successfully" });
+    } else {
+      res
+        .status(401)
+        .json({ success: false, message: "Invalid username or password" });
+    }
+  })
+);
 module.exports = router;
