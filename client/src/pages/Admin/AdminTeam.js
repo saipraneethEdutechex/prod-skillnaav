@@ -172,28 +172,28 @@ const AdminTeam = () => {
           <Form.Item
             name="teammemberName"
             label="Name"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Please enter name" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="teammemberDesgn"
             label="Designation"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Please enter designation" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="teammemberDesc"
             label="Description"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Please enter description" }]}
           >
             <TextArea rows={4} />
           </Form.Item>
           <Form.Item
             name="teammemberLinkedin"
             label="LinkedIn"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Please enter LinkedIn URL" }]}
           >
             <Input />
           </Form.Item>
@@ -220,28 +220,28 @@ const AdminTeam = () => {
           <Form.Item
             name="teammemberName"
             label="Name"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Please enter name" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="teammemberDesgn"
             label="Designation"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Please enter designation" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="teammemberDesc"
             label="Description"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Please enter description" }]}
           >
             <TextArea rows={4} />
           </Form.Item>
           <Form.Item
             name="teammemberLinkedin"
             label="LinkedIn"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Please enter LinkedIn URL" }]}
           >
             <Input />
           </Form.Item>

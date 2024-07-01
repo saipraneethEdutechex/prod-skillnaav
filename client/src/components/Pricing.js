@@ -43,14 +43,19 @@ function Pricing() {
     },
   };
 
-  // Map each card type to the corresponding color
-  const cardTypes = {
-    "Free Trial": colorClasses.teal,
-    "Student (B2C)": colorClasses.purple,
-    "Institutional (B2B)": colorClasses.orange,
+  // Map each card type to a specific color class
+  const getColorClass = (plantype) => {
+    switch (plantype) {
+      case "Free Trial":
+        return colorClasses.orange;
+      case "Student (B2C)":
+        return colorClasses.purple;
+      case "Institutional (B2B)":
+        return colorClasses.teal;
+      default:
+        return colorClasses.teal;
+    }
   };
-
-  console.log("Pricing cards:", pricingcard);
 
   return (
     <div id="pricing" className="py-12 my-12 pb-12 lg:py-16">
@@ -60,7 +65,7 @@ function Pricing() {
       <p className="pt-4 pb-10 text-center text-gray-600 lg:text-lg"></p>
       <div className="flex flex-col gap-6 lg:flex-row">
         {pricingcard.map((card, index) => {
-          const colorClass = cardTypes[card.plantype] || colorClasses.teal;
+          const colorClass = getColorClass(card.plantype);
 
           return (
             <div
@@ -79,11 +84,12 @@ function Pricing() {
                 <h2
                   className={`pt-4 text-2xl font-medium ${colorClass.text} lg:text-3xl`}
                 >
-                  {card.plantype === "Institutional (B2B)" ? (
+                  {/* {card.plantype === "Institutional (B2B)" ? (
                     <span className="text-orange-700">Contact Us</span>
                   ) : (
                     card.price
-                  )}
+                  )} */}
+                  {card.price}
                 </h2>
                 <ul
                   className={`flex flex-col gap-2 pt-4 ${colorClass.subtext}`}
