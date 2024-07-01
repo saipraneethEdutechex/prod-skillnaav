@@ -21,7 +21,7 @@ function AdminPricing() {
   const fetchPricingData = async () => {
     try {
       const response = await axios.get("/api/skillnaav/get-skillnaav-data");
-      setPricingData(response.data);
+      setPricingData(response.data); // Assuming response.data has pricing and pricingcard
     } catch (error) {
       console.error("Error fetching pricing data:", error);
       message.error("Error fetching pricing data");
@@ -33,7 +33,13 @@ function AdminPricing() {
   }
 
   const { pricing, pricingcard } = pricingData;
-  const { priceheading } = pricing[0];
+
+  // Check if pricing array exists and has at least one item
+  if (!pricing || pricing.length === 0) {
+    return <div>No pricing data available.</div>;
+  }
+
+  const { priceheading } = pricing[0]; // Destructure priceheading after ensuring pricing[0] exists
 
   const handleEditPricingCard = (pricingCard) => {
     setSelectedPricingCard(pricingCard);
@@ -97,7 +103,7 @@ function AdminPricing() {
 
   const onFinishEditHeading = async (values) => {
     try {
-      const { _id } = pricingData.pricing[0];
+      const { _id } = pricing[0];
       const response = await axios.post("/api/skillnaav/update-priceheading", {
         _id,
         priceheading: values.priceheading,
@@ -286,14 +292,14 @@ function AdminPricing() {
         <Form form={editHeadingForm} onFinish={onFinishEditHeading}>
           <Form.Item
             name="priceheading"
+            label="Pricing Heading"
             initialValue={priceheading}
-            label="Heading"
           >
             <Input />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              Update
+              Update Heading
             </Button>
           </Form.Item>
         </Form>
