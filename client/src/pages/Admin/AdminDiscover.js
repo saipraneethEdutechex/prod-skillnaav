@@ -87,7 +87,7 @@ const ImagePreview = styled.div`
   img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensure the image covers the div */
+    object-fit: cover;
   }
 
   .ant-btn-link {
