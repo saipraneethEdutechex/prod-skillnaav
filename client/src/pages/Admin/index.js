@@ -9,6 +9,7 @@ import {
   FaQuestionCircle,
   FaEnvelope,
   FaSpinner,
+  FaBars,
 } from "react-icons/fa";
 import SkillnaavLogo from "../../assets/skillnaav_logo-250w.png";
 
@@ -31,6 +32,7 @@ const Loader = () => (
 const Admin = () => {
   const { skillnaavData } = useSelector((state) => state.root);
   const [selectedTab, setSelectedTab] = useState("Discover");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const navItems = useMemo(
     () => [
@@ -56,9 +58,9 @@ const Admin = () => {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div className="flex flex-col h-screen bg-gray-50 font-poppins">
       {/* Header */}
-      <header className="bg-gradient-to-r from-blue-500 to-purple-500 shadow-md border-b">
+      <header className="bg-white shadow-md border-b">
         <div className="container mx-auto flex justify-between items-center py-4 px-6">
           <div className="flex items-center">
             <img
@@ -66,7 +68,7 @@ const Admin = () => {
               alt="Skillnaav Logo"
               className="w-32 h-auto md:w-40 md:h-auto mr-3"
             />
-            <span className="text-white text-lg md:text-xl font-medium">
+            <span className="text-gray-800 text-lg md:text-xl font-semibold">
               Admin Panel
             </span>
           </div>
@@ -75,7 +77,7 @@ const Admin = () => {
               localStorage.removeItem("token");
               window.location.href = "/admin-login";
             }}
-            className="text-white text-lg md:text-xl font-medium cursor-pointer hover:underline"
+            className="text-gray-800 text-lg md:text-xl font-semibold cursor-pointer hover:underline"
           >
             Logout
           </span>
@@ -85,25 +87,37 @@ const Admin = () => {
       {/* Main Content */}
       <div className="flex flex-1">
         {/* Sidebar */}
-        <aside className="bg-gray-800 text-gray-200 w-16 md:w-64 py-6 shadow-md">
+        <aside
+          className={`bg-gray-800 text-gray-200 ${
+            sidebarOpen ? "w-64" : "w-16"
+          } transition-all duration-300 py-6 shadow-md`}
+        >
+          <div className="flex justify-end px-4 mb-6">
+            <FaBars
+              className="cursor-pointer text-white"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            />
+          </div>
           <ul>
             {navItems.map((item, index) => (
               <li
                 key={index}
-                className={`flex items-center px-4 py-2 cursor-pointer hover:bg-gray-700 transition ${
+                className={`flex items-center px-4 py-3 cursor-pointer hover:bg-gray-700 transition ${
                   selectedTab === item.label ? "bg-gray-900" : ""
                 }`}
                 onClick={() => handleTabSelect(item.label)}
               >
-                <span className="mr-2">{item.icon}</span>
-                <span className="hidden md:block">{item.label}</span>
+                <span className="mr-2 text-lg">{item.icon}</span>
+                {sidebarOpen && (
+                  <span className="ml-2 text-md font-medium">{item.label}</span>
+                )}
               </li>
             ))}
           </ul>
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1 p-4 md:p-10 bg-gray-100 overflow-y-auto">
+        <main className="flex-1 p-6 bg-white overflow-y-auto shadow-inner">
           <Suspense fallback={<Loader />}>
             {navItems.map((item) =>
               item.label === selectedTab ? (

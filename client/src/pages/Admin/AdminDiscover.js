@@ -97,6 +97,23 @@ const ImagePreview = styled.div`
   }
 `;
 
+const PreviewContainer = styled.div`
+  margin-top: 2rem;
+`;
+
+const PreviewTitle = styled.h2`
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #333;
+`;
+
+const PreviewGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+`;
+
 const AdminDiscover = () => {
   const [form] = Form.useForm();
   const [discoverImgUrl, setDiscoverImgUrl] = useState("");
@@ -269,9 +286,9 @@ const AdminDiscover = () => {
                 style={{ width: "100%" }}
               />
             ) : (
-              <div className="flex items-center justify-center w-full h-full">
-                <UploadOutlined className="text-3xl text-gray-500" />
-                <div className="ml-2 text-gray-500">Upload</div>
+              <div className="upload-container">
+                <UploadOutlined className="upload-icon" />
+                <div className="upload-text">Upload Discover Image</div>
               </div>
             )}
           </Upload>
@@ -304,8 +321,8 @@ const AdminDiscover = () => {
               </ImagePreview>
             ))}
             {compImageUrls.length < 5 && (
-              <UploadWrapper className="relative flex items-center justify-center w-full h-full bg-gray-100 rounded-lg cursor-pointer">
-                <UploadOutlined className="text-3xl text-gray-500" />
+              <div className="upload-container">
+                <UploadOutlined className="upload-icon" />
                 <input
                   type="file"
                   className="hidden"
@@ -313,7 +330,8 @@ const AdminDiscover = () => {
                     handleCompanyImageUpload({ file: e.target.files[0] })
                   }
                 />
-              </UploadWrapper>
+                <div className="upload-text">Upload Company Image</div>
+              </div>
             )}
           </UploadWrapper>
           {compImageUrls.length === 5 && (
@@ -322,44 +340,38 @@ const AdminDiscover = () => {
             </p>
           )}
         </Form.Item>
-        {discovercompimg.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-2xl font-semibold mb-4">
-              Preview Company Images
-            </h2>
-            <div className="grid grid-cols-3 gap-4">
-              {discovercompimg.map((image, index) => (
-                <ImageLazyLoad key={image._id} height={200} offset={100}>
-                  <div>
-                    <img
-                      src={image.imageUrl}
-                      alt={`Company ${index + 1}`}
-                      style={{
-                        maxHeight: "200px",
-                        objectFit: "cover",
-                      }}
-                      className="rounded-lg shadow-md"
-                    />
-                    <Button
-                      type="link"
-                      onClick={() => handleImageRemove(image._id)}
-                      icon={<DeleteOutlined />}
-                      className="text-red-500"
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </ImageLazyLoad>
-              ))}
-            </div>
-          </div>
-        )}
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={loading}>
             Save Changes
           </Button>
         </Form.Item>
       </StyledForm>
+      {discovercompimg.length > 0 && (
+        <PreviewContainer>
+          <PreviewTitle>Preview Company Images</PreviewTitle>
+          <PreviewGrid>
+            {discovercompimg.map((image, index) => (
+              <ImageLazyLoad key={image._id} height={200} offset={100}>
+                <div className="preview-image-container">
+                  <img
+                    src={image.imageUrl}
+                    alt={`Company ${index + 1}  `}
+                    className="preview-image"
+                  />
+                  <Button
+                    type="link"
+                    onClick={() => handleImageRemove(image._id)}
+                    icon={<DeleteOutlined />}
+                    className="delete-button"
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </ImageLazyLoad>
+            ))}
+          </PreviewGrid>
+        </PreviewContainer>
+      )}
       <Spin spinning={uploading} indicator={antIcon} />
     </Container>
   );
