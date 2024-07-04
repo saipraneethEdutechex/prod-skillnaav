@@ -330,7 +330,6 @@ const AdminDiscover = () => {
                     handleCompanyImageUpload({ file: e.target.files[0] })
                   }
                 />
-                <div className="upload-text">Upload Company Image</div>
               </div>
             )}
           </UploadWrapper>
@@ -340,39 +339,39 @@ const AdminDiscover = () => {
             </p>
           )}
         </Form.Item>
-        <Form.Item>
+        {discovercompimg.length > 0 && (
+          <PreviewContainer>
+            <PreviewTitle>Preview Company Images</PreviewTitle>
+            <PreviewGrid>
+              {discovercompimg.map((image, index) => (
+                <ImageLazyLoad key={image._id} height={200} offset={100}>
+                  <div className="preview-image-container">
+                    <img
+                      src={image.imageUrl}
+                      alt={`Company ${index + 1}`}
+                      className="preview-image"
+                    />
+                    <Button
+                      type="link"
+                      onClick={() => handleImageRemove(image._id)}
+                      icon={<DeleteOutlined />}
+                      className="delete-button"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </ImageLazyLoad>
+              ))}
+            </PreviewGrid>
+          </PreviewContainer>
+        )}
+        <Spin spinning={uploading} indicator={antIcon} />
+        <Form.Item style={{ marginTop: "1rem" }}>
           <Button type="primary" htmlType="submit" loading={loading}>
             Save Changes
           </Button>
         </Form.Item>
       </StyledForm>
-      {discovercompimg.length > 0 && (
-        <PreviewContainer>
-          <PreviewTitle>Preview Company Images</PreviewTitle>
-          <PreviewGrid>
-            {discovercompimg.map((image, index) => (
-              <ImageLazyLoad key={image._id} height={200} offset={100}>
-                <div className="preview-image-container">
-                  <img
-                    src={image.imageUrl}
-                    alt={`Company ${index + 1}  `}
-                    className="preview-image"
-                  />
-                  <Button
-                    type="link"
-                    onClick={() => handleImageRemove(image._id)}
-                    icon={<DeleteOutlined />}
-                    className="delete-button"
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </ImageLazyLoad>
-            ))}
-          </PreviewGrid>
-        </PreviewContainer>
-      )}
-      <Spin spinning={uploading} indicator={antIcon} />
     </Container>
   );
 };
