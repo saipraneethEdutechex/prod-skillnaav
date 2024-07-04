@@ -5,23 +5,23 @@ import { useSelector } from "react-redux";
 function Pricing() {
   const { skillnaavData } = useSelector((state) => state.root);
 
-  // Destructure pricing and pricingcard from skillnaavData
+  if (!skillnaavData) {
+    return <div>Loading...</div>; // Add loading state if skillnaavData is null
+  }
+
   const { pricing, pricingcard } = skillnaavData;
 
-  // Check if pricing exists and has at least one item
-  if (!pricing || pricing.length === 0) {
+  if (
+    !pricing ||
+    pricing.length === 0 ||
+    !pricingcard ||
+    pricingcard.length === 0
+  ) {
     return <div>No pricing data available.</div>;
   }
 
-  // Extract priceheading from the first object in pricing array
   const { priceheading } = pricing[0];
 
-  // Check if pricingcard exists and has at least one item
-  if (!pricingcard || pricingcard.length === 0) {
-    return <div>No pricing card data available.</div>;
-  }
-
-  // Define the color classes mapping
   const colorClasses = {
     teal: {
       bg: "bg-teal-100",
@@ -43,34 +43,26 @@ function Pricing() {
     },
   };
 
-  // Map each card type to a specific color class
-  const getColorClass = (plantype) => {
-    switch (plantype) {
-      case "Free Trial":
-        return colorClasses.orange;
-      case "Student (B2C)":
-        return colorClasses.purple;
-      case "Institutional (B2B)":
-        return colorClasses.teal;
-      default:
-        return colorClasses.teal;
-    }
+  const getColorClass = (index) => {
+    const colors = Object.values(colorClasses);
+    const colorIndex = index % colors.length; // Calculate color index based on card index
+    return colors[colorIndex];
   };
 
   return (
     <div id="pricing" className="py-12 my-12 pb-12 lg:py-16">
-      <h1 className="text-center font-medium text-2xl lg:text-4xl text-gray-900">
+      <h1 className="text-center font-medium text-2xl lg:text-4xl text-gray-900 mb-6">
         {priceheading}
       </h1>
-      <p className="pt-4 pb-10 text-center text-gray-600 lg:text-lg"></p>
       <div className="flex flex-col gap-6 lg:flex-row">
         {pricingcard.map((card, index) => {
-          const colorClass = getColorClass(card.plantype);
+          const colorClass = getColorClass(index); // Pass index to getColorClass
 
           return (
             <div
               key={index}
               className={`w-full ${colorClass.bg} p-6 flex flex-col justify-between shadow-lg rounded-lg`}
+              style={{ marginTop: "20px" }} // Added margin top here
             >
               <div>
                 <h3
@@ -84,12 +76,11 @@ function Pricing() {
                 <h2
                   className={`pt-4 text-2xl font-medium ${colorClass.text} lg:text-3xl`}
                 >
-                  {/* {card.plantype === "Institutional (B2B)" ? (
+                  {card.plantype === "Institutional (B2B)" ? (
                     <span className="text-orange-700">Contact Us</span>
                   ) : (
                     card.price
-                  )} */}
-                  {card.price}
+                  )}
                 </h2>
                 <ul
                   className={`flex flex-col gap-2 pt-4 ${colorClass.subtext}`}
