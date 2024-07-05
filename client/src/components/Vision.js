@@ -17,7 +17,7 @@ const Vision = () => {
   return (
     <section
       id="vision"
-      className="rounded-lg py-8 lg:py-16 bg-gradient-to-b from-purple-500 via-pink-500 to-red-500 my-16 text-white"
+      className="py-8 lg:py-16 bg-gray-100 my-16 text-gray-800"
     >
       <div className="container mx-auto px-4 lg:px-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
@@ -25,31 +25,20 @@ const Vision = () => {
             <img
               src={visionhead[0].visionImg}
               alt="Vision"
-              className="rounded-lg shadow-lg object-cover w-full md:w-auto h-auto" // Responsive image
+              className="rounded-lg shadow-lg object-cover w-full h-auto md:w-auto lg:w-auto"
             />
           </div>
 
           <div className="text-center md:text-left">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-8 text-center">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4 lg:mb-6 text-center">
               {visionhead[0].visionheading}
             </h2>
-            <p className="text-base lg:text-lg mb-6 max-w-3xl mx-auto lg:mx-0">
+            <p className="text-lg lg:text-xl mb-6 max-w-3xl mx-auto">
               {visionhead[0].visionsub}
             </p>
-            <ul className="list-disc text-base lg:text-lg max-w-2xl mx-auto lg:mx-0 pl-5">
+            <ul className="list-disc text-base lg:text-lg max-w-2xl mx-auto pl-5">
               {visionpoint.map((point, index) => (
-                <li
-                  key={index}
-                  className={`text-base lg:text-lg mt-2 lg:mt-4 ${
-                    index % 4 === 0
-                      ? "text-blue-300"
-                      : index % 4 === 1
-                      ? "text-green-300"
-                      : index % 4 === 2
-                      ? "text-yellow-300"
-                      : "text-pink-300"
-                  }`}
-                >
+                <li key={index} className="mb-3">
                   {point.visionpoint}
                 </li>
               ))}

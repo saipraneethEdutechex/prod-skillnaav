@@ -257,6 +257,7 @@ const AdminDiscover = () => {
         layout="vertical"
         initialValues={discover}
       >
+        {/* Form items */}
         <Form.Item name="discoverheading" label="Discover Heading">
           <Input placeholder="Enter Discover Heading" />
         </Form.Item>
@@ -272,6 +273,7 @@ const AdminDiscover = () => {
           valuePropName="fileList"
           getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
         >
+          {/* Discover Image Upload */}
           <Upload
             name="image"
             listType="picture-card"
@@ -297,47 +299,48 @@ const AdminDiscover = () => {
               Remove
             </Button>
           )}
+          {/* Guidelines */}
+          <p className="ant-form-text">
+            Please upload a high-quality image with recommended dimensions of
+            1200x800 pixels.
+          </p>
         </Form.Item>
-        <Form.Item name="viewpricebtn" label="View Price Button">
-          <Input placeholder="Enter View Price Button" />
-        </Form.Item>
-        <Form.Item
-          name="compImageUrls"
-          label="Upload Company Images"
-          valuePropName="fileList"
-          getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
-        >
+        <Form.Item label="Company Images">
+          {/* Company Image Upload */}
+          <Upload
+            name="image"
+            listType="picture-card"
+            showUploadList={false}
+            beforeUpload={() => false}
+            onChange={handleCompanyImageUpload}
+          >
+            <div>
+              <UploadOutlined
+                style={{ fontSize: "1.5rem", color: "#1890ff" }}
+              />
+              <div className="ant-upload-text">Upload Company Image</div>
+            </div>
+          </Upload>
+          {/* Guidelines */}
+          <p className="ant-form-text">
+            Please upload up to 5 high-quality images with recommended
+            dimensions of 800x800 pixels.
+          </p>
+          {/* Uploaded Company Images */}
           <UploadWrapper>
             {compImageUrls.map((url, index) => (
-              <ImagePreview key={url}>
-                <img src={url} alt={`Company ${index + 1}`} />
+              <ImagePreview key={index}>
+                <ImageLazyLoad once offset={100}>
+                  <img src={url} alt={`Company Image ${index}`} />
+                </ImageLazyLoad>
                 <Button
                   type="link"
                   onClick={() => handleImageRemove(url)}
                   icon={<DeleteOutlined />}
-                >
-                  Remove
-                </Button>
+                />
               </ImagePreview>
             ))}
-            {compImageUrls.length < 5 && (
-              <div className="upload-container">
-                <UploadOutlined className="upload-icon" />
-                <input
-                  type="file"
-                  className="hidden"
-                  onChange={(e) =>
-                    handleCompanyImageUpload({ file: e.target.files[0] })
-                  }
-                />
-              </div>
-            )}
           </UploadWrapper>
-          {compImageUrls.length === 5 && (
-            <p className="text-gray-500 text-sm mt-2">
-              Maximum of 5 images uploaded.
-            </p>
-          )}
         </Form.Item>
         {discovercompimg.length > 0 && (
           <PreviewContainer>
@@ -365,13 +368,16 @@ const AdminDiscover = () => {
             </PreviewGrid>
           </PreviewContainer>
         )}
-        <Spin spinning={uploading} indicator={antIcon} />
-        <Form.Item style={{ marginTop: "1rem" }}>
+
+        {/* Save Changes Button */}
+        <Form.Item>
           <Button type="primary" htmlType="submit" loading={loading}>
             Save Changes
           </Button>
         </Form.Item>
       </StyledForm>
+
+      {/* Preview Section */}
     </Container>
   );
 };
