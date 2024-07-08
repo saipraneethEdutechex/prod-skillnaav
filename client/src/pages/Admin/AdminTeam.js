@@ -113,15 +113,15 @@ const AdminTeam = () => {
     form.setFieldsValue({
       teammemberName: teamMember.teammemberName,
       teammemberDesgn: teamMember.teammemberDesgn,
-      teammemberDesc: teamMember.teammemberDesc,
+      teammemberDesc: teamMember.teammemberDesc.substring(0, 120),
       teammemberLinkedin: teamMember.teammemberLinkedin,
     });
     setIsEditTeamModalVisible(true);
   };
 
   return (
-    <div>
-      <h1>Manage Team Members</h1>
+    <div style={{ maxWidth: "800px", margin: "auto" }}>
+      <h1 style={{ textAlign: "center" }}>Manage Team Members</h1>
       <Button
         type="primary"
         onClick={() => setIsAddTeamModalVisible(true)}
@@ -137,6 +137,7 @@ const AdminTeam = () => {
           dataSource={skillnaavData}
           renderItem={(item) => (
             <List.Item
+              style={{ border: "1px solid #e8e8e8", marginBottom: "10px" }}
               actions={[
                 <Button type="link" onClick={() => openEditTeamModal(item)}>
                   Edit
@@ -152,10 +153,22 @@ const AdminTeam = () => {
             >
               <List.Item.Meta
                 avatar={
-                  <img src={item.image} alt={item.teammemberName} width={50} />
+                  <img
+                    src={item.image}
+                    alt={item.teammemberName}
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      borderRadius: "50%",
+                    }}
+                  />
                 }
                 title={item.teammemberName}
-                description={item.teammemberDesgn}
+                description={
+                  item.teammemberDesc.length > 120
+                    ? item.teammemberDesc.substring(0, 120) + "..."
+                    : item.teammemberDesc
+                }
               />
             </List.Item>
           )}
@@ -186,9 +199,16 @@ const AdminTeam = () => {
           <Form.Item
             name="teammemberDesc"
             label="Description"
-            rules={[{ required: true, message: "Please enter description" }]}
+            rules={[
+              { required: true, message: "Please enter description" },
+              {
+                max: 120,
+                message: "Description cannot be longer than 120 characters",
+              },
+            ]}
           >
-            <TextArea rows={4} />
+            <TextArea rows={4} maxLength={120} />
+            <small>Max 120 characters</small>
           </Form.Item>
           <Form.Item
             name="teammemberLinkedin"
@@ -200,7 +220,13 @@ const AdminTeam = () => {
           <Form.Item label="Image">
             <input type="file" onChange={handleFileUpload} />
             {uploading && <p>Uploading...</p>}
-            {previewUrl && <img src={previewUrl} alt="Preview" width={100} />}
+            {previewUrl && (
+              <img
+                src={previewUrl}
+                alt="Preview"
+                style={{ marginTop: "10px", width: "100px" }}
+              />
+            )}
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
@@ -234,9 +260,16 @@ const AdminTeam = () => {
           <Form.Item
             name="teammemberDesc"
             label="Description"
-            rules={[{ required: true, message: "Please enter description" }]}
+            rules={[
+              { required: true, message: "Please enter description" },
+              {
+                max: 120,
+                message: "Description cannot be longer than 120 characters",
+              },
+            ]}
           >
-            <TextArea rows={4} />
+            <TextArea rows={4} maxLength={120} />
+            <small>Max 120 characters</small>
           </Form.Item>
           <Form.Item
             name="teammemberLinkedin"
@@ -248,7 +281,13 @@ const AdminTeam = () => {
           <Form.Item label="Image">
             <input type="file" onChange={handleFileUpload} />
             {uploading && <p>Uploading...</p>}
-            {previewUrl && <img src={previewUrl} alt="Preview" width={100} />}
+            {previewUrl && (
+              <img
+                src={previewUrl}
+                alt="Preview"
+                style={{ marginTop: "10px", width: "100px" }}
+              />
+            )}
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
