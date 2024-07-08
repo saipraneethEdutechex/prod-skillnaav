@@ -102,38 +102,42 @@ const Team = () => {
     !skillnaavData.team ||
     skillnaavData.team.length === 0
   ) {
-    return null;
+    return (
+      <div className="bg-gradient-to-r from-teal-500 to-green-500 py-12 px-4 rounded-lg">
+        <p className="text-white text-center">No team members found.</p>
+      </div>
+    );
   }
 
   const { teamheading, teamsubheading } = skillnaavData.team[0];
-  const teammember = skillnaavData.teammember.map((item) => item);
+  const teammembers = skillnaavData.teammember;
 
   return (
-    <div className="bg-gradient-to-r from-teal-500 to-green-500 py-12 px-4">
+    <div className="bg-gradient-to-r from-teal-500 to-green-500 py-12 rounded-lg px-4">
       <div className="text-center text-white mb-8">
         <h1 className="text-4xl font-bold mb-4">{teamheading}</h1>
-        <p className="text-xl">{teamsubheading}</p>
+        <p className="text-xl max-w-2xl mx-auto">{teamsubheading}</p>
       </div>
       <Slider {...settings} className="mb-8">
-        {teammember.map((item) => (
-          <div key={item._id} className="p-4">
+        {teammembers.map((member) => (
+          <div key={member._id} className="p-4">
             <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center h-full">
-              <div className="w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52 rounded-full overflow-hidden mb-4 flex-shrink-0">
+              <div className="w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52 rounded-full overflow-hidden mb-4">
                 <img
-                  src={item.image}
-                  alt={item.teammemberName}
+                  src={member.image}
+                  alt={member.teammemberName}
                   className="w-full h-full object-cover"
                 />
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">
-                {item.teammemberName}
+                {member.teammemberName}
               </h2>
-              <p className="text-gray-600 mb-2">{item.teammemberDesgn}</p>
+              <p className="text-gray-600 mb-2">{member.teammemberDesgn}</p>
               <p className="text-gray-700 text-center mb-4 h-20">
-                {item.teammemberDesc.substring(0, 120)}
+                {member.teammemberDesc.substring(0, 120)}
               </p>
               <button
-                onClick={() => openModal(item)}
+                onClick={() => openModal(member)}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition duration-300 hover:bg-green-700 mt-auto"
               >
                 Read More
@@ -183,12 +187,7 @@ const Team = () => {
                 Connect on LinkedIn
               </button>
             </div>
-            <button
-              onClick={closeModal}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700"
-            >
-              Close
-            </button>
+           
           </div>
         </Modal>
       )}
