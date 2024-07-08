@@ -113,7 +113,7 @@ const Team = () => {
   const teammembers = skillnaavData.teammember;
 
   return (
-    <div className="bg-gradient-to-r from-teal-500 to-green-500 py-12 rounded-lg px-4">
+    <div id="team" className="bg-gradient-to-r from-teal-500 to-green-500 py-12 rounded-lg px-4">
       <div className="text-center text-white mb-8">
         <h1 className="text-4xl font-bold mb-4">{teamheading}</h1>
         <p className="text-xl max-w-2xl mx-auto">{teamsubheading}</p>
