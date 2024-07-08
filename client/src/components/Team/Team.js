@@ -118,7 +118,7 @@ const Team = () => {
         {teammember.map((item) => (
           <div key={item._id} className="p-4">
             <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center h-full">
-              <div className="w-44 h-44 md:w-52 md:h-52 lg:w-60 lg:h-60 rounded-full overflow-hidden mb-4 flex-shrink-0">
+              <div className="w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52 rounded-full overflow-hidden mb-4 flex-shrink-0">
                 <img
                   src={item.image}
                   alt={item.teammemberName}
@@ -160,7 +160,7 @@ const Team = () => {
               </button>
             </div>
             <div className="flex flex-col items-center mb-4">
-              <div className="w-44 h-44 md:w-52 md:h-52 lg:w-60 lg:h-60 rounded-full overflow-hidden mb-4">
+              <div className="w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52 rounded-full overflow-hidden mb-4">
                 <img
                   src={selectedMember.image}
                   alt={selectedMember.teammemberName}
