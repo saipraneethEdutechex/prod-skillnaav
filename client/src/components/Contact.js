@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios"; // Import axios for HTTP requests
+import axios from "axios";
 
 export default function Contact() {
   const [name, setName] = useState("");
@@ -18,8 +18,13 @@ export default function Contact() {
         message,
       });
       console.log("Form submitted successfully!");
-      console.log("Submitted data:", response.data); // Log the response data
-      setSubmitted(true); // Set submitted to true to trigger animation
+      console.log("Submitted data:", response.data);
+      setSubmitted(true);
+      // Clear form fields after successful submission
+      setName("");
+      setEmail("");
+      setSubject("");
+      setMessage("");
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -49,20 +54,20 @@ export default function Contact() {
   return (
     <div
       id="contacts"
-      className="bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 rounded-lg overflow-hidden shadow-lg"
+      className="bg-gradient-to-br from-blue-200 to-blue-300 rounded-lg overflow-hidden shadow-lg"
     >
       <div className="flex flex-col lg:flex-row">
         {/* Left Section */}
-        <div className="w-full lg:w-1/2 py-10 px-8 lg:p-12 bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 flex flex-col justify-center items-center">
-          <h1 className="text-white text-4xl lg:text-5xl font-bold mb-6 text-center">
+        <div className="w-full lg:w-1/2 py-10 px-8 lg:p-12 bg-gradient-to-br from-blue-200 to-blue-300 flex flex-col justify-center items-center">
+          <h1 className="text-blue-700 text-4xl lg:text-5xl font-bold mb-6 text-center">
             Have Questions? Get in Touch
           </h1>
           <p className="text-white text-lg mb-6 text-center">
             <a
               href="mailto:info@navigatebi.com"
-              className="text-white font-medium"
+              className="text-blue-600 font-medium"
             >
-              Email to: info@skillnaav.com
+              Email: info@skillnaav.com
             </a>
           </p>
         </div>
@@ -70,45 +75,81 @@ export default function Contact() {
         {/* Right Section */}
         <form
           onSubmit={handleSubmit}
-          className="w-full lg:w-1/2 py-10 px-8 lg:p-12 bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500"
+          className="w-full lg:w-1/2 py-10 px-8 lg:p-12 bg-white shadow-lg rounded-lg"
         >
-          <h2 className="text-white text-3xl lg:text-4xl font-bold mb-8 text-center">
+          <h2 className="text-blue-900 text-3xl lg:text-4xl font-bold mb-8 text-center">
             Contact Us
           </h2>
           {submitted && <SuccessAnimation />}
-          <input
-            type="text"
-            placeholder="Enter Your Name*"
-            className="w-full py-3 px-4 bg-white rounded-md text-lg text-gray-800 mb-4 focus:outline-none focus:ring-2 focus:ring-pink-500"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <input
-            type="email"
-            placeholder="Enter Your Email*"
-            className="w-full py-3 px-4 bg-white rounded-md text-lg text-gray-800 mb-4 focus:outline-none focus:ring-2 focus:ring-pink-500"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Your Question About.."
-            className="w-full py-3 px-4 bg-white rounded-md text-lg text-gray-800 mb-4 focus:outline-none focus:ring-2 focus:ring-pink-500"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-          />
-          <textarea
-            placeholder="Your Message..."
-            className="w-full py-3 px-4 bg-white rounded-md text-lg text-gray-800 mb-6 h-32 focus:outline-none focus:ring-2 focus:ring-pink-500"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            required
-          />
+          <div className="mb-4">
+            <label
+              htmlFor="name"
+              className="block text-lg font-medium text-gray-800 mb-1"
+            >
+              Your Name*
+            </label>
+            <input
+              type="text"
+              id="name"
+              placeholder="Enter Your Name"
+              className="w-full py-3 px-4 bg-gray-100 rounded-md text-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              htmlFor="email"
+              className="block text-lg font-medium text-gray-800 mb-1"
+            >
+              Your Email*
+            </label>
+            <input
+              type="email"
+              id="email"
+              placeholder="Enter Your Email"
+              className="w-full py-3 px-4 bg-gray-100 rounded-md text-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              htmlFor="subject"
+              className="block text-lg font-medium text-gray-800 mb-1"
+            >
+              Subject
+            </label>
+            <input
+              type="text"
+              id="subject"
+              placeholder="Your Question About.."
+              className="w-full py-3 px-4 bg-gray-100 rounded-md text-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+            />
+          </div>
+          <div className="mb-6">
+            <label
+              htmlFor="message"
+              className="block text-lg font-medium text-gray-800 mb-1"
+            >
+              Message
+            </label>
+            <textarea
+              id="message"
+              placeholder="Your Message..."
+              className="w-full py-3 px-4 bg-gray-100 rounded-md text-lg text-gray-800 h-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
+            />
+          </div>
           <button
             type="submit"
-            className="py-4 px-8 bg-white rounded-md text-pink-500 text-lg font-medium hover:bg-pink-100 focus:outline-none focus:ring-2 focus:ring-pink-500"
+            className="py-4 px-8 bg-blue-500 rounded-md text-white text-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Submit
           </button>
