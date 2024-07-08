@@ -4,11 +4,57 @@ import Modal from "react-modal";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import linkedin from "../../assets/linkedin_blue.png";
-import HemRanjiniCropped from "../../assets/HemRanjiniCropped.png";
-import KrishnaPillaiCropped from "../../assets/KrishnaPillaiCropped.png";
-import AkanshaCropped from "../../assets/Akansha.jpg";
-import "./Team.scss";
 import { useSelector } from "react-redux";
+
+const NextArrow = (props) => {
+  const { onClick } = props;
+  return (
+    <div
+      className="absolute top-1/2 right-4 transform -translate-y-1/2 z-10 cursor-pointer bg-green-300 text-white p-2 rounded-full shadow-lg hover:bg-green-400 transition duration-300"
+      onClick={onClick}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        className="w-6 h-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M9 5l7 7-7 7"
+        />
+      </svg>
+    </div>
+  );
+};
+
+const PrevArrow = (props) => {
+  const { onClick } = props;
+  return (
+    <div
+      className="absolute top-1/2 left-4 transform -translate-y-1/2 z-10 cursor-pointer bg-green-300 text-white p-2 rounded-full shadow-lg hover:bg-green-400 transition duration-300"
+      onClick={onClick}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        className="w-6 h-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M15 19l-7-7 7-7"
+        />
+      </svg>
+    </div>
+  );
+};
 
 const Team = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -31,6 +77,8 @@ const Team = () => {
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 1,
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
     responsive: [
       {
         breakpoint: 1024,
@@ -54,110 +102,92 @@ const Team = () => {
     !skillnaavData.team ||
     skillnaavData.team.length === 0
   ) {
-    return null;
+    return (
+      <div className="bg-gradient-to-r from-teal-500 to-green-500 py-12 px-4 rounded-lg">
+        <p className="text-white text-center">No team members found.</p>
+      </div>
+    );
   }
 
   const { teamheading, teamsubheading } = skillnaavData.team[0];
-  const teammember = skillnaavData.teammember.map((item, index) => {
-    return item;
-  });
+  const teammembers = skillnaavData.teammember;
 
   return (
     <div
       id="team"
-      className="team-section w-full h-full flex flex-col rounded-lg justify-center items-center px-4 py-12 my-12 pb-12 md:py-12 lg:py-20 gap-10"
+      className="bg-gradient-to-r from-teal-500 to-green-500 py-12 rounded-lg px-4 mt-16 md:mt-8"
     >
-      <h1 className="text-3xl md:text-4xl lg:text-5xl text-white text-center mb-4">
-        {teamheading}
-      </h1>
-      <p className="text-lg md:text-xl text-white max-w-2xl text-center mb-8">
-        {teamsubheading}
-      </p>
-      <div className="w-full">
-        <Slider {...settings}>
-          {teammember.map((item) => (
-            <div key={item._id} className="flex justify-center">
-              <div className="team-card bg-white p-6 md:p-8 lg:p-10 rounded-lg shadow-lg max-w-xs flex flex-col items-center">
-                <div className="team-image-container relative mb-6 flex items-center justify-center rounded-full overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.teammemberName}
-                    className="team-image object-cover w-full h-full transition-transform duration-300 hover:scale-110"
-                  />
-                </div>
-                <h1 className="text-xl md:text-2xl text-gray-900 font-bold mb-2 text-center">
-                  {item.teammemberName}
-                </h1>
-                <p className="text-sm md:text-base text-center text-gray-600 mb-1">
-                  {item.teammemberDesgn}
-                </p>
-                <p className="text-sm md:text-base text-center text-gray-700 mb-4">
-                  {item.teammemberDesc.substring(0, 120)}
-                </p>
-                <button
-                  onClick={() => openModal(item)}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold w-full transition-colors duration-300 hover:bg-green-700"
-                >
-                  Read More
-                </button>
-              </div>
-            </div>
-          ))}
-        </Slider>
+      <div className="text-center text-white mb-8">
+        <h1 className="text-4xl font-bold mb-4">{teamheading}</h1>
+        <p className="text-xl max-w-2xl mx-auto">{teamsubheading}</p>
       </div>
+      <Slider {...settings} className="mb-8">
+        {teammembers.map((member) => (
+          <div key={member._id} className="p-4">
+            <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center h-full">
+              <div className="w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52 rounded-full overflow-hidden mb-4">
+                <img
+                  src={member.image}
+                  alt={member.teammemberName}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">
+                {member.teammemberName}
+              </h2>
+              <p className="text-gray-600 mb-2">{member.teammemberDesgn}</p>
+              <p className="text-gray-700 text-center mb-4 h-20">
+                {member.teammemberDesc.substring(0, 120)}
+              </p>
+              <button
+                onClick={() => openModal(member)}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition duration-300 hover:bg-green-700 mt-auto"
+              >
+                Read More
+              </button>
+            </div>
+          </div>
+        ))}
+      </Slider>
       {modalIsOpen && selectedMember && (
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={closeModal}
           contentLabel="Team Member Details"
-          className="team-modal"
-          overlayClassName="modal-overlay"
+          className="fixed inset-0 flex items-center justify-center z-50"
+          overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40"
         >
-          <div className="modal-content">
-            <div className="modal-header">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 max-h-full overflow-auto">
+            <div className="flex justify-between items-center border-b pb-4 mb-4">
               <h2 className="text-2xl font-bold text-gray-800">
                 {selectedMember.teammemberName}
               </h2>
-              <button
-                onClick={closeModal}
-                className="modal-close-button"
-                aria-label="Close Modal"
-              >
+              <button onClick={closeModal} className="text-gray-600 text-xl">
                 &times;
               </button>
             </div>
-            <div className="modal-body">
-              <div className="modal-image-container">
+            <div className="flex flex-col items-center mb-4">
+              <div className="w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52 rounded-full overflow-hidden mb-4">
                 <img
                   src={selectedMember.image}
                   alt={selectedMember.teammemberName}
-                  className="modal-image"
+                  className="w-full h-full object-cover"
                 />
               </div>
-              <p className="text-base text-gray-700 mt-4 mb-2">
+              <p className="text-gray-700 mb-4">
                 {selectedMember.teammemberDesgn}
               </p>
-              <p className="text-base text-gray-700 mb-4">
+              <p className="text-gray-700 text-center">
                 {selectedMember.teammemberDesc}
               </p>
               <button
                 onClick={() =>
                   window.open(selectedMember.teammemberLinkedin, "_blank")
                 }
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 mr-4"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 mt-4 flex items-center"
               >
-                <img
-                  src={linkedin}
-                  alt="LinkedIn"
-                  className="inline-block w-5 h-5 mr-2"
-                />
+                <img src={linkedin} alt="LinkedIn" className="w-5 h-5 mr-2" />
                 Connect on LinkedIn
-              </button>
-              <button
-                onClick={closeModal}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700"
-              >
-                Close
               </button>
             </div>
           </div>

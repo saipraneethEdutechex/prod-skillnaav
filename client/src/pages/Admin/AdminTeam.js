@@ -131,7 +131,7 @@ const AdminTeam = () => {
       </Button>
       {loading ? (
         <Skeleton active />
-      ) : (
+      ) : skillnaavData.length > 0 ? (
         <List
           itemLayout="horizontal"
           dataSource={skillnaavData}
@@ -155,11 +155,17 @@ const AdminTeam = () => {
                   <img src={item.image} alt={item.teammemberName} width={50} />
                 }
                 title={item.teammemberName}
-                description={item.teammemberDesgn}
+                description={
+                  item.teammemberDesc.length > 120
+                    ? item.teammemberDesc.substring(0, 120) + "..."
+                    : item.teammemberDesc
+                }
               />
             </List.Item>
           )}
         />
+      ) : (
+        <p>No team members found.</p>
       )}
 
       <Modal
@@ -172,31 +178,53 @@ const AdminTeam = () => {
           <Form.Item
             name="teammemberName"
             label="Name"
-            rules={[{ required: true, message: "Please enter name" }]}
+            rules={[
+              { required: true, message: "Please enter name" },
+              { max: 50, message: "Name should not exceed 50 characters" },
+            ]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="teammemberDesgn"
             label="Designation"
-            rules={[{ required: true, message: "Please enter designation" }]}
+            rules={[
+              { required: true, message: "Please enter designation" },
+              {
+                max: 50,
+                message: "Designation should not exceed 50 characters",
+              },
+            ]}
           >
-            <Input />
+            <Input maxLength={50} />
           </Form.Item>
           <Form.Item
             name="teammemberDesc"
             label="Description"
-            rules={[{ required: true, message: "Please enter description" }]}
+            rules={[
+              { required: true, message: "Please enter description" },
+              {
+                max: 120,
+                message: "Description should not exceed 120 characters",
+              },
+            ]}
           >
-            <TextArea rows={4} />
+            <TextArea rows={4} maxLength={120} />
           </Form.Item>
           <Form.Item
             name="teammemberLinkedin"
             label="LinkedIn"
-            rules={[{ required: true, message: "Please enter LinkedIn URL" }]}
+            rules={[
+              { required: true, message: "Please enter LinkedIn URL" },
+              {
+                max: 100,
+                message: "LinkedIn URL should not exceed 100 characters",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
+
           <Form.Item label="Image">
             <input type="file" onChange={handleFileUpload} />
             {uploading && <p>Uploading...</p>}
@@ -229,14 +257,14 @@ const AdminTeam = () => {
             label="Designation"
             rules={[{ required: true, message: "Please enter designation" }]}
           >
-            <Input />
+            <Input maxLength={50} />
           </Form.Item>
           <Form.Item
             name="teammemberDesc"
             label="Description"
             rules={[{ required: true, message: "Please enter description" }]}
           >
-            <TextArea rows={4} />
+            <TextArea rows={4} maxLength={120} />
           </Form.Item>
           <Form.Item
             name="teammemberLinkedin"
