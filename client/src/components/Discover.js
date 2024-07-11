@@ -50,7 +50,7 @@ const Discover = () => {
             <img
               src={company.imageUrl || company.src}
               alt={company.alt || `company ${index + 1}`}
-              className="w-24 h-24  object-contain mx-auto"
+              className="w-24 h-24 object-contain mx-auto"
             />
           </div>
         ))}
@@ -110,7 +110,7 @@ const Discover = () => {
           <img
             src={Gradient}
             alt="Gradient"
-            className="w-full object-cover min-h-[200px] sm:min-h-[300px] lg:min-h-[400px] xl:min-h-[500px]"
+            className="w-full object-cover min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] xl:min-h-[700px]"
           />
           <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
             <img
@@ -123,7 +123,7 @@ const Discover = () => {
         <div className="absolute bottom-0 w-full flex flex-col items-center mt-6 lg:mt-10 xl:mt-12">
           <div className="w-full px-4 sm:px-0 lg:px-20 xl:px-32">
             <div className="text-white text-center">
-              <p className="text-base mt-4 sm:text-lg lg:text-lg xl:text-xl mb-2">
+              <p className="text-base mt-4 sm:text-lg lg:text-lg xl:text-xl mb-2 hidden sm:block">
                 Navigate to the Best Companies
               </p>
             </div>
