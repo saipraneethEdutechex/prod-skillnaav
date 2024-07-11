@@ -11,108 +11,8 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons";
 import ImageLazyLoad from "react-lazyload";
-import styled from "styled-components";
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-
-const Container = styled.div`
-  padding: 2rem;
-  background: #f9f9f9;
-  border-radius: 1rem;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  max-width: 1200px;
-  margin: 3rem auto;
-  font-family: "Roboto", sans-serif;
-`;
-
-const Title = styled.h1`
-  font-size: 2.5rem;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 2rem;
-  color: #333;
-`;
-
-const StyledForm = styled(Form)`
-  .ant-form-item {
-    margin-bottom: 1.5rem;
-  }
-
-  .ant-input,
-  .ant-input-textarea {
-    padding: 0.75rem;
-    font-size: 1rem;
-  }
-
-  .ant-input-textarea {
-    resize: none;
-  }
-
-  .ant-form-item-label > label {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #333;
-  }
-
-  .ant-btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-    font-size: 1rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-  }
-
-  .ant-btn-link {
-    color: #007bff;
-    padding: 0;
-    height: auto;
-    font-size: 0.875rem;
-  }
-`;
-
-const UploadWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const ImagePreview = styled.div`
-  position: relative;
-  width: 150px;
-  height: 150px;
-  border: 1px solid #ddd;
-  border-radius: 0.5rem;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .ant-btn-link {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-  }
-`;
-
-const PreviewContainer = styled.div`
-  margin-top: 2rem;
-`;
-
-const PreviewTitle = styled.h2`
-  font-size: 1.75rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  color: #333;
-`;
-
-const PreviewGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-`;
 
 const AdminDiscover = () => {
   const [form] = Form.useForm();
@@ -249,9 +149,11 @@ const AdminDiscover = () => {
   const discovercompimg = skillnaavData.discovercompimg || [];
 
   return (
-    <Container>
-      <Title>Edit Discover Section</Title>
-      <StyledForm
+    <div className="p-8 bg-gray-100 rounded-lg shadow-md max-w-3xl mx-auto my-12 font-roboto">
+      <h1 className="text-2xl font-bold text-center mb-8 text-gray-700">
+        Edit Discover Section
+      </h1>
+      <Form
         form={form}
         onFinish={onFinish}
         layout="vertical"
@@ -285,12 +187,14 @@ const AdminDiscover = () => {
               <img
                 src={discoverImgUrl}
                 alt="Discover"
-                style={{ width: "100%" }}
+                className="w-full h-auto rounded-lg"
               />
             ) : (
-              <div className="upload-container">
-                <UploadOutlined className="upload-icon" />
-                <div className="upload-text">Upload Discover Image</div>
+              <div className="flex items-center justify-center border border-dashed border-gray-300 rounded-md cursor-pointer p-4">
+                <UploadOutlined className="text-3xl text-blue-500" />
+                <span className="ml-2 text-gray-500">
+                  Upload Discover Image
+                </span>
               </div>
             )}
           </Upload>
@@ -300,7 +204,7 @@ const AdminDiscover = () => {
             </Button>
           )}
           {/* Guidelines */}
-          <p className="ant-form-text">
+          <p className="text-sm text-gray-500 mt-2">
             Please upload a high-quality image with recommended dimensions of
             1200x800 pixels.
           </p>
@@ -314,71 +218,71 @@ const AdminDiscover = () => {
             beforeUpload={() => false}
             onChange={handleCompanyImageUpload}
           >
-            <div>
-              <UploadOutlined
-                style={{ fontSize: "1.5rem", color: "#1890ff" }}
-              />
-              <div className="ant-upload-text">Upload Company Image</div>
+            <div className="flex items-center justify-center border border-dashed border-gray-300 rounded-md cursor-pointer p-4">
+              <UploadOutlined className="text-3xl text-blue-500" />
+              <span className="ml-2 text-gray-500">Upload Company Image</span>
             </div>
           </Upload>
           {/* Guidelines */}
-          <p className="ant-form-text">
+          <p className="text-sm text-gray-500 mt-2">
             Please upload up to 5 high-quality images with recommended
             dimensions of 800x800 pixels.
           </p>
           {/* Uploaded Company Images */}
-          <UploadWrapper>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
             {compImageUrls.map((url, index) => (
-              <ImagePreview key={index}>
-                <ImageLazyLoad once offset={100}>
-                  <img src={url} alt={`Company Image ${index}`} />
-                </ImageLazyLoad>
+              <div key={index} className="relative">
+                <img
+                  src={url}
+                  alt={`Company Image ${index}`}
+                  className="w-full h-auto rounded-lg"
+                />
                 <Button
                   type="link"
                   onClick={() => handleImageRemove(url)}
                   icon={<DeleteOutlined />}
-                />
-              </ImagePreview>
+                  className="absolute top-2 right-2 text-red-500"
+                >
+                  Delete
+                </Button>
+              </div>
             ))}
-          </UploadWrapper>
+          </div>
         </Form.Item>
         {discovercompimg.length > 0 && (
-          <PreviewContainer>
-            <PreviewTitle>Preview Company Images</PreviewTitle>
-            <PreviewGrid>
+          <div className="mt-8">
+            <h2 className="text-xl font-bold mb-4 text-gray-700">
+              Preview Company Images
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {discovercompimg.map((image, index) => (
-                <ImageLazyLoad key={image._id} height={200} offset={100}>
-                  <div className="preview-image-container">
-                    <img
-                      src={image.imageUrl}
-                      alt={`Company ${index + 1}`}
-                      className="preview-image"
-                    />
-                    <Button
-                      type="link"
-                      onClick={() => handleImageRemove(image._id)}
-                      icon={<DeleteOutlined />}
-                      className="delete-button"
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </ImageLazyLoad>
+                <div key={image._id} className="relative">
+                  <img
+                    src={image.imageUrl}
+                    alt={`Company ${index + 1}`}
+                    className="w-full h-auto rounded-lg"
+                  />
+                  <Button
+                    type="link"
+                    onClick={() => handleImageRemove(image._id)}
+                    icon={<DeleteOutlined />}
+                    className="absolute top-2 right-2 text-red-500"
+                  >
+                    Delete
+                  </Button>
+                </div>
               ))}
-            </PreviewGrid>
-          </PreviewContainer>
+            </div>
+          </div>
         )}
-
         {/* Save Changes Button */}
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading}>
+          <Button type="primary" htmlType="submit">
             Save Changes
           </Button>
         </Form.Item>
-      </StyledForm>
-
-      {/* Preview Section */}
-    </Container>
+      </Form>
+    </div>
   );
 };
 
