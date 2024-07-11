@@ -89,7 +89,7 @@ const Discover = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <button className="bg-blue-600 text-white w-full sm:w-auto px-4 sm:px-8 py-2 sm:py-4 rounded-md hover:bg-blue-700 transition duration-200">
+          <button className="bg-blue-600 text-white w-full sm:w-auto px-4 sm:px-8 py-2 sm:py-4 rounded-md hover:bg-blue-700 transition duration-200 cursor-default">
             {tryforfreebtn}
           </button>
           <button className="text-blue-600 font-medium flex items-center justify-center gap-2 w-full sm:w-auto px-4 sm:px-8 py-2 sm:py-4 rounded-md border border-blue-600 hover:bg-blue-100 transition duration-200">
