@@ -34,31 +34,34 @@ function Home() {
   return (
     <div className="font-inter">
       <Navbar />
-
-      {memoizedData ? (
-        <Suspense
-          fallback={
+      <div className="pt-20">
+        {" "}
+        {/* Adjust this value based on your navbar height */}
+        {memoizedData ? (
+          <Suspense
+            fallback={
+              <div className="px-[20px] lg:px-20 mx-auto">
+                <Skeleton active />
+              </div>
+            }
+          >
+            <Discover />
             <div className="px-[20px] lg:px-20 mx-auto">
-              <Skeleton active />
+              <Vision className="mt-16" />
+              <Features className="mt-16" />
+              <Team className="mt-16" />
+              <Pricing className="mt-16" />
+              <Faq className="mt-16" />
+              <Contact className="mt-16" />
+              <Footer className="mt-16" />
             </div>
-          }
-        >
-          <Discover />
+          </Suspense>
+        ) : (
           <div className="px-[20px] lg:px-20 mx-auto">
-            <Vision />
-            <Features />
-            <Team />
-            <Pricing />
-            <Faq />
-            <Contact />
-            <Footer />
+            <Skeleton active />
           </div>
-        </Suspense>
-      ) : (
-        <div className="px-[20px] lg:px-20 mx-auto">
-          <Skeleton active />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

@@ -56,7 +56,7 @@ const PrevArrow = (props) => {
   );
 };
 
-const Team = () => {
+const Team = ({className}) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const { skillnaavData } = useSelector((state) => state.root);

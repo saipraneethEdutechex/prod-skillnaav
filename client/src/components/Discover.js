@@ -61,7 +61,7 @@ const Discover = () => {
   return (
     <motion.div
       id="discover"
-      className="pt-8 lg:pt-12"
+      className="pt-20 lg:pt-24"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
