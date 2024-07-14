@@ -26,6 +26,16 @@ const cache = new NodeCache({ stdTTL: 600, checkperiod: 120 }); // TTL of 10 min
 const asyncHandler = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
+// Middleware to check cache
+const checkCache = (req, res, next) => {
+  const key = req.originalUrl;
+  const cachedData = cache.get(key);
+  if (cachedData) {
+    return res.status(200).json(cachedData);
+  }
+  next();
+};
+
 // Error handling middleware
 const errorHandler = (err, req, res, next) => {
   console.error(err.stack);
@@ -53,6 +63,7 @@ const deleteOneById = async (model, id) => {
 // Route to get all SkillNaav data with caching
 router.get(
   "/get-skillnaav-data",
+  checkCache, // Apply caching middleware here
   asyncHandler(async (req, res) => {
     const cacheKey = "skillnaav-data";
     const cachedData = cache.get(cacheKey);
