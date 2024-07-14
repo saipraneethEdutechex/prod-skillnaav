@@ -19,14 +19,11 @@ const {
 
 const User = require("../models/userModel");
 
-// Initialize cache
-const cache = new NodeCache({ stdTTL: 600, checkperiod: 120 }); // TTL of 10 minutes
+const cache = new NodeCache({ stdTTL: 600, checkperiod: 120 });
 
-// Middleware for handling asynchronous route handlers
 const asyncHandler = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
-// Error handling middleware
 const errorHandler = (err, req, res, next) => {
   console.error(err.stack);
   res
@@ -34,7 +31,6 @@ const errorHandler = (err, req, res, next) => {
     .json({ success: false, message: "Server Error", error: err.message });
 };
 
-// Generalized CRUD operations
 const createOne = async (model, data) => {
   const instance = new model(data);
   await instance.save();
@@ -50,7 +46,6 @@ const deleteOneById = async (model, id) => {
   await model.findByIdAndDelete(id);
 };
 
-// Route to get all SkillNaav data with caching
 router.get(
   "/get-skillnaav-data",
   asyncHandler(async (req, res) => {
@@ -112,7 +107,6 @@ router.get(
   })
 );
 
-// Define CRUD routes generically
 const createRoute = (path, model) => {
   router.post(
     path,
@@ -179,7 +173,6 @@ const deleteRoute = (path, model) => {
   );
 };
 
-// Define specific routes for each model
 createRoute("/add-discover", Discover);
 updateRoute("/update-discover", Discover);
 deleteRoute("/delete-discover", Discover);
@@ -291,7 +284,6 @@ createRoute("/add-faqcard", FAQCard);
 updateRoute("/update-faqcard", FAQCard);
 deleteRoute("/delete-faqcard", FAQCard);
 
-// Route to get all contacts with pagination, search, and sorting
 router.get(
   "/",
   asyncHandler(async (req, res) => {
@@ -322,7 +314,6 @@ router.get(
   })
 );
 
-// Route to add a new contact
 router.post(
   "/",
   asyncHandler(async (req, res) => {
@@ -333,7 +324,6 @@ router.post(
   })
 );
 
-// Route to delete a contact by ID
 router.delete(
   "/:id",
   asyncHandler(async (req, res) => {
@@ -345,14 +335,14 @@ router.delete(
     });
   })
 );
-// Admin login route
+
 router.post(
   "/admin-login",
   asyncHandler(async (req, res) => {
     const { username, password } = req.body;
     const user = await User.findOne({ username, password });
     if (user) {
-      user.password = ""; // Remove password from response
+      user.password = "";
       res
         .status(200)
         .json({ data: user, success: true, message: "Login Successfully" });
@@ -363,4 +353,5 @@ router.post(
     }
   })
 );
+
 module.exports = router;
