@@ -1,16 +1,16 @@
-import React, { Suspense, lazy, useMemo, useEffect, useState } from "react";
+import React, { Suspense, useMemo, useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
 import { useSelector } from "react-redux";
 import { Skeleton } from "antd";
 
-const Discover = lazy(() => import("../../components/Discover"));
-const Vision = lazy(() => import("../../components/Vision"));
-const Features = lazy(() => import("../../components/Features"));
-const Team = lazy(() => import("../../components/Team/Team"));
-const Pricing = lazy(() => import("../../components/Pricing"));
-const Faq = lazy(() => import("../../components/Faq"));
-const Contact = lazy(() => import("../../components/Contact"));
-const Footer = lazy(() => import("../../components/Footer"));
+const Discover = React.lazy(() => import("../../components/Discover"));
+const Vision = React.lazy(() => import("../../components/Vision"));
+const Features = React.lazy(() => import("../../components/Features"));
+const Team = React.lazy(() => import("../../components/Team/Team"));
+const Pricing = React.lazy(() => import("../../components/Pricing"));
+const Faq = React.lazy(() => import("../../components/Faq"));
+const Contact = React.lazy(() => import("../../components/Contact"));
+const Footer = React.lazy(() => import("../../components/Footer"));
 
 const Section = ({ children }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -31,7 +31,7 @@ const Section = ({ children }) => {
     return () => observer.disconnect();
   }, []);
 
-  return <div ref={sectionRef}>{isVisible ? children : null}</div>;
+  return <div ref={sectionRef}>{isVisible && children}</div>;
 };
 
 function Home() {
